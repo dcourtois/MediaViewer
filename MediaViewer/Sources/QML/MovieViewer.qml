@@ -16,7 +16,7 @@ VideoOutput {
 	property var stateManager
 
 	// only enable for movies
-	enabled: selection && selection.currentImageType == Media.Movie
+	enabled: selection && selection.currentMediaType == Media.Movie
 
 	// only visible when enabled
 	visible: enabled
@@ -27,7 +27,7 @@ VideoOutput {
 	// the media player
 	MediaPlayer {
 		id: mediaPlayer
-		source: (enabled && selection) ? "file:///" + selection.currentImagePath : ""
+		source: (enabled && selection) ? "file:///" + selection.currentMediaPath : ""
 		autoPlay: true
 		onError: {
 			if (MediaPlayer.NoError != error) {

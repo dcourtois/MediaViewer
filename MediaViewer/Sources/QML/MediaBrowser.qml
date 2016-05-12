@@ -5,7 +5,7 @@ import QtQml.Models 2.2
 
 
 //
-// The images browser. We use a grid view which is a flickable view, so We
+// The media browser. We use a grid view which is a flickable view, so We
 // need to add a scroll view to make the scroll bar visible on Desktop
 //
 ScrollView {
@@ -96,7 +96,7 @@ ScrollView {
 		Binding {
 			target: root
 			property: "currentIndex"
-			value: selection.currentImageIndex
+			value: selection.currentMediaIndex
 			when: selection
 		}
 
@@ -115,7 +115,7 @@ ScrollView {
 				);
 			}
 			onDoubleClicked: {
-				if (selection.currentImage) {
+				if (selection.currentMedia) {
 					stateManager.state = "fullscreen";
 				}
 			}

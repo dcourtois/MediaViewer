@@ -102,7 +102,7 @@ TreeView {
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.left: delegateIcon.right
 				anchors.leftMargin: 5
-				anchors.right: delegateImageCount.visible ? delegateImageCount.left : parent.right
+				anchors.right: delegateMediaCount.visible ? delegateMediaCount.left : parent.right
 				anchors.rightMargin: 5
 				elide: Text.ElideRight
 				font.pixelSize: sourceSans.size
@@ -110,11 +110,11 @@ TreeView {
 				text: styleData.value ? styleData.value.name : ""
 			}
 
-			// image count
+			// media count
 			Rectangle {
-				id: delegateImageCount
+				id: delegateMediaCount
 
-				visible: styleData.value ? styleData.value.imageCount !== 0 : false
+				visible: styleData.value ? styleData.value.mediaCount !== 0 : false
 
 				anchors.right: parent.right
 				anchors.rightMargin: 5
@@ -123,19 +123,19 @@ TreeView {
 				anchors.bottom: parent.bottom
 				anchors.bottomMargin: 2
 
-				width: delegateImageCountText.contentWidth + 10
+				width: delegateMediaCountText.contentWidth + 10
 
 				radius: 10
 				color: styleData.selected ? evenColor : selectedColor;
 
 				Text {
-					id: delegateImageCountText
+					id: delegateMediaCountText
 
 					anchors.centerIn: parent
 
 					font.pixelSize: 12
 					font.family: sourceSans.name
-					text: styleData.value ? styleData.value.imageCount : ""
+					text: styleData.value ? styleData.value.mediaCount : ""
 				}
 			}
 		}

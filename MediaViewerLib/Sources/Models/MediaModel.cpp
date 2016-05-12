@@ -55,19 +55,19 @@ namespace MediaViewerLib
 	}
 
 	//!
-	//! Clear the images
+	//! Clear the medias
 	//!
 	void MediaModel::Clear(void)
 	{
-		for (Media * image : m_Medias)
+		for (Media * media : m_Medias)
 		{
-			DELETE image;
+			DELETE media;
 		}
 		m_Medias.clear();
 	}
 
 	//!
-	//! Get the images in the root folder
+	//! Get the medias in the root folder
 	//!
 	const QVector< Media * > &	MediaModel::GetMedias(void) const
 	{
@@ -95,9 +95,9 @@ namespace MediaViewerLib
 	int MediaModel::getIndexByPath(const QString & path) const
 	{
 		int index = 0;
-		for (const Media * image : m_Medias)
+		for (const Media * media : m_Medias)
 		{
-			if (image->GetPath() == path)
+			if (media->GetPath() == path)
 			{
 				return index;
 			}
@@ -176,13 +176,13 @@ namespace MediaViewerLib
 			return QVariant();
 		}
 
-		Media * image = static_cast< Media * >(index.internalPointer());
-		Q_ASSERT(image != nullptr);
+		Media * media = static_cast< Media * >(index.internalPointer());
+		Q_ASSERT(media != nullptr);
 
 		switch (role)
 		{
-			case Qt::DisplayRole:	return image->GetName();
-			case Qt::UserRole:		return image->GetPath();
+			case Qt::DisplayRole:	return media->GetName();
+			case Qt::UserRole:		return media->GetPath();
 			default:				return QVariant();
 		}
 	}

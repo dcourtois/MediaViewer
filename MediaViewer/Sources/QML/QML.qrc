@@ -4,10 +4,12 @@
 	<!-- QML files -->
 	<qresource prefix="/">
 		<file>FolderBrowser.qml</file>
+		<file>ImageViewer.qml</file>
 		<file>Main.qml</file>
 		<file>MediaBrowser.qml</file>
 		<file>MediaSelection.qml</file>
 		<file>MediaViewer.qml</file>
+		<file>MovieViewer.qml</file>
 		<file>StateManager.qml</file>
 		<file>WindowSettings.qml</file>
 		<file>WindowState.qml</file>

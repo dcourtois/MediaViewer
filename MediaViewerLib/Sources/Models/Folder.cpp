@@ -13,7 +13,7 @@ namespace MediaViewerLib
 	//!
 	Folder::Folder(const QString & path, const Folder * parent)
 		: m_Parent(parent)
-		, m_ImageCount(0)
+		, m_MediaCount(0)
 		, m_Dirty(true)
 	{
 		this->SetPath(path);
@@ -24,7 +24,7 @@ namespace MediaViewerLib
 	//!
 	Folder::Folder(const Folder & other)
 		: m_Parent(other.m_Parent)
-		, m_ImageCount(0)
+		, m_MediaCount(0)
 		, m_Dirty(true)
 	{
 		this->SetPath(other.m_Path);
@@ -73,8 +73,8 @@ namespace MediaViewerLib
 			emit pathChanged(m_Path);
 			emit nameChanged(m_Name);
 
-			// update the images
-			this->UpdateImages();
+			// update the medias
+			this->UpdateMedias();
 		}
 	}
 
@@ -87,11 +87,11 @@ namespace MediaViewerLib
 	}
 
 	//!
-	//! Get the number of images in this folder
+	//! Get the number of medias in this folder
 	//!
-	int Folder::GetImageCount(void) const
+	int Folder::GetMediaCount(void) const
 	{
-		return m_ImageCount;
+		return m_MediaCount;
 	}
 
 	//!
@@ -134,15 +134,15 @@ namespace MediaViewerLib
 	}
 
 	//!
-	//! Update the number of images in the folder
+	//! Update the medias list for the folder
 	//!
-	void Folder::UpdateImages(void) const
+	void Folder::UpdateMedias(void) const
 	{
 		NEW Job([&] (void) {
-			// reset the image count
-			m_ImageCount = 0;
+			// reset the media count
+			m_MediaCount = 0;
 
-			// initialize the list of children, and count images
+			// initialize the list of children, and count medias
 			QDir dir(m_Path);
 			if (dir.exists() == true)
 			{
@@ -150,13 +150,13 @@ namespace MediaViewerLib
 				{
 					if (Media::IsMedia(child.fileName()))
 					{
-						++m_ImageCount;
+						++m_MediaCount;
 					}
 				}
 			}
 
 			// notify
-			emit imageCountChanged(m_ImageCount);
+			emit mediaCountChanged(m_MediaCount);
 		});
 	}
 

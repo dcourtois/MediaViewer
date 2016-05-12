@@ -168,7 +168,7 @@ namespace MediaViewerLib
 		QHash< int, QByteArray > roles;
 		roles.insert(Qt::DisplayRole,	"name");
 		roles.insert(Qt::UserRole,		"path");
-		roles.insert(Qt::UserRole + 1,	"imageCount");
+		roles.insert(Qt::UserRole + 1,	"mediaCount");
 		roles.insert(Qt::UserRole + 2,	"folder");
 		return roles;
 	}
@@ -193,7 +193,7 @@ namespace MediaViewerLib
 		{
 			case Qt::DisplayRole:		return node->GetName();
 			case Qt::UserRole:			return node->GetPath();
-			case Qt::UserRole + 1:		return node->GetImageCount();
+			case Qt::UserRole + 1:		return node->GetMediaCount();
 			case Qt::UserRole + 2:		return QVariant::fromValue(node);
 			default:					return QVariant();
 		}

@@ -15,7 +15,7 @@ AnimatedImage {
 	property var stateManager
 
 	// only enable for images
-	enabled: selection && (selection.currentImageType == Media.Image || selection.currentImageType == Media.AnimatedImage)
+	enabled: selection && (selection.currentMediaType == Media.Image || selection.currentMediaType == Media.AnimatedImage)
 
 	// when loosing focus, switch back to preview state
 	onActiveFocusChanged: if (activeFocus == false) { stateManager.state = "preview"; }
@@ -24,7 +24,7 @@ AnimatedImage {
 	onStatusChanged: playing = (status == AnimatedImage.Ready)
 
 	// bind the source
-	source: (enabled && selection) ? selection.currentImagePath : "qrc:///images/empty"
+	source: (enabled && selection) ? selection.currentMediaPath : "qrc:///images/empty"
 
 	// only fit when the image is greater than the view size
 	fillMode: sourceSize.width > width || sourceSize.height > height ? Image.PreserveAspectFit : Image.Pad

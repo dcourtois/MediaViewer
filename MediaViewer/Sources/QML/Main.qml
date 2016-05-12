@@ -60,14 +60,15 @@ Window {
 	}
 
 	//
-	// The split between the mediaViewer + folder view and the images
+	// The split between the media preview and folder browser on the left,
+	// and the media browser on the right
 	//
 	SplitView {
 		anchors.fill: parent
 		orientation: Qt.Horizontal
 
 		//
-		// split between the folders and the image view
+		// split between the folders and the media preview
 		//
 		SplitView {
 			orientation: Qt.Vertical
@@ -82,7 +83,7 @@ Window {
 			}
 
 			//
-			// Imageview of the image.
+			// media preview
 			//
 			MediaViewer {
 				id: mediaViewer
@@ -92,7 +93,7 @@ Window {
 		}
 
 		//
-		// The image browser
+		// media browser
 		//
 		MediaBrowser {
 			id: mediaBrowser

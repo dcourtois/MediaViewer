@@ -36,7 +36,7 @@ Rectangle {
 	]
 
 	//
-	// The window that's used to display the image in fullscreen
+	// The window that's used to display the media in fullscreen
 	//
 	Window {
 		id: fullScreenWindow

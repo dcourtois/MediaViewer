@@ -1,5 +1,5 @@
-#ifndef __IMAGE_MODEL_H__
-#define __IMAGE_MODEL_H__
+#ifndef __MEDIA_MODEL_H__
+#define __MEDIA_MODEL_H__
 
 
 namespace MediaViewerLib
@@ -76,4 +76,4 @@ namespace MediaViewerLib
 } // namespace MediaViewerLib
 
 
-#endif // __IMAGE_MODEL_H__
+#endif // __MEDIA_MODEL_H__

@@ -28,13 +28,13 @@ namespace MediaViewerLib
 
 		Q_PROPERTY(QString path READ GetPath WRITE SetPath NOTIFY pathChanged)
 		Q_PROPERTY(QString name READ GetName NOTIFY nameChanged)
-		Q_PROPERTY(int imageCount READ GetImageCount NOTIFY imageCountChanged)
+		Q_PROPERTY(int mediaCount READ GetMediaCount NOTIFY mediaCountChanged)
 
 	signals:
 
 		void pathChanged(const QString & path) const;
 		void nameChanged(const QString & name) const;
-		void imageCountChanged(int imageCount) const;
+		void mediaCountChanged(int mediaCount) const;
 
 	public:
 
@@ -45,7 +45,7 @@ namespace MediaViewerLib
 		// public API
 		const QString &					GetPath(void) const;
 		const QString &					GetName(void) const;
-		int								GetImageCount(void) const;
+		int								GetMediaCount(void) const;
 		const Folder *					GetParent(void) const;
 		const QVector< Folder * > &		GetChildren(void) const;
 
@@ -53,7 +53,7 @@ namespace MediaViewerLib
 
 		// private API
 		void	UpdateChildren(void) const;
-		void	UpdateImages(void) const;
+		void	UpdateMedias(void) const;
 		void	SetPath(const QString & path);
 
 		//! The parent
@@ -65,8 +65,8 @@ namespace MediaViewerLib
 		//! The name of the folder
 		QString m_Name;
 
-		//! The number of images
-		mutable int m_ImageCount;
+		//! The number of medias
+		mutable int m_MediaCount;
 
 		//! True when the children's list is dirty
 		mutable bool m_Dirty;
