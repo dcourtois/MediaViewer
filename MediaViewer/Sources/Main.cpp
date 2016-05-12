@@ -113,6 +113,7 @@ int main(int argc, char *argv[])
 #if defined(DEBUG)
 		// install a file system watcher to be able to hot-reload the QML when it changes
 		QFileSystemWatcher watcher;
+		watcher.addPath("AnimatedImageViewer.qml");
 		watcher.addPath("FolderBrowser.qml");
 		watcher.addPath("ImageViewer.qml");
 		watcher.addPath("Main.qml");

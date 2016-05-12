@@ -22,16 +22,14 @@ Rectangle {
 		State {
 			name: "fullscreen"
 			ParentChange { target: image; parent: fullScreenItem }
+			ParentChange { target: animatedImage; parent: fullScreenItem }
 			ParentChange { target: movie; parent: fullScreenItem }
-			PropertyChanges { target: image; focus: true }
-			PropertyChanges { target: movie; focus: true }
 		},
 		State {
 			name: "preview"
 			ParentChange { target: image; parent: root }
+			ParentChange { target: animatedImage; parent: root }
 			ParentChange { target: movie; parent: root }
-			PropertyChanges { target: image; focus: false }
-			PropertyChanges { target: movie; focus: false }
 		}
 	]
 
@@ -68,10 +66,20 @@ Rectangle {
 	}
 
 	//
-	// The image viewer
+	// The static image viewer
 	//
 	ImageViewer {
 		id: image
+		anchors.fill: parent
+		selection: root.selection
+		stateManager: root.stateManager
+	}
+
+	//
+	// The animated image viewer
+	//
+	AnimatedImageViewer {
+		id: animatedImage
 		anchors.fill: parent
 		selection: root.selection
 		stateManager: root.stateManager

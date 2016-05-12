@@ -1,41 +1,44 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
-import QtMultimedia 5.6
 import MediaViewerLib 0.1
 
 
 //
-// Movie viewer
+// Animated image view
 //
-VideoOutput {
-	id: root
-	source: mediaPlayer
+AnimatedImage {
+	id: image
+	anchors.fill: parent
 
 	// externally set
 	property var selection
 	property var stateManager
 
-	// only enable for movies
-	enabled: selection && selection.currentMediaType == Media.Movie
+	// only enable for images
+	enabled: selection && selection.currentMediaType == Media.AnimatedImage
 	focus: enabled
-
-	// only visible when enabled
-	visible: enabled
 
 	// when loosing focus, switch back to preview state
 	onActiveFocusChanged: if (activeFocus == false) { stateManager.state = "preview"; }
 
-	// the media player
-	MediaPlayer {
-		id: mediaPlayer
-		source: (enabled && selection) ? "file:///" + selection.currentMediaPath : ""
-		autoPlay: true
-		onError: {
-			if (MediaPlayer.NoError != error) {
-				console.log("[qmlvideo] VideoItem.onError error " + error + " errorString " + errorString)
-			}
-		}
-	}
+	// auto-play on load
+	onStatusChanged: playing = (status == AnimatedImage.Ready)
+
+	// bind the source
+	source: (enabled && selection) ? selection.currentMediaPath : "qrc:///images/empty"
+
+	// only fit when the image is greater than the view size
+	fillMode: sourceSize.width > width || sourceSize.height > height ? Image.PreserveAspectFit : Image.Pad
+
+	// hide when media is not an image
+	visible: enabled
+
+	// configure the image for best quality
+	asynchronous: true
+	antialiasing: true
+	autoTransform: true
+	smooth: true
+	mipmap: true
 
 	// Mouse area to catch double clicks
 	MouseArea {

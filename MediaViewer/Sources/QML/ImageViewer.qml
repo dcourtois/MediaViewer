@@ -4,9 +4,9 @@ import MediaViewerLib 0.1
 
 
 //
-// Image view
+// Static image view
 //
-AnimatedImage {
+Image {
 	id: image
 	anchors.fill: parent
 
@@ -15,13 +15,11 @@ AnimatedImage {
 	property var stateManager
 
 	// only enable for images
-	enabled: selection && (selection.currentMediaType == Media.Image || selection.currentMediaType == Media.AnimatedImage)
+	enabled: selection && selection.currentMediaType == Media.Image
+	focus: enabled
 
 	// when loosing focus, switch back to preview state
 	onActiveFocusChanged: if (activeFocus == false) { stateManager.state = "preview"; }
-
-	// auto-play on load
-	onStatusChanged: playing = (status == AnimatedImage.Ready)
 
 	// bind the source
 	source: (enabled && selection) ? selection.currentMediaPath : "qrc:///images/empty"

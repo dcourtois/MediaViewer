@@ -3,6 +3,7 @@
 
 	<!-- QML files -->
 	<qresource prefix="/">
+		<file>AnimatedImageViewer.qml</file>
 		<file>FolderBrowser.qml</file>
 		<file>ImageViewer.qml</file>
 		<file>Main.qml</file>
