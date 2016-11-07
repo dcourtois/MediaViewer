@@ -24,6 +24,7 @@ namespace MediaViewerLib
 
 		// movies
 		{ "wmv",	Media::Type::Movie },
+		{ "mkv",	Media::Type::Movie },
 		{ "avi",	Media::Type::Movie }
 	};
 
