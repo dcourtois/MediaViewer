@@ -15,6 +15,10 @@ Window {
 
 	visible: true
 
+	// default size
+	width: 1000
+	height: 750
+
 	//
 	// Initialize
 	//
@@ -42,8 +46,6 @@ Window {
 	WindowSettings {
 		category: "MainWindow"
 		window: mainWindow
-		width: 1000
-		height: 750
 	}
 
 	//
@@ -101,6 +103,8 @@ Window {
 				id: mediaViewer
 				color: Qt.rgba(0, 0, 0, 1);
 				selection: mediaSelection
+				width: 300
+				height: 300
 			}
 		}
 

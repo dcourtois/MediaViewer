@@ -10,7 +10,7 @@ import Qt.labs.settings 1.0
 Item {
 	id: root
 
-	// the window
+	// the window (must be set by the user)
 	property Window window
 
 	// the settings category
@@ -43,11 +43,11 @@ Item {
 	Component.onCompleted: {
 		if (!settings.width || !settings.height) {
 			// First run, or width/height are screwed up.
-			current.x = x;
-			current.y = y;
-			current.width = width;
-			current.height = height;
-			current.maximized = maximized;
+			current.x = window.x;
+			current.y = window.y;
+			current.width = window.width;
+			current.height = window.height;
+			current.maximized = false;
 		} else {
 			current.x = settings.x;
 			current.y = settings.y;
