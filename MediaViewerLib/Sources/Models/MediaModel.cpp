@@ -120,7 +120,7 @@ namespace MediaViewerLib
 	//!
 	QModelIndex MediaModel::getPreviousModelIndex(const QModelIndex & index) const
 	{
-		if (index.isValid() == false || index.row() <= 1)
+		if (index.isValid() == false || index.row() <= 0)
 		{
 			return QModelIndex();
 		}
