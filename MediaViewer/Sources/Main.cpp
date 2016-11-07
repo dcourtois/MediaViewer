@@ -37,7 +37,7 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 		}
 		else if (info.isDir())
 		{
-			engine.rootContext()->setContextProperty("initFolder", info.absolutePath());
+			engine.rootContext()->setContextProperty("initFolder", info.absoluteFilePath());
 		}
 	}
 

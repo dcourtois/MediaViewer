@@ -23,10 +23,10 @@ Window {
 	// Initialize
 	//
 	Component.onCompleted: {
-		if (initFolder) {
+		if (initFolder !== "") {
 			folderBrowser.currentFolderPath = initFolder;
 		}
-		if (initMedia) {
+		if (initMedia !== "") {
 			mediaSelection.selectByPath(initMedia);
 			stateManager.state = "fullscreen";
 		}
