@@ -105,6 +105,10 @@ ScrollView {
 			anchors.fill: parent
 			acceptedButtons: Qt.LeftButton
 			onClicked: {
+				// acquire the focus (the folder browser might have it, and we want
+				// to be able to navigate with the keyboard)
+				scrollView.focus = true;
+
 				// update the current index
 				root.currentIndex = root.indexAt(
 					mouse.x + root.contentX,
