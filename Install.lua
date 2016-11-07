@@ -12,13 +12,12 @@ newaction {
 
 		-- create the command, and normalize path for windows
 		local command = QT_PATH[_platform] .. "/bin/windeployqt.exe"
+		command = command .. " --verbose 3"
 		command = command .. " --no-translations"
 		command = command .. " --no-opengl-sw"
 		command = command .. (_configuration == "Debug" and " --debug" or " --release")
 		command = command .. " --qmldir \"Output/bin/" .. _configuration .. "/" .. _platform .. "/\""
 		command = command .. " \"Output/bin/" .. _configuration .. "/" .. _platform .. "/" .. PROJECT_NAME .. ".exe\""
-		command = command .. " --verbose 3"
-		command = string.gsub(command, "/", "\\")
 
 		-- note : a bit messy, --dir doesn't seem to work, so we need to set the Qt bin folder in the PATH env var
 		--        in the same call to os.execute as the one containing windeployqt ...
