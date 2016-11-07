@@ -28,6 +28,7 @@ Window {
 		}
 		if (initMedia) {
 			mediaSelection.selectByPath(initMedia);
+			stateManager.state = "fullscreen";
 		}
 	}
 
@@ -69,6 +70,7 @@ Window {
 	// Stater manager
 	//
 	StateManager {
+		id: stateManager
 		mediaViewer: mediaViewer
 		mediaBrowser: mediaBrowser
 	}
