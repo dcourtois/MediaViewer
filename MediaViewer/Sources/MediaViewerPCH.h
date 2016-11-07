@@ -18,9 +18,11 @@
 // Qt
 
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QDebug>
 #include <QDir>
 #include <QFileIconProvider>
+#include <QFileInfo>
 #include <QPixmap>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>

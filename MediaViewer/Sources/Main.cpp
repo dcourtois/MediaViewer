@@ -5,14 +5,10 @@
 //!
 //! Set the application engine with our main QML file
 //!
-void setup(QQmlApplicationEngine *& engine)
+void Setup(QApplication & app, QQmlApplicationEngine & engine)
 {
-	// re-create the engine
-	delete engine;
-	engine = new QQmlApplicationEngine();
-
-	// setup
-	engine->addImageProvider("FolderIcon", new FolderIconProvider);
+	// set the image provider for the folders
+	engine.addImageProvider("FolderIcon", new FolderIconProvider);
 
 	// expose the list of drives to QML
 	QVariantList drives;
@@ -20,10 +16,29 @@ void setup(QQmlApplicationEngine *& engine)
 	{
 		drives << drive.absolutePath();
 	}
-	engine->rootContext()->setContextProperty("drives", drives);
+	engine.rootContext()->setContextProperty("drives", drives);
+
+	// open the initial folder / media
+	QStringList args = app.arguments();
+	engine.rootContext()->setContextProperty("initMedia", "");
+	engine.rootContext()->setContextProperty("initFolder", "");
+	if (args.size() > 1)
+	{
+		QString path = args[1];
+		QFileInfo info(path);
+		if (info.isFile())
+		{
+			engine.rootContext()->setContextProperty("initFolder", info.absolutePath());
+			engine.rootContext()->setContextProperty("initMedia", info.absoluteFilePath());
+		}
+		else if (info.isDir())
+		{
+			engine.rootContext()->setContextProperty("initFolder", info.absolutePath());
+		}
+	}
 
 	// set the source
-	engine->load(QUrl("qrc:/Main.qml"));
+	engine.load(QUrl("qrc:/Main.qml"));
 }
 
 //!
@@ -41,14 +56,11 @@ int main(int argc, char *argv[])
 		app.setApplicationVersion("0.1");
 
 		// create and setup application engine
-		QQmlApplicationEngine * engine = nullptr;
-		setup(engine);
+		QQmlApplicationEngine engine;
+		Setup(app, engine);
 
 		// run the application
 		code = app.exec();
-
-		// cleanup
-		delete engine;
 	}
 
 	return code;

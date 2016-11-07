@@ -16,6 +16,18 @@ Window {
 	visible: true
 
 	//
+	// Initialize
+	//
+	Component.onCompleted: {
+		if (initFolder) {
+			folderBrowser.currentFolderPath = initFolder;
+		}
+		if (initMedia) {
+			mediaSelection.selectByPath(initMedia);
+		}
+	}
+
+	//
 	// Font
 	//
 	FontLoader {
@@ -30,8 +42,6 @@ Window {
 	WindowSettings {
 		category: "MainWindow"
 		window: mainWindow
-		x: 100
-		y: 100
 		width: 1000
 		height: 750
 	}
