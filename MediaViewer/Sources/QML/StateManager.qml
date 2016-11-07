@@ -21,14 +21,11 @@ Item {
 	states: [
 		State {
 			name: "preview"
-			PropertyChanges { target: mediaViewer; focus: false }
 			PropertyChanges { target: mediaBrowser; focus: true }
 		},
 		State {
 			name: "fullscreen"
-			PropertyChanges { target: mediaViewer; focus: true }
 			PropertyChanges { target: mediaBrowser; focus: false }
 		}
 	]
-
 }

@@ -1,5 +1,6 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
+import QtQuick.Layouts 1.3
 import QtMultimedia 5.6
 import MediaViewerLib 0.1
 
@@ -17,13 +18,14 @@ VideoOutput {
 
 	// only enable for movies
 	enabled: selection && selection.currentMediaType == Media.Movie
-	focus: enabled
-
-	// only visible when enabled
 	visible: enabled
+	focus: enabled && stateManager.state === "fullscreen"
 
 	// when loosing focus, switch back to preview state
-	onActiveFocusChanged: if (activeFocus == false) { stateManager.state = "preview"; }
+	onActiveFocusChanged: if (activeFocus === false && selection.currentMediaType === Media.Movie) { stateManager.state = "preview"; }
+
+	// playing state
+	property bool isPlaying: true
 
 	// the media player
 	MediaPlayer {
@@ -35,24 +37,16 @@ VideoOutput {
 				console.log("[qmlvideo] VideoItem.onError error " + error + " errorString " + errorString)
 			}
 		}
-	}
 
-	// Mouse area to catch double clicks
-	MouseArea {
-		anchors.fill: parent
-		acceptedButtons: Qt.LeftButton
-		onDoubleClicked: {
-			if (stateManager.state == "fullscreen") {
-				stateManager.state = "preview";
-			} else {
-				stateManager.state = "fullscreen";
-			}
-		}
+		// update playing state
+		onPaused: root.isPlaying = false
+		onPlaying: root.isPlaying = true
+		onStopped: root.isPlaying = false
 	}
 
 	// keyboard navigation
 	Keys.onPressed: {
-		if (activeFocus == false) {
+		if (activeFocus === false) {
 			return;
 		}
 		switch (event.key) {
@@ -71,6 +65,56 @@ VideoOutput {
 			case Qt.Key_Escape:
 				stateManager.state = "preview";
 				break;
+		}
+	}
+
+	// Mouse area to catch double clicks
+	MouseArea {
+		anchors.fill: parent
+		acceptedButtons: Qt.LeftButton
+		onDoubleClicked: {
+			if (stateManager.state == "fullscreen") {
+				stateManager.state = "preview";
+			} else {
+				stateManager.state = "fullscreen";
+			}
+		}
+	}
+
+	// playback controls
+	Rectangle {
+		anchors {
+			bottom: parent.bottom
+			bottomMargin: 50
+			horizontalCenter: parent.horizontalCenter
+		}
+		width: childrenRect.width
+		height: childrenRect.height
+		radius: 10
+		color: Qt.rgba(0.3, 0.3, 0.3, 0.3)
+		RowLayout {
+			Image {
+				width: 50
+				height: 50
+				fillMode: Image.PreserveAspectFit
+				source: "qrc:/icons/stop"
+				MouseArea {
+					anchors.fill: parent
+					acceptedButtons: Qt.LeftButton
+					onClicked: mediaPlayer.stop()
+				}
+			}
+			Image {
+				width: 50
+				height: 50
+				fillMode: Image.PreserveAspectFit
+				source: root.isPlaying ? "qrc:/icons/pause" : "qrc:/icons/play"
+				MouseArea {
+					anchors.fill: parent
+					acceptedButtons: Qt.LeftButton
+					onClicked: root.isPlaying ? mediaPlayer.pause() : mediaPlayer.play()
+				}
+			}
 		}
 	}
 }

@@ -105,9 +105,6 @@ ScrollView {
 			anchors.fill: parent
 			acceptedButtons: Qt.LeftButton
 			onClicked: {
-				// get the focus on click
-				scrollView.focus = true;
-
 				// update the current index
 				root.currentIndex = root.indexAt(
 					mouse.x + root.contentX,

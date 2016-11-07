@@ -50,7 +50,7 @@ function configure()
 
 		defines { "DEBUG", "_DEBUG", "QT_QML_DEBUG" }
 		optimize "Off"
-		flags { "Symbols" }
+		symbols "On"
 
 	-- release configurations
 	filter "configurations:not Debug"
@@ -62,12 +62,13 @@ function configure()
 	filter "configurations:Release"
 
 		defines { "RELEASE", "QT_QML_DEBUG" }
-		flags { "Symbols" }
+		symbols "On"
 
 	-- retail configuration
 	filter "configurations:Retail"
 
 		defines { "RETAIL" }
+		symbols "Off"
 
 	-- windows, disable deprecated warnings
 	filter "action:vs*"

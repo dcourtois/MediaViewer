@@ -14,4 +14,12 @@
 		<file alias="SourceSansPro-Regular">Fonts/SourceSansPro-Regular.ttf</file>
 	</qresource>
 
+	<!-- Icons -->
+	<qresource prefix="/icons">
+		<!-- Source - https://design.google.com/icons/ - https://github.com/google/material-design-icons/ -->
+		<file alias="play">Icons/ic_play_arrow_white_24px.svg</file>
+		<file alias="pause">Icons/ic_pause_white_24px.svg</file>
+		<file alias="stop">Icons/ic_stop_white_24px.svg</file>
+	</qresource>
+
 </RCC>

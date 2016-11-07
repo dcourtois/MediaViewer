@@ -15,20 +15,18 @@ Image {
 	property var stateManager
 
 	// only enable for images
-	enabled: selection && selection.currentMediaType == Media.Image
-	focus: enabled
+	enabled: selection && selection.currentMediaType === Media.Image
+	visible: enabled
+	focus: enabled && stateManager.state === "fullscreen"
 
 	// when loosing focus, switch back to preview state
-	onActiveFocusChanged: if (activeFocus == false) { stateManager.state = "preview"; }
+	onActiveFocusChanged: if (activeFocus === false && selection.currentMediaType === Media.Image) { stateManager.state = "preview"; }
 
 	// bind the source
 	source: (enabled && selection) ? selection.currentMediaPath : "qrc:///images/empty"
 
 	// only fit when the image is greater than the view size
 	fillMode: sourceSize.width > width || sourceSize.height > height ? Image.PreserveAspectFit : Image.Pad
-
-	// hide when media is not an image
-	visible: enabled
 
 	// configure the image for best quality
 	asynchronous: true
@@ -52,7 +50,7 @@ Image {
 
 	// keyboard navigation
 	Keys.onPressed: {
-		if (activeFocus == false) {
+		if (activeFocus === false) {
 			return;
 		}
 		switch (event.key) {

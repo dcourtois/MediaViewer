@@ -19,7 +19,7 @@ Window {
 	// Font
 	//
 	FontLoader {
-		id: sourceSans;
+		id: sourceSans
 		property int size: 12		
 		source: "qrc:///fonts/SourceSansPro-Regular"
 	}
@@ -30,6 +30,8 @@ Window {
 	WindowSettings {
 		category: "MainWindow"
 		window: mainWindow
+		x: 100
+		y: 100
 		width: 1000
 		height: 750
 	}

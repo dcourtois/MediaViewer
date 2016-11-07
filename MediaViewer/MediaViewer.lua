@@ -32,7 +32,7 @@ project "MediaViewer"
 	filter "files:**/imports.qml"
 		buildmessage "Deploying %{file.name}"
 		buildcommands { "copy \"%{file.relpath:gsub('/', '\\')}\" \"%{cfg.buildtarget.directory:gsub('/', '\\')}\\%{file.name}\"" }
-		buildoutputs { "%{cfg.buildtarget.directory:gsub('/', '\\')}\\%{file.name}" }
+		buildoutputs { "%{cfg.buildtarget.directory}/%{file.name}" }
 
 	--
 	-- uncomment to enable verbose QML import logs

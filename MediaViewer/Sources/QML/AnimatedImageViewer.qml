@@ -15,11 +15,12 @@ AnimatedImage {
 	property var stateManager
 
 	// only enable for images
-	enabled: selection && selection.currentMediaType == Media.AnimatedImage
-	focus: enabled
+	enabled: selection && selection.currentMediaType === Media.AnimatedImage
+	visible: enabled
+	focus: enabled && stateManager.state === "fullscreen"
 
 	// when loosing focus, switch back to preview state
-	onActiveFocusChanged: if (activeFocus == false) { stateManager.state = "preview"; }
+	onActiveFocusChanged: if (activeFocus === false && selection.currentMediaType === Media.AnimatedImage) { stateManager.state = "preview"; }
 
 	// auto-play on load
 	onStatusChanged: playing = (status == AnimatedImage.Ready)
@@ -29,9 +30,6 @@ AnimatedImage {
 
 	// only fit when the image is greater than the view size
 	fillMode: sourceSize.width > width || sourceSize.height > height ? Image.PreserveAspectFit : Image.Pad
-
-	// hide when media is not an image
-	visible: enabled
 
 	// configure the image for best quality
 	asynchronous: true
