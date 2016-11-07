@@ -22,10 +22,12 @@ Item {
 		State {
 			name: "preview"
 			PropertyChanges { target: mediaBrowser; focus: true }
+			PropertyChanges { target: cursor; hidden: false }
 		},
 		State {
 			name: "fullscreen"
 			PropertyChanges { target: mediaBrowser; focus: false }
+			PropertyChanges { target: cursor; hidden: true }
 		}
 	]
 }

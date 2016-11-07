@@ -1,5 +1,6 @@
 #include "MediaViewerPCH.h"
 #include "Utils/FolderIconProvider.h"
+#include "Utils/Cursor.h"
 
 
 //!
@@ -9,6 +10,9 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 {
 	// set the image provider for the folders
 	engine.addImageProvider("FolderIcon", new FolderIconProvider);
+
+	// set the cursor manager
+	engine.rootContext()->setContextProperty("cursor", new Cursor);
 
 	// expose the list of drives to QML
 	QVariantList drives;
