@@ -74,7 +74,7 @@ namespace MediaViewerLib
 		if (m_Dirty == true)
 		{
 			QDir dir(m_Root);
-			for (const auto & file : dir.entryList(QDir::Files, QDir::Name))
+			for (const auto & file : dir.entryList(QDir::Files, QDir::NoSort))
 			{
 				if (Media::IsMedia(file) == true)
 				{
@@ -163,6 +163,9 @@ namespace MediaViewerLib
 		QHash< int, QByteArray > roles;
 		roles.insert(Qt::DisplayRole,	"name");
 		roles.insert(Qt::UserRole,		"path");
+		roles.insert(Qt::UserRole + 1,	"date");
+		roles.insert(Qt::UserRole + 2,	"size");
+		roles.insert(Qt::UserRole + 3,	"type");
 		return roles;
 	}
 
@@ -183,6 +186,9 @@ namespace MediaViewerLib
 		{
 			case Qt::DisplayRole:	return media->GetName();
 			case Qt::UserRole:		return media->GetPath();
+			case Qt::UserRole + 1:	return media->GetDate();
+			case Qt::UserRole + 2:	return media->GetSize();
+			case Qt::UserRole + 3:	return static_cast< int >(media->GetType());
 			default:				return QVariant();
 		}
 	}
