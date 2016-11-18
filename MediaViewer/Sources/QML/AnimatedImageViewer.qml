@@ -19,9 +19,6 @@ AnimatedImage {
 	visible: enabled
 	focus: enabled && stateManager.state === "fullscreen"
 
-	// when loosing focus, switch back to preview state
-	onActiveFocusChanged: if (activeFocus === false && selection.currentMediaType === Media.AnimatedImage) { stateManager.state = "preview"; }
-
 	// auto-play on load
 	onStatusChanged: playing = (status == AnimatedImage.Ready)
 

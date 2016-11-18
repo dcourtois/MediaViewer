@@ -42,12 +42,10 @@ namespace MediaViewerLib
 			return;
 		}
 
+		// reset the model
 		this->beginResetModel();
 		this->Clear();
-
 		m_Root = path;
-		m_Dirty = true;
-
 		this->endResetModel();
 
 		// notify
@@ -64,6 +62,7 @@ namespace MediaViewerLib
 			DELETE media;
 		}
 		m_Medias.clear();
+		m_Dirty = true;
 	}
 
 	//!
@@ -95,7 +94,7 @@ namespace MediaViewerLib
 	int MediaModel::getIndexByPath(const QString & path) const
 	{
 		int index = 0;
-		for (const Media * media : m_Medias)
+		for (const Media * media : this->GetMedias())
 		{
 			if (media->GetPath() == path)
 			{
@@ -112,7 +111,7 @@ namespace MediaViewerLib
 	QModelIndex MediaModel::getModelIndexByPath(const QString & path) const
 	{
 		int index = this->getIndexByPath(path);
-		return index != -1 ? this->createIndex(index, 0, const_cast< Media * >(m_Medias[index])) : QModelIndex();
+		return index != -1 ? this->createIndex(index, 0, const_cast< Media * >(this->GetMedias()[index])) : QModelIndex();
 	}
 
 	//!
@@ -124,7 +123,7 @@ namespace MediaViewerLib
 		{
 			return QModelIndex();
 		}
-		return this->createIndex(index.row() - 1, 0, m_Medias.at(index.row() - 1));
+		return this->createIndex(index.row() - 1, 0, this->GetMedias()[index.row() - 1]);
 	}
 
 	//!
@@ -132,11 +131,11 @@ namespace MediaViewerLib
 	//!
 	QModelIndex MediaModel::getNextModelIndex(const QModelIndex & index) const
 	{
-		if (index.isValid() == false || index.row() >= m_Medias.size() - 1)
+		if (index.isValid() == false || index.row() >= this->GetMedias().size() - 1)
 		{
 			return QModelIndex();
 		}
-		return this->createIndex(index.row() + 1, 0, m_Medias.at(index.row() + 1));
+		return this->createIndex(index.row() + 1, 0, this->GetMedias()[index.row() + 1]);
 	}
 
 	//!

@@ -19,9 +19,6 @@ Image {
 	visible: enabled
 	focus: enabled && stateManager.state === "fullscreen"
 
-	// when loosing focus, switch back to preview state
-	onActiveFocusChanged: if (activeFocus === false && selection.currentMediaType === Media.Image) { stateManager.state = "preview"; }
-
 	// bind the source
 	source: (enabled && selection) ? selection.currentMediaPath : "qrc:///images/empty"
 

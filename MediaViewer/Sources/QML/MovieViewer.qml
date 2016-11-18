@@ -21,9 +21,6 @@ VideoOutput {
 	visible: enabled
 	focus: enabled && stateManager.state === "fullscreen"
 
-	// when loosing focus, switch back to preview state
-	onActiveFocusChanged: if (activeFocus === false && selection.currentMediaType === Media.Movie) { stateManager.state = "preview"; }
-
 	// playing state
 	property bool isPlaying: true
 

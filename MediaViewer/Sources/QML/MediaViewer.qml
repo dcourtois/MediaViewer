@@ -42,9 +42,13 @@ Rectangle {
 		// configure
 		color: root.color
 		flags: Qt.SplashScreen
-		visibility: root.state == "fullscreen" ? Window.FullScreen : Window.Hidden
+		visible: root.state === "fullscreen" ? true : false
+		visibility: root.state === "fullscreen" ? Window.FullScreen : Window.Hidden
 		width: Screen.width
 		height: Screen.height
+
+		// when the window is no longer active, revert into the preview state
+		onActiveChanged: if (active === false) { stateManager.state = "preview"; }
 
 		// quit the main application when the user closes the window in fullscreen mode
 		// (by default, it will only close the fullscreen window, leaving the application
