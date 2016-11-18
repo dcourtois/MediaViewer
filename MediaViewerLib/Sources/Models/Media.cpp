@@ -20,12 +20,16 @@ namespace MediaViewerLib
 		{ "svg",	Media::Type::Image },
 
 		// animated images
-		{ "gif",	Media::Type::AnimatedImage },
+		{ "gif",	Media::Type::AnimatedImage }//,
 
 		// movies
-		{ "wmv",	Media::Type::Movie },
-		{ "mkv",	Media::Type::Movie },
-		{ "avi",	Media::Type::Movie }
+		//{ "wmv",	Media::Type::Movie },
+		//{ "webm",	Media::Type::Movie },
+		//{ "mkv",	Media::Type::Movie },
+		//{ "flv",	Media::Type::Movie },
+		//{ "mp4",	Media::Type::Movie },
+		//{ "mov",	Media::Type::Movie },
+		//{ "avi",	Media::Type::Movie }
 	};
 
 	//!
@@ -36,6 +40,9 @@ namespace MediaViewerLib
 		, m_Name(QFileInfo(path).fileName())
 		, m_Type(GetType(path))
 	{
+		QFileInfo info(path);
+		m_Date	= info.lastModified();
+		m_Size	= info.size();
 	}
 
 	//!
@@ -44,6 +51,8 @@ namespace MediaViewerLib
 	Media::Media(const Media & other)
 		: m_Path(other.m_Path)
 		, m_Name(other.m_Name)
+		, m_Date(other.m_Date)
+		, m_Size(other.m_Size)
 		, m_Type(other.m_Type)
 	{
 	}
@@ -69,6 +78,22 @@ namespace MediaViewerLib
 	const QString & Media::GetName(void) const
 	{
 		return m_Name;
+	}
+
+	//!
+	//! Get the media's last modification date
+	//!
+	const QDateTime & Media::GetDate(void) const
+	{
+		return m_Date;
+	}
+
+	//!
+	//! Get the media's name
+	//!
+	uint64_t Media::GetSize(void) const
+	{
+		return m_Size;
 	}
 
 	//!
