@@ -20,16 +20,16 @@ namespace MediaViewerLib
 		{ "svg",	Media::Type::Image },
 
 		// animated images
-		{ "gif",	Media::Type::AnimatedImage }//,
+		{ "gif",	Media::Type::AnimatedImage },
 
 		// movies
-		//{ "wmv",	Media::Type::Movie },
-		//{ "webm",	Media::Type::Movie },
-		//{ "mkv",	Media::Type::Movie },
-		//{ "flv",	Media::Type::Movie },
-		//{ "mp4",	Media::Type::Movie },
-		//{ "mov",	Media::Type::Movie },
-		//{ "avi",	Media::Type::Movie }
+		{ "wmv",	Media::Type::Movie },
+		{ "webm",	Media::Type::Movie },
+		{ "mkv",	Media::Type::Movie },
+		{ "flv",	Media::Type::Movie },
+		{ "mp4",	Media::Type::Movie },
+		{ "mov",	Media::Type::Movie },
+		{ "avi",	Media::Type::Movie }
 	};
 
 	//!

@@ -1,7 +1,7 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3
-import QtMultimedia 5.6
+import QtMultimedia 5.8
 import MediaViewerLib 0.1
 
 
@@ -22,16 +22,16 @@ VideoOutput {
 	focus: enabled && stateManager.state === "fullscreen"
 
 	// playing state
-	property bool isPlaying: true
+	property bool isPlaying: false
 
 	// the media player
 	MediaPlayer {
 		id: mediaPlayer
-		source: (enabled && selection) ? "file:///" + selection.currentMediaPath : ""
-		autoPlay: true
+		source: (enabled && selection) ? selection.currentMediaPath : ""
+		autoPlay: false
 		onError: {
-			if (MediaPlayer.NoError != error) {
-				console.log("[qmlvideo] VideoItem.onError error " + error + " errorString " + errorString)
+			if (MediaPlayer.NoError !== error) {
+				console.log("Error playing : " + source + " - " + errorString + "(error code: " + error + ")");
 			}
 		}
 
@@ -91,8 +91,8 @@ VideoOutput {
 		color: Qt.rgba(0.3, 0.3, 0.3, 0.3)
 		RowLayout {
 			Image {
-				width: 50
-				height: 50
+				width: 100
+				height: 100
 				fillMode: Image.PreserveAspectFit
 				source: "qrc:/icons/stop"
 				MouseArea {
@@ -102,8 +102,8 @@ VideoOutput {
 				}
 			}
 			Image {
-				width: 50
-				height: 50
+				width: 100
+				height: 100
 				fillMode: Image.PreserveAspectFit
 				source: root.isPlaying ? "qrc:/icons/pause" : "qrc:/icons/play"
 				MouseArea {

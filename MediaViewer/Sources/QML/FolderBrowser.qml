@@ -71,7 +71,7 @@ TreeView {
 	selection: ItemSelectionModel {
 		id: folderSelectionModel
 		model: root.model
-		onCurrentChanged: currentFolderPath = current.valid ? model.data(current, 256) : ""
+		onCurrentChanged: currentFolderPath = (current.valid ? model.data(current, 256) : "")
 	}
 
 	// Draw the row's background
