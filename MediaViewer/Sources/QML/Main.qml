@@ -9,7 +9,7 @@ import MediaViewerLib 0.1
 //
 // The main window
 //
-Window {
+ApplicationWindow {
 	id: mainWindow
 
 	visible: true
@@ -66,12 +66,44 @@ Window {
 	Connections { target: folderBrowser; onCurrentFolderPathChanged: mediaSelection.clear() }
 
 	//
-	// Stater manager
+	// State manager
 	//
 	StateManager {
 		id: stateManager
 		mediaViewer: mediaViewer
 		mediaBrowser: mediaBrowser
+	}
+
+	//
+	// Menu
+	//
+	menuBar: MenuBar {
+		Menu {
+			title: "Edit"
+			MenuItem {
+				text: "Cut"
+				shortcut: StandardKey.Cut
+			}
+			MenuItem {
+				text: "Copy"
+				shortcut: StandardKey.Copy
+			}
+			MenuItem {
+				text: "Paste"
+				shortcut: StandardKey.Paste
+			}
+			MenuItem {
+				text: "Delete"
+				shortcut: StandardKey.Delete
+			}
+		}
+		Menu {
+			title: "Options"
+			MenuItem {
+				text: "Preferences"
+				shortcut: StandardKey.Preferences
+			}
+		}
 	}
 
 	//
