@@ -12,7 +12,7 @@ project "MediaViewer"
 
 	-- enable Qt for this project
 	qt.enable()
-	qtmodules { "core", "qml", "gui", "quick", "widgets" }
+	qtmodules { "core", "qml", "gui", "quick", "widgets", "multimedia" }
 
 	-- files of the project
 	files {

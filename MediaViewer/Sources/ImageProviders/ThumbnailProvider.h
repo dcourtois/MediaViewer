@@ -7,14 +7,19 @@
 //!
 class ThumbnailProvider
 	: public QQuickImageProvider
+	, public QAbstractVideoSurface
 {
 
 public:
 
-	ThumbnailProvider(void);
+	ThumbnailProvider(QObject * parent = nullptr);
 
 	// reimplemented from QQuickImageProvider
 	QImage requestImage(const QString & id, QSize * size, const QSize & requestedSize) final;
+
+	// reimplemented from QAbstractVideoSurface
+	bool present(const QVideoFrame & frame) final;
+	QList< QVideoFrame::PixelFormat > supportedPixelFormats(QAbstractVideoBuffer::HandleType type = QAbstractVideoBuffer::NoHandle) const final;
 
 private:
 

@@ -30,6 +30,7 @@
 #include <QQuickImageProvider>
 #include <QSize>
 #include <QString>
+#include <QAbstractVideoSurface>
 
 #if !defined(RETAIL)
 #	include <QFileSystemWatcher>

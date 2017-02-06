@@ -5,8 +5,9 @@
 //!
 //! Constructor
 //!
-ThumbnailProvider::ThumbnailProvider(void)
+ThumbnailProvider::ThumbnailProvider(QObject * parent)
 	: QQuickImageProvider(QQuickImageProvider::Image)
+	, QAbstractVideoSurface(parent)
 {
 }
 
@@ -33,4 +34,20 @@ QImage ThumbnailProvider::requestImage(const QString & id, QSize * size, const Q
 	{
 		return QImage(id).scaled(width, height, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
 	}
+}
+
+//!
+//! Get a frame from a video
+//!
+bool ThumbnailProvider::present(const QVideoFrame & frame)
+{
+	return false;
+}
+
+//!
+//! Get the list of supported formats
+//!
+QList< QVideoFrame::PixelFormat > ThumbnailProvider::supportedPixelFormats(QAbstractVideoBuffer::HandleType type) const
+{
+	return QList< QVideoFrame::PixelFormat >();
 }
