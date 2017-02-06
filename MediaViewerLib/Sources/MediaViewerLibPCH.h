@@ -45,7 +45,6 @@
 #include <QtDebug>
 #include <QtQml>
 #include <QString>
-#include <QSvgRenderer>
 #include <QVector>
 
 

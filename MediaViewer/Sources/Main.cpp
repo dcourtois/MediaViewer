@@ -1,5 +1,6 @@
 #include "MediaViewerPCH.h"
-#include "Utils/FolderIconProvider.h"
+#include "ImageProviders/FolderIconProvider.h"
+#include "ImageProviders/ThumbnailProvider.h"
 #include "Utils/Cursor.h"
 
 
@@ -10,6 +11,7 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 {
 	// set the image provider for the folders
 	engine.addImageProvider("FolderIcon", new FolderIconProvider);
+	engine.addImageProvider("Thumbnail", new ThumbnailProvider);
 
 	// set the cursor manager
 	engine.rootContext()->setContextProperty("cursor", new Cursor);

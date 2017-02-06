@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QFileIconProvider>
 #include <QFileInfo>
+#include <QImage>
 #include <QPixmap>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -33,6 +34,13 @@
 #if !defined(RETAIL)
 #	include <QFileSystemWatcher>
 #endif
+
+
+//------------------------------------------------------------------------------
+// MediaViewerLib
+
+#include "MediaViewerLibPCH.h"
+#include "Models/Media.h"
 
 
 //------------------------------------------------------------------------------

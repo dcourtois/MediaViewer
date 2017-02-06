@@ -45,7 +45,7 @@ ScrollView {
 					anchors.centerIn: parent
 					Image {
 						id: image
-						source: "file:///" + path
+						source: "image://Thumbnail/" + path
 						sourceSize.width: root.cellWidth - 20
 						sourceSize.height: root.cellHeight - 20 - (label.visible ? label.height + 20 : 0)
 						anchors.horizontalCenter: parent.horizontalCenter

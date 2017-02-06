@@ -24,6 +24,10 @@ project "MediaViewer"
 		["Generated/*"] = { "../Output/obj/MediaViewer" },
 	}
 
+	-- use media viewer lib
+	includedirs { "../MediaViewerLib/Sources" }
+	links { "MediaViewerLib" }
+
 	-- precompiled headers
 	pchsource "Sources/MediaViewerPCH.cpp"
 	pchheader "MediaViewerPCH.h"
