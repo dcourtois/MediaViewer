@@ -142,44 +142,44 @@ namespace MediaViewerLib
 			case SortBy::Name:
 				if (m_SortOrder == SortOrder::Ascending)
 				{
-					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetName() < r->GetName(); });
+					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetName() < r->GetName(); });
 				}
 				else
 				{
-					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetName() > r->GetName(); });
+					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetName() > r->GetName(); });
 				}
 				break;
 
 			case SortBy::Date:
 				if (m_SortOrder == SortOrder::Ascending)
 				{
-					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetDate() < r->GetDate(); });
+					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetDate() < r->GetDate(); });
 				}
 				else
 				{
-					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetDate() > r->GetDate(); });
+					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetDate() > r->GetDate(); });
 				}
 				break;
 
 			case SortBy::Size:
 				if (m_SortOrder == SortOrder::Ascending)
 				{
-					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetSize() < r->GetSize(); });
+					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetSize() < r->GetSize(); });
 				}
 				else
 				{
-					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetSize() > r->GetSize(); });
+					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetSize() > r->GetSize(); });
 				}
 				break;
 
 			case SortBy::Type:
 				if (m_SortOrder == SortOrder::Ascending)
 				{
-					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetType() < r->GetType(); });
+					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetType() < r->GetType(); });
 				}
 				else
 				{
-					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetType() > r->GetType(); });
+					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetType() > r->GetType(); });
 				}
 				break;
 		}

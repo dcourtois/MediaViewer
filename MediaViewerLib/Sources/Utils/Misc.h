@@ -7,7 +7,8 @@ namespace MediaViewerLib
 	namespace Utils
 	{
 
-		template< typename ContainerType, typename Type > int IndexOf(const ContainerType & container, const Type & element);
+		template< typename ContainerType, typename Type >		int		IndexOf(const ContainerType & container, const Type & element);
+		template< typename ContainerType, typename Functor >	void	Sort(ContainerType & container, const Functor & functor);
 
 	} // namespace Utils
 } // namespace MediaViewerLib
