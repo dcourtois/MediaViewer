@@ -22,6 +22,7 @@
 #	pragma warning ( disable : 4127 )	// conditional expression is constant
 #	pragma warning ( disable : 4251 )	// needs to have dll-interface to be used by clients of class
 #	pragma warning ( disable : 4512 )	// assignment operator could not be generated
+#	pragma warning ( disable : 4714 )	// function 'function' marked as __forceinline not inlined
 #	pragma warning ( disable : 4800 )	// forcing value to bool 'true' or 'false' (performance warning)
 #endif
 

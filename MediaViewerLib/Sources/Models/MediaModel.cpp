@@ -13,6 +13,8 @@ namespace MediaViewerLib
 	MediaModel::MediaModel(QObject * parent)
 		: QAbstractItemModel(parent)
 		, m_Dirty(false)
+		, m_SortBy(SortBy::Name)
+		, m_SortOrder(SortOrder::Ascending)
 	{
 	}
 
@@ -86,6 +88,111 @@ namespace MediaViewerLib
 			m_Dirty = false;
 		}
 		return m_Medias;
+	}
+
+	//!
+	//! Get the sort type
+	//!
+	MediaModel::SortBy MediaModel::GetSortBy(void) const
+	{
+		return m_SortBy;
+	}
+
+	//!
+	//! Set the sort type
+	//!
+	void MediaModel::SetSortBy(SortBy by)
+	{
+		if (m_SortBy != by)
+		{
+			m_SortBy = by;
+			emit sortByChanged(by);
+		}
+	}
+
+	//!
+	//! Get the sort direction
+	//!
+	MediaModel::SortOrder MediaModel::GetSortOrder(void) const
+	{
+		return m_SortOrder;
+	}
+
+	//!
+	//! Set the sort direction
+	//!
+	void MediaModel::SetSortOrder(SortOrder order)
+	{
+		if (m_SortOrder != order)
+		{
+			m_SortOrder = order;
+			emit sortOrderChanged(order);
+		}
+	}
+
+	//!
+	//! Sort the model
+	//!
+	void MediaModel::Sort(void)
+	{
+		this->beginResetModel();
+
+		switch (m_SortBy)
+		{
+			case SortBy::Name:
+				if (m_SortOrder == SortOrder::Ascending)
+				{
+					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetName() < r->GetName(); });
+				}
+				else
+				{
+					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetName() > r->GetName(); });
+				}
+				break;
+
+			case SortBy::Date:
+				if (m_SortOrder == SortOrder::Ascending)
+				{
+					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetDate() < r->GetDate(); });
+				}
+				else
+				{
+					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetDate() > r->GetDate(); });
+				}
+				break;
+
+			case SortBy::Size:
+				if (m_SortOrder == SortOrder::Ascending)
+				{
+					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetSize() < r->GetSize(); });
+				}
+				else
+				{
+					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetSize() > r->GetSize(); });
+				}
+				break;
+
+			case SortBy::Type:
+				if (m_SortOrder == SortOrder::Ascending)
+				{
+					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetType() < r->GetType(); });
+				}
+				else
+				{
+					std::sort(m_Medias.begin(), m_Medias.end(), [](const Media * l, const Media * r) -> bool { return l->GetType() > r->GetType(); });
+				}
+				break;
+		}
+
+		this->endResetModel();
+	}
+
+	//!
+	//! The QML invokable sort method
+	//!
+	void MediaModel::sort(void)
+	{
+		this->Sort();
 	}
 
 	//!

@@ -26,11 +26,35 @@ namespace MediaViewerLib
 
 		Q_OBJECT
 
+		Q_ENUMS(SortBy)
+		Q_ENUMS(SortOrder)
 		Q_PROPERTY(QString root READ GetRoot WRITE SetRoot NOTIFY rootChanged)
+		Q_PROPERTY(SortBy sortBy READ GetSortBy WRITE SetSortBy NOTIFY sortByChanged)
+		Q_PROPERTY(SortOrder sortOrder READ GetSortOrder WRITE SetSortOrder NOTIFY sortOrderChanged)
+
+	public:
+
+		//! The various sort options
+		enum class SortBy
+		{
+			Name = 0,
+			Size,
+			Date,
+			Type
+		};
+
+		//! The sort order
+		enum class SortOrder
+		{
+			Ascending = 0,
+			Descending,
+		};
 
 	signals:
 
 		void	rootChanged(const QString & path);
+		void	sortByChanged(SortBy sortBy);
+		void	sortOrderChanged(SortOrder sortOrder);
 
 	public:
 
@@ -49,6 +73,11 @@ namespace MediaViewerLib
 		const QString &				GetRoot(void) const;
 		void						SetRoot(const QString & path);
 		const QVector< Media * > &	GetMedias(void) const;
+		SortBy						GetSortBy(void) const;
+		void						SetSortBy(SortBy by);
+		SortOrder					GetSortOrder(void) const;
+		void						SetSortOrder(SortOrder order);
+		void						Sort(void);
 
 		// public QML API
 		Q_INVOKABLE int				getIndexByPath(const QString & path) const;
@@ -57,6 +86,7 @@ namespace MediaViewerLib
 		Q_INVOKABLE QModelIndex		getNextModelIndex(const QModelIndex & index) const;
 		Q_INVOKABLE Media *			getMedia(const QModelIndex & index) const;
 		Q_INVOKABLE int				getIndex(const QModelIndex & index) const;
+		Q_INVOKABLE void			sort(void);
 
 	private:
 
@@ -70,6 +100,12 @@ namespace MediaViewerLib
 
 		//! The media in the root folder
 		mutable QVector< Media * > m_Medias;
+
+		//! The sort criteria
+		SortBy m_SortBy;
+
+		//! The sort order
+		SortOrder m_SortOrder;
 
 	};
 
