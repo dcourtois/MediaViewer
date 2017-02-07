@@ -48,8 +48,10 @@ ScrollView {
 						source: "image://Thumbnail/" + path
 						sourceSize.width: root.cellWidth - 20
 						sourceSize.height: root.cellHeight - 20 - label.height - 20
+						width: sourceSize.width
+						height: sourceSize.height
 						anchors.horizontalCenter: parent.horizontalCenter
-						fillMode: sourceSize.width > width || sourceSize.height > height ? Image.PreserveAspectFit : Image.Pad
+						fillMode: sourceSize.width >= width || sourceSize.height >= height ? Image.PreserveAspectFit : Image.Pad
 						asynchronous: true
 						antialiasing: true
 						autoTransform: true

@@ -19,26 +19,36 @@ namespace MediaViewer
 	//!
 	QImage ThumbnailProvider::requestImage(const QString & id, QSize * size, const QSize & requestedSize)
 	{
-		// set the size
-		int width = requestedSize.width() > 0 ? requestedSize.width() : 16;
-		int height = requestedSize.height() > 0 ? requestedSize.height() : 16;
-		if (size != nullptr)
-		{
-			size->setWidth(width);
-			size->setHeight(height);
-		}
-
 		// special handling of movies
 		if (Media::GetType(id) == MediaViewer::Media::Type::Movie)
 		{
+			// extract the frame
 			ThumbnailExtractor extractor(id, 0.33);
 			QEventLoop loop;
 			QObject::connect(&extractor, &ThumbnailExtractor::ready, &loop, &QEventLoop::quit);
 			loop.exec();
-			return extractor.GetThumbnail().scaled(width, height, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
+
+			// set the size
+			if (size != nullptr)
+			{
+				*size = extractor.GetThumbnail().size();
+			}
+
+			// and return the frame
+			return extractor.GetThumbnail();
 		}
 		else
 		{
+			// set the size
+			int width = requestedSize.width() > 0 ? requestedSize.width() : 16;
+			int height = requestedSize.height() > 0 ? requestedSize.height() : 16;
+			if (size != nullptr)
+			{
+				size->setWidth(width);
+				size->setHeight(height);
+			}
+
+			// create the thumbnail at the correct size
 			return QImage(id).scaled(width, height, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
 		}
 	}
@@ -46,7 +56,7 @@ namespace MediaViewer
 	//!
 	//! Get the thumbnail
 	//!
-	QImage ThumbnailExtractor::GetThumbnail(void) const
+	const QImage & ThumbnailExtractor::GetThumbnail(void) const
 	{
 		return m_Thumbnail;
 	}

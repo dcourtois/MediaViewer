@@ -44,7 +44,7 @@ namespace MediaViewer
 		ThumbnailExtractor(const QString & path, double position);
 
 		// C++ API
-		QImage GetThumbnail(void) const;
+		const QImage & GetThumbnail(void) const;
 
 		// reimplemented from QAbstractVideoSurface
 		bool present(const QVideoFrame & frame) final;

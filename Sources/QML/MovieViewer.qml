@@ -24,6 +24,14 @@ VideoOutput {
 	// playing state
 	property bool isPlaying: false
 
+	// thumbnail
+	Image {
+		anchors.fill: parent
+		visible: root.isPlaying === false && mediaPlayer.position === 0
+		source: "image://Thumbnail/" + selection.currentMedia.path
+		fillMode: sourceSize.width >= width || sourceSize.height >= height ? Image.PreserveAspectFit : Image.Pad
+	}
+
 	// the media player
 	MediaPlayer {
 		id: mediaPlayer
