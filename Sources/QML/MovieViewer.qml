@@ -29,6 +29,7 @@ VideoOutput {
 		id: mediaPlayer
 		source: (enabled && selection) ? selection.currentMediaPath : ""
 		autoPlay: false
+		muted: true
 		onError: {
 			if (MediaPlayer.NoError !== error) {
 				console.log("Error playing : " + source + " - " + errorString + "(error code: " + error + ")");
@@ -91,9 +92,8 @@ VideoOutput {
 		color: Qt.rgba(0.3, 0.3, 0.3, 0.3)
 		RowLayout {
 			Image {
-				width: 100
-				height: 100
-				fillMode: Image.PreserveAspectFit
+				sourceSize.width: 40
+				sourceSize.height: 40
 				source: "qrc:/icons/stop"
 				MouseArea {
 					anchors.fill: parent
@@ -102,9 +102,8 @@ VideoOutput {
 				}
 			}
 			Image {
-				width: 100
-				height: 100
-				fillMode: Image.PreserveAspectFit
+				sourceSize.width: 40
+				sourceSize.height: 40
 				source: root.isPlaying ? "qrc:/icons/pause" : "qrc:/icons/play"
 				MouseArea {
 					anchors.fill: parent

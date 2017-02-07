@@ -10,15 +10,41 @@ namespace MediaViewer
 	//!
 	class ThumbnailProvider
 		: public QQuickImageProvider
-		, public QAbstractVideoSurface
 	{
 
 	public:
 
-		ThumbnailProvider(QObject * parent = nullptr);
+		ThumbnailProvider(void);
 
 		// reimplemented from QQuickImageProvider
 		QImage requestImage(const QString & id, QSize * size, const QSize & requestedSize) final;
+
+	private:
+
+		//! A file icon provider
+		QFileIconProvider m_IconProvider;
+
+	};
+
+	//!
+	//! Class used to extract a preview from a video
+	//!
+	class ThumbnailExtractor
+		: public QAbstractVideoSurface
+	{
+
+		Q_OBJECT
+
+	signals:
+
+		void ready(void);
+
+	public:
+
+		ThumbnailExtractor(const QString & path, double position);
+
+		// C++ API
+		QImage GetThumbnail(void) const;
 
 		// reimplemented from QAbstractVideoSurface
 		bool present(const QVideoFrame & frame) final;
@@ -26,8 +52,11 @@ namespace MediaViewer
 
 	private:
 
-		//! A file icon provider
-		QFileIconProvider m_IconProvider;
+		//! The media player used to retrieve video thumbnails
+		QMediaPlayer m_MediaPlayer;
+
+		//! The thumbnail
+		QImage m_Thumbnail;
 
 	};
 

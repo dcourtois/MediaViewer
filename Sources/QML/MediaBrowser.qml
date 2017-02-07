@@ -47,7 +47,7 @@ ScrollView {
 						id: image
 						source: "image://Thumbnail/" + path
 						sourceSize.width: root.cellWidth - 20
-						sourceSize.height: root.cellHeight - 20 - (label.visible ? label.height + 20 : 0)
+						sourceSize.height: root.cellHeight - 20 - label.height - 20
 						anchors.horizontalCenter: parent.horizontalCenter
 						fillMode: sourceSize.width > width || sourceSize.height > height ? Image.PreserveAspectFit : Image.Pad
 						asynchronous: true

@@ -28,6 +28,7 @@
 #include <QIcon>
 #include <QImage>
 #include <QList>
+#include <QMediaPlayer>
 #include <QObject>
 #include <QPainter>
 #include <QPixmap>

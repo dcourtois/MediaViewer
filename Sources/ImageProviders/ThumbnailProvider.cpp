@@ -9,9 +9,8 @@ namespace MediaViewer
 	//!
 	//! Constructor
 	//!
-	ThumbnailProvider::ThumbnailProvider(QObject * parent)
+	ThumbnailProvider::ThumbnailProvider(void)
 		: QQuickImageProvider(QQuickImageProvider::Image)
-		, QAbstractVideoSurface(parent)
 	{
 	}
 
@@ -32,7 +31,11 @@ namespace MediaViewer
 		// special handling of movies
 		if (Media::GetType(id) == MediaViewer::Media::Type::Movie)
 		{
-			return QImage();
+			ThumbnailExtractor extractor(id, 0.33);
+			QEventLoop loop;
+			QObject::connect(&extractor, &ThumbnailExtractor::ready, &loop, &QEventLoop::quit);
+			loop.exec();
+			return extractor.GetThumbnail().scaled(width, height, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
 		}
 		else
 		{
@@ -41,19 +44,90 @@ namespace MediaViewer
 	}
 
 	//!
+	//! Get the thumbnail
+	//!
+	QImage ThumbnailExtractor::GetThumbnail(void) const
+	{
+		return m_Thumbnail;
+	}
+
+	//!
+	//! Constructor
+	//!
+	//! @param path
+	//!		Path of the video to extract from
+	//!
+	//! @param position
+	//!		The position to seek before extracting the thumbnail. Between 0 and 1.
+	//!
+	ThumbnailExtractor::ThumbnailExtractor(const QString & path, double position)
+	{
+		// configure the media player
+		m_MediaPlayer.setVideoOutput(this);
+		m_MediaPlayer.setVolume(0);
+		m_MediaPlayer.setMedia(QUrl::fromLocalFile(path));
+
+		// stops on error
+		QObject::connect(&m_MediaPlayer, static_cast< void (QMediaPlayer::*)(QMediaPlayer::Error) >(&QMediaPlayer::error), [&](QMediaPlayer::Error) {
+			m_MediaPlayer.stop();
+			emit ready();
+		});
+
+		// start playing when the media is loaded
+		QObject::connect(&m_MediaPlayer, &QMediaPlayer::mediaStatusChanged, [&](QMediaPlayer::MediaStatus status) {
+			if (status == QMediaPlayer::MediaStatus::LoadedMedia)
+			{
+				m_MediaPlayer.setPosition(static_cast< qint64 >(m_MediaPlayer.duration() * position));
+				m_MediaPlayer.play();
+			}
+		});
+	}
+
+	//!
 	//! Get a frame from a video
 	//!
-	bool ThumbnailProvider::present(const QVideoFrame & frame)
+	bool ThumbnailExtractor::present(const QVideoFrame & frame)
 	{
-		return false;
+		// map the frame
+		QVideoFrame newframe(frame);
+		newframe.map(QAbstractVideoBuffer::MapMode::ReadOnly);
+
+		// create the image
+		int bytesperlines = newframe.bytesPerLine();
+		int width = newframe.width();
+		int height = newframe.height();
+		m_Thumbnail = QImage(width, height, QImage::Format::Format_RGB888);
+		if (newframe.pixelFormat() == QVideoFrame::PixelFormat::Format_ARGB32)
+		{
+			for (int x = 0; x < width; ++x)
+			{
+				for (int y = 0; y < height; ++y)
+				{
+					const uchar * pixel = newframe.bits() + y * bytesperlines + x * 4;
+					m_Thumbnail.setPixelColor(x, y, QColor(pixel[2], pixel[1], pixel[0]));
+				}
+			}
+		}
+
+		// unmap
+		newframe.unmap();
+
+		// stop playing and notify
+		m_MediaPlayer.stop();
+		emit ready();
+
+		return true;
 	}
 
 	//!
 	//! Get the list of supported formats
 	//!
-	QList< QVideoFrame::PixelFormat > ThumbnailProvider::supportedPixelFormats(QAbstractVideoBuffer::HandleType type) const
+	QList< QVideoFrame::PixelFormat > ThumbnailExtractor::supportedPixelFormats(QAbstractVideoBuffer::HandleType type) const
 	{
-		return QList< QVideoFrame::PixelFormat >();
+		Q_UNUSED(type);
+		QList< QVideoFrame::PixelFormat > formats;
+		formats << QVideoFrame::PixelFormat::Format_ARGB32;
+		return formats;
 	}
 
 } // namespace MediaViewer
