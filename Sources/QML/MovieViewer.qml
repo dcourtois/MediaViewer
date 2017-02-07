@@ -63,6 +63,9 @@ VideoOutput {
 			case Qt.Key_Escape:
 				stateManager.state = "preview";
 				break;
+			case Qt.Key_Space:
+				root.isPlaying ? mediaPlayer.pause() : mediaPlayer.play();
+				break;
 		}
 	}
 
@@ -70,17 +73,42 @@ VideoOutput {
 	MouseArea {
 		anchors.fill: parent
 		acceptedButtons: Qt.LeftButton
+		hoverEnabled: true
+
+		// timer used to hide the mouse cursor
+		Timer {
+			id: timer
+			onTriggered: {
+				if (stateManager.state == "fullscreen") {
+					cursor.hidden = true;
+					controls.visible = false;
+				}
+			}
+		}
+
+		// detect mouse moves to show the cursor
+		onPositionChanged: {
+			if (stateManager.state == "fullscreen") {
+				controls.visible = true;
+				cursor.hidden = false;
+				timer.restart();
+			}
+		}
+
 		onDoubleClicked: {
 			if (stateManager.state == "fullscreen") {
 				stateManager.state = "preview";
+				controls.visible = true;
 			} else {
 				stateManager.state = "fullscreen";
+				controls.visible = false;
 			}
 		}
 	}
 
 	// playback controls
 	Rectangle {
+		id: controls
 		anchors {
 			bottom: parent.bottom
 			bottomMargin: 50
