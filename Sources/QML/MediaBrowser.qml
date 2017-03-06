@@ -1,6 +1,7 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
+import MediaViewer 0.1
 
 
 //
@@ -45,7 +46,7 @@ ScrollView {
 					anchors.centerIn: parent
 					Image {
 						id: image
-						source: "image://Thumbnail/" + path
+						source: type === Media.Movie ? "image://Thumbnail/" + path : "file:///" + path
 						sourceSize.width: root.cellWidth - 20
 						sourceSize.height: root.cellHeight - 20 - label.height - 20
 						width: sourceSize.width
