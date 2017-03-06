@@ -39,9 +39,12 @@ namespace MediaViewer
 		}
 		else
 		{
+			// load the image
+			QImage image(id);
+
 			// set the size
-			int width = requestedSize.width() > 0 ? requestedSize.width() : 16;
-			int height = requestedSize.height() > 0 ? requestedSize.height() : 16;
+			int width = requestedSize.width() > 0 ? (requestedSize.width() > image.width() ? image.width() : requestedSize.width()) : 16;
+			int height = requestedSize.height() > 0 ? (requestedSize.height() > image.height() ? image.height() : requestedSize.height()) : 16;
 			if (size != nullptr)
 			{
 				size->setWidth(width);
@@ -49,7 +52,7 @@ namespace MediaViewer
 			}
 
 			// create the thumbnail at the correct size
-			return QImage(id).scaled(width, height, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
+			return image.scaled(width, height, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
 		}
 	}
 
@@ -100,7 +103,17 @@ namespace MediaViewer
 	{
 		// map the frame
 		QVideoFrame newframe(frame);
-		newframe.map(QAbstractVideoBuffer::MapMode::ReadOnly);
+		if (newframe.map(QAbstractVideoBuffer::MapMode::ReadOnly) == false)
+		{
+			return false;
+		}
+
+		// get the data
+		const uchar * firstPixel = newframe.bits();
+		if (firstPixel == nullptr)
+		{
+			return false;
+		}
 
 		// create the image
 		int bytesperlines = newframe.bytesPerLine();
@@ -113,7 +126,7 @@ namespace MediaViewer
 			{
 				for (int y = 0; y < height; ++y)
 				{
-					const uchar * pixel = newframe.bits() + y * bytesperlines + x * 4;
+					const uchar * pixel = firstPixel+ y * bytesperlines + x * 4;
 					m_Thumbnail.setPixelColor(x, y, QColor(pixel[2], pixel[1], pixel[0]));
 				}
 			}
