@@ -127,6 +127,8 @@ namespace MediaViewer
 				for (int y = 0; y < height; ++y)
 				{
 					const uchar * pixel = firstPixel+ y * bytesperlines + x * 4;
+
+					// note : even though pixel format is RGB, the real order seems to be BGR ...
 					m_Thumbnail.setPixelColor(x, y, QColor(pixel[2], pixel[1], pixel[0]));
 				}
 			}
