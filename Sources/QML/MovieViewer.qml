@@ -8,9 +8,8 @@ import MediaViewer 0.1
 //
 // Movie viewer
 //
-VideoOutput {
+Item {
 	id: root
-	source: mediaPlayer
 
 	// externally set
 	property var selection
@@ -28,26 +27,45 @@ VideoOutput {
 	Image {
 		anchors.fill: parent
 		visible: root.isPlaying === false && mediaPlayer.position === 0
-		source: "image://Thumbnail/" + selection.currentMedia.path
+		source: selection.currentMedia ? "image://Thumbnail/" + selection.currentMedia.path : ""
 		fillMode: sourceSize.width >= width || sourceSize.height >= height ? Image.PreserveAspectFit : Image.Pad
 	}
 
 	// the media player
-	MediaPlayer {
-		id: mediaPlayer
-		source: (enabled && selection) ? selection.currentMediaPath : ""
-		autoPlay: false
-		muted: true
-		onError: {
-			if (MediaPlayer.NoError !== error) {
-				console.log("Error playing : " + source + " - " + errorString + "(error code: " + error + ")");
+	VideoOutput {
+		id: output
+		source: mediaPlayer
+
+		// the player
+		MediaPlayer {
+			id: mediaPlayer
+			source: (enabled && selection) ? selection.currentMediaPath : ""
+			autoPlay: false
+			muted: true
+			onError: {
+				if (MediaPlayer.NoError !== error) {
+					console.log("Error playing : " + source + " - " + errorString + "(error code: " + error + ")");
+				}
+			}
+
+			// update playing state
+			onPaused: root.isPlaying = false
+			onPlaying: root.isPlaying = true
+			onStopped: root.isPlaying = false
+
+			// update the video output sizing depending on the video resolution. This can be done
+			// only when the status is "loaded".
+			onStatusChanged: {
+				if (status === MediaPlayer.Loaded) {
+					var size = metaData.resolution;
+					if (size.width >= parent.width || size.height >= parent.height) {
+						output.anchors.fill = root;
+					} else {
+						output.anchors.centerIn = root;
+					}
+				}
 			}
 		}
-
-		// update playing state
-		onPaused: root.isPlaying = false
-		onPlaying: root.isPlaying = true
-		onStopped: root.isPlaying = false
 	}
 
 	// keyboard navigation
@@ -86,6 +104,7 @@ VideoOutput {
 		// timer used to hide the mouse cursor
 		Timer {
 			id: timer
+			interval: 2000
 			onTriggered: {
 				if (stateManager.state == "fullscreen") {
 					cursor.hidden = true;
