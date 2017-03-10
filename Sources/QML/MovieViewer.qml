@@ -23,14 +23,6 @@ Item {
 	// playing state
 	property bool isPlaying: false
 
-	// thumbnail
-	Image {
-		anchors.fill: parent
-		visible: root.isPlaying === false && mediaPlayer.position === 0
-		source: selection.currentMedia ? "image://Thumbnail/" + selection.currentMedia.path : ""
-		fillMode: sourceSize.width >= width || sourceSize.height >= height ? Image.PreserveAspectFit : Image.Pad
-	}
-
 	// the media player
 	VideoOutput {
 		id: output
@@ -66,6 +58,14 @@ Item {
 				}
 			}
 		}
+	}
+
+	// thumbnail
+	Image {
+		anchors.fill: parent
+		visible: root.isPlaying === false && mediaPlayer.position === 0
+		source: selection.currentMedia ? "image://Thumbnail/" + selection.currentMedia.path : ""
+		fillMode: sourceSize.width >= width || sourceSize.height >= height ? Image.PreserveAspectFit : Image.Pad
 	}
 
 	// keyboard navigation
@@ -153,7 +153,7 @@ Item {
 				MouseArea {
 					anchors.fill: parent
 					acceptedButtons: Qt.LeftButton
-					onClicked: mediaPlayer.stop()
+					onClicked: root.isPlaying ? mediaPlayer.stop() : mediaPlayer.seek(0)
 				}
 			}
 			Image {
