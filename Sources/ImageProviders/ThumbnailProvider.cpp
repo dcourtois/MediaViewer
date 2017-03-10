@@ -74,6 +74,7 @@ namespace MediaViewer
 	//!		The position to seek before extracting the thumbnail. Between 0 and 1.
 	//!
 	ThumbnailExtractor::ThumbnailExtractor(const QString & path, double position)
+		: m_Capture(0)
 	{
 		// configure the media player
 		m_MediaPlayer.setVideoOutput(this);
@@ -87,11 +88,12 @@ namespace MediaViewer
 		});
 
 		// start playing when the media is loaded
-		QObject::connect(&m_MediaPlayer, &QMediaPlayer::mediaStatusChanged, [&](QMediaPlayer::MediaStatus status) {
+		QObject::connect(&m_MediaPlayer, &QMediaPlayer::mediaStatusChanged, [&, position](QMediaPlayer::MediaStatus status) {
 			if (status == QMediaPlayer::MediaStatus::LoadedMedia)
 			{
 				m_MediaPlayer.setPosition(static_cast< qint64 >(m_MediaPlayer.duration() * position));
 				m_MediaPlayer.play();
+				m_Capture = 1;
 			}
 		});
 	}
@@ -101,6 +103,12 @@ namespace MediaViewer
 	//!
 	bool ThumbnailExtractor::present(const QVideoFrame & frame)
 	{
+		// check if we need to capture
+		if (m_Capture != 1)
+		{
+			return false;
+		}
+
 		// map the frame
 		QVideoFrame newframe(frame);
 		if (newframe.map(QAbstractVideoBuffer::MapMode::ReadOnly) == false)
@@ -138,6 +146,7 @@ namespace MediaViewer
 		newframe.unmap();
 
 		// stop playing and notify
+		m_Capture = 0;
 		m_MediaPlayer.stop();
 		emit ready();
 

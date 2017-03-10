@@ -58,6 +58,9 @@ namespace MediaViewer
 		//! The thumbnail
 		QImage m_Thumbnail;
 
+		//! When true, will capture the next available frame
+		QAtomicInt m_Capture;
+
 	};
 
 } // namespace MediaViewer
