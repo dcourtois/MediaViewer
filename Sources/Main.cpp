@@ -3,6 +3,7 @@
 #include "ImageProviders/FolderIconProvider.h"
 #include "ImageProviders/ThumbnailProvider.h"
 #include "Utils/Cursor.h"
+#include "Utils/FileSystem.h"
 
 
 //!
@@ -17,8 +18,9 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 	engine.addImageProvider("FolderIcon", new MediaViewer::FolderIconProvider);
 	engine.addImageProvider("Thumbnail", new MediaViewer::ThumbnailProvider);
 
-	// set the cursor manager
+	// set a few global QML helpers
 	engine.rootContext()->setContextProperty("cursor", new Cursor);
+	engine.rootContext()->setContextProperty("fileSystem", new FileSystem);
 
 	// expose the list of drives to QML
 	QVariantList drives;

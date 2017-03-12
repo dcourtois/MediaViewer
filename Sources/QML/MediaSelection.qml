@@ -14,31 +14,45 @@ ItemSelectionModel {
 	property var currentMediaType: Media.NotSupported
 	property var currentMediaIndex: -1
 
+	// check if we have a previous media
+	function hasPrevious() {
+		return model ? model.getPreviousModelIndex(currentIndex).valid : false;
+	}
+
+	// check if we have a next media
+	function hasNext() {
+		return model ? model.getNextModelIndex(currentIndex).valid : false;
+	}
+
 	// set the current media by path
 	function selectByPath(path) {
-		if (model) {
-			var index = model.getModelIndexByPath(path);
-			setCurrentIndex(index, ItemSelectionModel.Current);
-		}
+		setCurrent(model.getModelIndexByPath(path));
+	}
+
+	// set the current media by index
+	function selectByIndex(index) {
+		setCurrent(model.getModelIndexByIndex(index));
 	}
 
 	// select the previous media
 	function selectPrevious() {
-		if (model) {
-			var index = model.getPreviousModelIndex(currentIndex);
-			if (index.valid) {
-				setCurrentIndex(index, ItemSelectionModel.Current);
-			}
-		}
+		setCurrent(model.getPreviousModelIndex(currentIndex));
 	}
 
 	// select the next media
 	function selectNext() {
+		setCurrent(model.getNextModelIndex(currentIndex));
+	}
+
+	// select the last media
+	function selectLast() {
+		setCurrent(model.getLastModelIndex());
+	}
+
+	// helper
+	function setCurrent(index) {
 		if (model) {
-			var index = model.getNextModelIndex(currentIndex);
-			if (index.valid) {
-				setCurrentIndex(index, ItemSelectionModel.Current);
-			}
+			setCurrentIndex(index, ItemSelectionModel.Current);
 		}
 	}
 

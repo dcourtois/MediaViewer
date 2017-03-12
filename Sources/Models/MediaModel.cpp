@@ -16,6 +16,14 @@ namespace MediaViewer
 		, m_SortBy(SortBy::None)
 		, m_SortOrder(SortOrder::Ascending)
 	{
+		// setup file watching
+		QObject::connect(&m_FileWatcher, &QFileSystemWatcher::directoryChanged, [&] (const QString &) {
+			this->beginResetModel();
+			this->Clear();
+			m_Dirty = true;
+			this->GetMedias();
+			this->endResetModel();
+		});
 	}
 
 	//!
@@ -44,11 +52,17 @@ namespace MediaViewer
 			return;
 		}
 
+		// remove the old path from the file watcher
+		m_FileWatcher.removePath(m_Root);
+
 		// reset the model
 		this->beginResetModel();
 		this->Clear();
 		m_Root = path;
 		this->endResetModel();
+
+		// add the new path to the file watcher
+		m_FileWatcher.addPath(m_Root);
 
 		// notify
 		emit rootChanged(m_Root);
@@ -265,6 +279,22 @@ namespace MediaViewer
 			return QModelIndex();
 		}
 		return this->createIndex(index.row() + 1, 0, this->GetMedias()[index.row() + 1]);
+	}
+
+	//!
+	//! Get the last model index
+	//!
+	QModelIndex MediaModel::getLastModelIndex(void) const
+	{
+		return this->getModelIndexByIndex(this->GetMedias().size() - 1);
+	}
+
+	//!
+	//! Get a model index from an index
+	//!
+	QModelIndex MediaModel::getModelIndexByIndex(int index) const
+	{
+		return (index >= 0 && index < this->GetMedias().size()) ? this->createIndex(index, 0, this->GetMedias()[index]) : QModelIndex();
 	}
 
 	//!

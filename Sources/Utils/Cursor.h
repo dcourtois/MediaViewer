@@ -2,6 +2,9 @@
 #define __CURSOR_H__
 
 
+//!
+//! Small helper class used to expose cursor manipulation to QML
+//!
 class Cursor
 	: public QObject
 {

@@ -81,20 +81,53 @@ ApplicationWindow {
 		Menu {
 			title: "Edit"
 			MenuItem {
-				text: "Cut"
-				shortcut: StandardKey.Cut
-			}
-			MenuItem {
 				text: "Copy"
 				shortcut: StandardKey.Copy
+				enabled: mediaSelection.currentMedia !== null
+				onTriggered: {
+					fileSystem.copy([ mediaSelection.currentMedia.path ]);
+					_sourceFolderPath = folderBrowser.currentFolderPath;
+				}
+			}
+			MenuItem {
+				text: "Cut"
+				shortcut: StandardKey.Cut
+				enabled: mediaSelection.currentMedia !== null
+				onTriggered: {
+					fileSystem.cut([ mediaSelection.currentMedia.path ]);
+					_sourceFolderPath = folderBrowser.currentFolderPath;
+				}
 			}
 			MenuItem {
 				text: "Paste"
 				shortcut: StandardKey.Paste
+				enabled: fileSystem.canPaste
+				onTriggered: {
+					if (_sourceFolderPath !== folderBrowser.currentFolderPath) {
+						fileSystem.paste(folderBrowser.currentFolderPath);
+					}
+				}
 			}
 			MenuItem {
 				text: "Delete"
 				shortcut: StandardKey.Delete
+				enabled: mediaSelection.currentMedia !== null
+				onTriggered: {
+					// clear selection (AnimatedImage locks the file, preventing the deletion
+					// to work) and remove the file
+					var path = mediaSelection.currentMedia.path,
+						index = mediaSelection.currentMediaIndex,
+						hasNext = mediaSelection.hasNext();
+					mediaSelection.clearCurrentIndex();
+					fileSystem.remove([ path ]);
+					
+					// re-select the correct index
+					if (hasNext === true) {
+						mediaSelection.selectByIndex(index);
+					} else if (index > 0) {
+						mediaSelection.selectByIndex(index - 1);
+					}
+				}
 			}
 		}
 		Menu {
@@ -150,4 +183,7 @@ ApplicationWindow {
 			selection: mediaSelection
 		}
 	}
+
+	// some privates
+	property string _sourceFolderPath: ""
 }
