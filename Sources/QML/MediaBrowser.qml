@@ -46,7 +46,7 @@ ScrollView {
 					anchors.centerIn: parent
 					Image {
 						id: image
-						source: type === Media.Movie ? "image://Thumbnail/" + path : "file:///" + path
+						source: type === Media.Movie ? "image://Thumbnail/0/" + path : "file:///" + path
 						sourceSize.width: root.cellWidth - 20
 						sourceSize.height: root.cellHeight - 20 - label.height - 20
 						width: sourceSize.width

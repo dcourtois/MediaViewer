@@ -127,11 +127,14 @@ void DumpMemory(void)
 		qDebug() << line;
 		for (auto entry : *AllocatedBlocks)
 		{
-			sprintf(line, "%s(%d): %d bytes at location 0x%x",
+			sprintf(
+				line,
+				"%s(%d): %d bytes at location 0x%x",
 				std::get< 1 >(entry.second),
 				std::get< 2 >(entry.second),
 				std::get< 0 >(entry.second),
-				reinterpret_cast< unsigned int >(entry.first));
+				entry.first
+			);
 			qDebug() << line;
 		}
 	}

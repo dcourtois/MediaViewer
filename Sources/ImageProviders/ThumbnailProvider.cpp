@@ -23,7 +23,9 @@ namespace MediaViewer
 		if (Media::GetType(id) == MediaViewer::Media::Type::Movie)
 		{
 			// extract the frame
-			ThumbnailExtractor extractor(id, 0.33);
+			QString path = id.section('/', 1);
+			float time = id.section('/', 0, 0).toFloat();
+			ThumbnailExtractor extractor(path, time);
 			QEventLoop loop;
 			QObject::connect(&extractor, &ThumbnailExtractor::ready, &loop, &QEventLoop::quit);
 			loop.exec();
