@@ -31,7 +31,8 @@ namespace MediaViewer
 			Name = 0,
 			Size,
 			Date,
-			Type
+			Type,
+			None
 		};
 
 		//! The sort order
@@ -68,7 +69,7 @@ namespace MediaViewer
 		void						SetSortBy(SortBy by);
 		SortOrder					GetSortOrder(void) const;
 		void						SetSortOrder(SortOrder order);
-		void						Sort(void);
+		void						Sort(void) const;
 
 		// public QML API
 		Q_INVOKABLE int				getIndexByPath(const QString & path) const;
@@ -77,7 +78,7 @@ namespace MediaViewer
 		Q_INVOKABLE QModelIndex		getNextModelIndex(const QModelIndex & index) const;
 		Q_INVOKABLE Media *			getMedia(const QModelIndex & index) const;
 		Q_INVOKABLE int				getIndex(const QModelIndex & index) const;
-		Q_INVOKABLE void			sort(void);
+		Q_INVOKABLE void			sort(SortBy by, SortOrder order);
 
 	private:
 

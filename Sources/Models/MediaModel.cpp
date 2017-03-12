@@ -13,7 +13,7 @@ namespace MediaViewer
 	MediaModel::MediaModel(QObject * parent)
 		: QAbstractItemModel(parent)
 		, m_Dirty(false)
-		, m_SortBy(SortBy::Name)
+		, m_SortBy(SortBy::None)
 		, m_SortOrder(SortOrder::Ascending)
 	{
 	}
@@ -84,6 +84,9 @@ namespace MediaViewer
 				}
 			}
 
+			// sort
+			this->Sort();
+
 			// reset the dirty flag
 			m_Dirty = false;
 		}
@@ -105,7 +108,7 @@ namespace MediaViewer
 	{
 		if (m_SortBy != by)
 		{
-			m_SortBy = by;
+			this->sort(by, m_SortOrder);
 			emit sortByChanged(by);
 		}
 	}
@@ -125,7 +128,7 @@ namespace MediaViewer
 	{
 		if (m_SortOrder != order)
 		{
-			m_SortOrder = order;
+			this->sort(m_SortBy, order);
 			emit sortOrderChanged(order);
 		}
 	}
@@ -133,10 +136,8 @@ namespace MediaViewer
 	//!
 	//! Sort the model
 	//!
-	void MediaModel::Sort(void)
+	void MediaModel::Sort(void) const
 	{
-		this->beginResetModel();
-
 		switch (m_SortBy)
 		{
 			case SortBy::Name:
@@ -182,17 +183,38 @@ namespace MediaViewer
 					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetType() > r->GetType(); });
 				}
 				break;
-		}
 
-		this->endResetModel();
+			case SortBy::None:
+			default:
+				break;
+		}
 	}
 
 	//!
 	//! The QML invokable sort method
 	//!
-	void MediaModel::sort(void)
+	void MediaModel::sort(SortBy by, SortOrder order)
 	{
-		this->Sort();
+		bool needSort = false;
+		if (m_SortBy != by)
+		{
+			needSort = true;
+			m_SortBy = by;
+			emit sortByChanged(by);
+		}
+		if (m_SortOrder != order)
+		{
+			needSort = true;
+			m_SortOrder = order;
+			emit sortOrderChanged(order);
+		}
+
+		if (needSort == true)
+		{
+			this->beginResetModel();
+			this->Sort();
+			this->endResetModel();
+		}
 	}
 
 	//!
