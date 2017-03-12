@@ -17,6 +17,12 @@ namespace MediaViewer
 		, m_Dirty(true)
 	{
 		this->SetPath(path);
+
+		// setup the file watcher
+		QObject::connect(&m_FileWatcher, &QFileSystemWatcher::directoryChanged, [&] (const QString &) {
+			this->UpdateMedias();
+		});
+
 	}
 
 	//!
@@ -56,8 +62,15 @@ namespace MediaViewer
 	{
 		if (m_Path != path)
 		{
+			// remove old path
+			m_FileWatcher.removePath(m_Path);
+
+			// update
 			m_Path = path;
 			m_Dirty = true;
+
+			// add new path
+			m_FileWatcher.addPath(path);
 
 			// get the name
 			QDir dir = QDir(path);

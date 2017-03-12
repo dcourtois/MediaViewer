@@ -62,6 +62,9 @@ namespace MediaViewer
 		//! The children
 		mutable QVector< Folder * > m_Children;
 
+		//! File watcher used to detect file changes in the current folder
+		QFileSystemWatcher m_FileWatcher;
+
 	};
 
 } // namespace MediaViewer
