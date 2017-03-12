@@ -64,7 +64,7 @@ Item {
 			controls.show();
 
 			// the following only needs to be done when it's a movie
-			if (enabled) {
+			if (root.enabled) {
 				// update the preview
 				preview.update(mediaPlayer.position / mediaPlayer.duration);
 
