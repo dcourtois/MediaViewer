@@ -43,8 +43,10 @@ Item {
 				if (status === MediaPlayer.Loaded) {
 					var size = metaData.resolution;
 					if (size.width >= parent.width || size.height >= parent.height) {
+						output.anchors.centerIn = undefined;
 						output.anchors.fill = root;
 					} else {
+						output.anchors.fill = undefined;
 						output.anchors.centerIn = root;
 					}
 				}
