@@ -24,6 +24,7 @@ Item {
 	VideoOutput {
 		id: output
 		source: mediaPlayer
+		autoOrientation: true
 
 		// the player
 		MediaPlayer {
@@ -31,35 +32,73 @@ Item {
 			source: (enabled && selection) ? selection.currentMediaPath : ""
 			autoPlay: false
 			muted: true
-			onError: {
-				if (MediaPlayer.NoError !== error) {
-					console.log("Error playing : " + source + " - " + errorString + "(error code: " + error + ")");
-				}
-			}
 
-			// update the video output sizing depending on the video resolution. This can be done
-			// only when the status is "loaded".
-			onStatusChanged: {
-				if (status === MediaPlayer.Loaded) {
+			// update the output size
+			function updateSizing(force) {
+				if ((force === true && metaData.resolution !== undefined) || status === MediaPlayer.Loaded) {
 					var size = metaData.resolution;
-					if (size.width >= parent.width || size.height >= parent.height) {
+					if (size.width >= root.width || size.height >= root.height) {
 						output.anchors.centerIn = undefined;
 						output.anchors.fill = root;
 					} else {
 						output.anchors.fill = undefined;
+						output.width = size.width;
+						output.height = size.height;
 						output.anchors.centerIn = root;
 					}
 				}
 			}
+
+			// update the sizing when needed
+			onStatusChanged: updateSizing()
+			onSourceChanged: updateSizing()
 		}
 	}
 
-	// thumbnail
+	// detect current media changes
+	Connections {
+		target: selection
+		onCurrentMediaPathChanged: {
+			// stop playback
+			mediaPlayer.stop();
+
+			// update the preview
+			preview.update(mediaPlayer.position / mediaPlayer.duration);
+
+			// if we are in fullscreen, show controls again
+			if (stateManager.state === "fullscreen") {
+				controls.autoHide();
+			}
+		}
+	}
+
+	// check the fullscreen / preview state to force controls on preview
+	Connections {
+		target: stateManager
+		onStateChanged: {
+			// update the mediaPlayer's sizing
+			mediaPlayer.updateSizing(true);
+
+			// display or hide the controls
+			if (stateManager.state === "preview") {
+				controls.show();
+			} else if (stateManager.state === "fullscreen") {
+				controls.autoHide();
+			}
+		}
+	}
+
+	// thumbnail (source is set on the connection to the selection.currentMediaPath changed)
 	Image {
+		id: preview
 		anchors.fill: parent
 		visible: mediaPlayer.playbackState === MediaPlayer.StoppedState
-		source: selection.currentMedia ? "image://Thumbnail/0/" + selection.currentMedia.path : ""
 		fillMode: sourceSize.width >= width || sourceSize.height >= height ? Image.PreserveAspectFit : Image.Pad
+		function update(time) {
+			if (mediaPlayer.playbackState === MediaPlayer.StoppedState) {
+				source = selection.currentMedia ? "image://Thumbnail/" + time + "/" + selection.currentMedia.path : "";
+			}
+		}
 	}
 
 	// keyboard navigation
@@ -93,7 +132,7 @@ Item {
 		}
 	}
 
-	// Mouse area to catch double clicks
+	// Mouse area on the whole video
 	MouseArea {
 		anchors.fill: parent
 		acceptedButtons: Qt.LeftButton
@@ -102,10 +141,11 @@ Item {
 		// detect mouse moves to show the cursor
 		onPositionChanged: {
 			if (stateManager.state == "fullscreen") {
-				cursor.hidden = false;
+				controls.autoHide();
 			}
 		}
 
+		// double click toggles fullscreen / preview
 		onDoubleClicked: {
 			if (stateManager.state == "fullscreen") {
 				stateManager.state = "preview";
@@ -113,11 +153,39 @@ Item {
 				stateManager.state = "fullscreen";
 			}
 		}
+
+		// on simple clicks, pause / resume video
+		onClicked: {
+			if (mediaPlayer.playbackState === MediaPlayer.PlayingState) {
+				mediaPlayer.pause();
+			} else {
+				mediaPlayer.play();
+			}
+		}
 	}
 
 	// movie controls
 	Rectangle {
 		id: controls
+		property bool _containsCursor: false
+
+		// show the controls and disable auto-hide
+		function show() {
+			controls.visible = true;
+			cursor.hidden = false;
+			timer.stop();
+		}
+
+		// show the controls and restart the auto-hide
+		function autoHide() {
+			if (_containsCursor === false) {
+				controls.visible = true;
+				cursor.hidden = false;
+				timer.restart();
+			}
+		}
+
+		// size and color
 		anchors {
 			bottom: parent.bottom
 			left: parent.left
@@ -125,6 +193,22 @@ Item {
 		}
 		height: 80
 		color: Qt.rgba(0.3, 0.3, 0.3, 0.3)
+
+		// when the cursor is in the mouse area, let the controls visible
+		MouseArea {
+			anchors.fill: parent
+			acceptedButtons: Qt.LeftButton
+			hoverEnabled: true
+
+			// disable the play / pause on the controls (override the whole video mouse area)
+			onClicked: mouse.accepted = true
+
+			// when entering the area, show the controls
+			onEntered: { parent._containsCursor = true; parent.show(); }
+
+			// when leaving, autohide
+			onExited: { parent._containsCursor = false; parent.autoHide(); }
+		}
 
 		// playback controls
 		RowLayout {
@@ -138,7 +222,10 @@ Item {
 				MouseArea {
 					anchors.fill: parent
 					acceptedButtons: Qt.LeftButton
-					onClicked: mediaPlayer.stop()
+					onClicked: {
+						mediaPlayer.stop();
+						preview.update(0);
+					}
 				}
 			}
 			Image {
@@ -177,7 +264,11 @@ Item {
 			// detect user click to seek the movie
 			MouseArea {
 				anchors.fill: parent
-				onClicked: mediaPlayer.seek((mouseX / width) * mediaPlayer.duration)
+				acceptedButtons: Qt.LeftButton
+				onClicked: {
+					mediaPlayer.seek((mouseX / width) * mediaPlayer.duration);
+					preview.update(mouseX / width);
+				}
 			}
 		}
 
@@ -200,6 +291,16 @@ Item {
 
 			color: Qt.rgba(1, 1, 1, 1)
 			text: formatTime(mediaPlayer.position) + " / " + formatTime(mediaPlayer.duration)
+		}
+
+		// the timer used to hide / show the controls
+		Timer {
+			id: timer
+			interval: 2000
+			onTriggered: {
+				controls.visible = false;
+				cursor.hidden = true;
+			}
 		}
 	}
 }
