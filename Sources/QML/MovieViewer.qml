@@ -16,7 +16,7 @@ Item {
 	property var stateManager
 
 	// only enable for movies
-	enabled: selection && selection.currentMediaType == Media.Movie
+	enabled: selection && selection.currentMedia && selection.currentMedia.type === Media.Movie
 	visible: enabled
 	focus: enabled && stateManager.state === "fullscreen"
 
@@ -29,7 +29,7 @@ Item {
 		// the player
 		MediaPlayer {
 			id: mediaPlayer
-			source: (enabled && selection) ? selection.currentMediaPath : ""
+			source: enabled ? selection.currentMedia.path : ""
 			autoPlay: false
 			muted: true
 
@@ -58,16 +58,20 @@ Item {
 	// detect current media changes
 	Connections {
 		target: selection
-		onCurrentMediaPathChanged: {
-			// stop playback
+		onCurrentMediaChanged: {
+			// always stop playback and show controls
 			mediaPlayer.stop();
+			controls.show();
 
-			// update the preview
-			preview.update(mediaPlayer.position / mediaPlayer.duration);
+			// the following only needs to be done when it's a movie
+			if (enabled) {
+				// update the preview
+				preview.update(mediaPlayer.position / mediaPlayer.duration);
 
-			// if we are in fullscreen, show controls again
-			if (stateManager.state === "fullscreen") {
-				controls.autoHide();
+				// if we are in fullscreen, show controls again
+				if (stateManager.state === "fullscreen") {
+					controls.autoHide();
+				}
 			}
 		}
 	}
@@ -79,6 +83,9 @@ Item {
 			// update the mediaPlayer's sizing
 			mediaPlayer.updateSizing(true);
 
+			// update preview
+			preview.update(mediaPlayer.position / mediaPlayer.duration);
+
 			// display or hide the controls
 			if (stateManager.state === "preview") {
 				controls.show();
@@ -88,7 +95,7 @@ Item {
 		}
 	}
 
-	// thumbnail (source is set on the connection to the selection.currentMediaPath changed)
+	// preview image
 	Image {
 		id: preview
 		anchors.fill: parent
