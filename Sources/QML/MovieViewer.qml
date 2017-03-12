@@ -29,13 +29,13 @@ Item {
 		// the player
 		MediaPlayer {
 			id: mediaPlayer
-			source: enabled ? selection.currentMedia.path : ""
+			source: enabled ? "file:///" + selection.currentMedia.path : ""
 			autoPlay: false
 			muted: true
 
 			// update the output size
-			function updateSizing(force) {
-				if ((force === true && metaData.resolution !== undefined) || status === MediaPlayer.Loaded) {
+			function updateSizing() {
+				if (metaData.resolution !== undefined) {
 					var size = metaData.resolution;
 					if (size.width >= root.width || size.height >= root.height) {
 						output.anchors.centerIn = undefined;
@@ -50,8 +50,7 @@ Item {
 			}
 
 			// update the sizing when needed
-			onStatusChanged: updateSizing()
-			onSourceChanged: updateSizing()
+			onStatusChanged: if (status === MediaPlayer.Loaded) { updateSizing(); }
 		}
 	}
 
@@ -81,7 +80,7 @@ Item {
 		target: stateManager
 		onStateChanged: {
 			// update the mediaPlayer's sizing
-			mediaPlayer.updateSizing(true);
+			mediaPlayer.updateSizing();
 
 			// update preview
 			preview.update(mediaPlayer.position / mediaPlayer.duration);
