@@ -15,7 +15,7 @@ AnimatedImage {
 	property var stateManager
 
 	// only enable for images
-	enabled: selection && selection.currentMediaType === Media.AnimatedImage
+	enabled: selection && selection.currentMedia && selection.currentMedia.type === Media.AnimatedImage
 	visible: enabled
 	focus: enabled && stateManager.state === "fullscreen"
 
@@ -23,7 +23,7 @@ AnimatedImage {
 	onStatusChanged: playing = (status == AnimatedImage.Ready)
 
 	// bind the source
-	source: (enabled && selection) ? selection.currentMediaPath : "qrc:///images/empty"
+	source: enabled ? "file:///" + selection.currentMedia.path : "qrc:///images/empty"
 
 	// only fit when the image is greater than the view size
 	fillMode: sourceSize.width > width || sourceSize.height > height ? Image.PreserveAspectFit : Image.Pad
