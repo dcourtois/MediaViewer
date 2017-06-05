@@ -24,10 +24,32 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 
 	// expose the list of drives to QML
 	QVariantList drives;
+#if defined(WINDOWS)
 	for (auto drive : QDir::drives())
 	{
 		drives << drive.absolutePath();
 	}
+#elif defined(LINUX)
+	// get the user home
+	for (auto drive : QStandardPaths::standardLocations(QStandardPaths::HomeLocation))
+	{
+		drives << drive;
+	}
+
+	// hacky way of getting the mounted volumes (local harddrives, usb keys, etc.)
+	for (const QStorageInfo & storage : QStorageInfo::mountedVolumes())
+	{
+		if (storage.isRoot() == true ||
+			storage.isReadOnly() == true ||
+			storage.device().startsWith("/dev/sd") == false)
+		{
+			continue;
+		}
+		drives << storage.rootPath();
+	}
+#else
+	static_assert(false, "initialize drives for your platform");1
+#endif
 	engine.rootContext()->setContextProperty("drives", drives);
 
 	// open the initial folder / media

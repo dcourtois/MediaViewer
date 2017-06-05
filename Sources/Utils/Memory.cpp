@@ -169,7 +169,7 @@ void * operator new [](size_t size, const char * filename, int line)
 //!
 //! Override of delete
 //!
-void operator delete(void * pointer)
+void operator delete(void * pointer) noexcept
 {
 	CheckAllocatedBlocks();
 	std::lock_guard< std::mutex > lock(Mutex);
@@ -199,7 +199,7 @@ void operator delete(void * pointer, const char * /* filename */, int /* line */
 //!
 //! Override of delete []
 //!
-void operator delete [](void * pointer)
+void operator delete [](void * pointer) noexcept
 {
 	CheckAllocatedBlocks();
 	std::lock_guard< std::mutex > lock(Mutex);

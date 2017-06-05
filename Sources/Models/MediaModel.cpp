@@ -345,7 +345,7 @@ namespace MediaViewer
 			case Qt::DisplayRole:	return media->GetName();
 			case Qt::UserRole:		return media->GetPath();
 			case Qt::UserRole + 1:	return media->GetDate();
-			case Qt::UserRole + 2:	return media->GetSize();
+			case Qt::UserRole + 2:	return static_cast< qulonglong >(media->GetSize());
 			case Qt::UserRole + 3:	return static_cast< int >(media->GetType());
 			default:				return QVariant();
 		}

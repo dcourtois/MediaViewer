@@ -12,9 +12,9 @@
 
 extern void * operator new(size_t size, const char * filename, int line);
 extern void * operator new [] (size_t size, const char * filename, int line);
-extern void operator delete(void * pointer);
+extern void operator delete(void * pointer) noexcept;
 extern void operator delete(void * pointer, const char * filename, int line);
-extern void operator delete [] (void * pointer);
+extern void operator delete [] (void * pointer) noexcept;
 extern void operator delete [] (void * pointer, const char * filename, int line);
 
 #	define	NEW				new(__FILE__, __LINE__)
