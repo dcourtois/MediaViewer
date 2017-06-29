@@ -70,26 +70,26 @@ Rectangle {
 			if (selection.currentMedia) {
 				switch (selection.currentMedia.type) {
 					case Media.Image:
-						viewer.sourceComponent = image;
+						viewer.source = "qrc:///Viewers/Image.qml";
 						viewer.item.source = "file:///" + selection.currentMedia.path;
 						break;
 
 					case Media.AnimatedImage:
-						viewer.sourceComponent = animatedImage;
+						viewer.source = "qrc:///Viewers/AnimatedImage.qml";
 						viewer.item.source = "file:///" + selection.currentMedia.path;
 						break;
 
 					case Media.Movie:
-						viewer.sourceComponent = movie;
+						viewer.source = "qrc:///Viewers/Movie.qml";
 						viewer.item.source = "file:///" + selection.currentMedia.path;
 						break;
 
 					case Media.NotSupported:
-						viewer.sourceComponent = undefined;
+						viewer.source = undefined;
 						break;
 				}
 			} else {
-				viewer.sourceComponent = undefined;
+				viewer.source = undefined;
 			}
 		}
 	}
@@ -123,32 +123,9 @@ Rectangle {
 		id: viewer
 		asynchronous: false
 		anchors.fill: parent
-	}
 
-	// The static image viewer
-	Component {
-		id: image
-		ImageViewer {
-			selection: root.selection
-			stateManager: root.stateManager
-		}
-	}
-
-	// The animated image viewer
-	Component {
-		id: animatedImage
-		AnimatedImageViewer {
-			selection: root.selection
-			stateManager: root.stateManager
-		}
-	}
-
-	// The movie viewer
-	Component {
-		id: movie
-		MovieViewer {
-			selection: root.selection
-			stateManager: root.stateManager
-		}
+		// make selection and state manager available
+		property var selection: root.selection
+		property var stateManager: root.stateManager
 	}
 }

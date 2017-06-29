@@ -1,6 +1,5 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
-import QtQuick.Controls 2.2 as Controls
 import QtQuick.Layouts 1.0
 import Qt.labs.settings 1.0
 import MediaViewer 0.1
@@ -11,6 +10,7 @@ import MediaViewer 0.1
 //
 MainWindow {
 	id: mainWindow
+	title: selection.currentMedia ? "Media Viewer - " + selection.currentMedia.path : "Media Viewer"
 
 	// initialize starting folders
 	Component.onCompleted: {
@@ -18,7 +18,7 @@ MainWindow {
 			folderBrowser.currentFolderPath = initFolder;
 		}
 		if (initMedia !== "") {
-			mediaSelection.selectByPath(initMedia);
+			selection.selectByPath(initMedia);
 			stateManager.state = "fullscreen";
 		}
 	}
@@ -47,14 +47,14 @@ MainWindow {
 	// global media selection (needed to share selection between the
 	// media browser and the media preview)
 	MediaSelection {
-		id: mediaSelection
+		id: selection
 		model: mediaModel
 	}
 
 	// connect the media selection and the folder browser
 	Connections {
 		target: folderBrowser
-		onCurrentFolderPathChanged: mediaSelection.clear()
+		onCurrentFolderPathChanged: selection.clear()
 	}
 
 	// global state manager. Used to control fullscren/browsing mode
@@ -80,6 +80,7 @@ MainWindow {
 
 	// Menu
 	header: MainMenu {
+		selection: selection
 	}
 
 	// The split between the media preview and folder browser on the left,
@@ -108,7 +109,7 @@ MainWindow {
 				MediaViewer {
 					id: mediaViewer
 					color: Qt.rgba(0, 0, 0, 1);
-					selection: mediaSelection
+					selection: selection
 					stateManager: stateManager
 				}
 			}
@@ -118,7 +119,7 @@ MainWindow {
 		MediaBrowser {
 			id: mediaBrowser
 			Layout.fillWidth: true
-			selection: mediaSelection
+			selection: selection
 			stateManager: stateManager
 			settings: preferences.settings
 		}

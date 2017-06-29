@@ -12,6 +12,9 @@ ToolBar {
 	Material.background: Material.BlueGrey
 	Material.elevation: 0
 
+	// externally set
+	property var selection
+
 	RowLayout {
 		anchors.fill: parent
 		ToolButton {
@@ -37,7 +40,7 @@ ToolBar {
 		MenuItem {
 			id: copy
 			text: "Copy"
-			enabled: mediaSelection.currentMedia !== null
+			enabled: selection.currentMedia !== null
 			Shortcut {
 				enabled: copy.enabled
 				sequence: "Ctrl+C"
@@ -45,14 +48,14 @@ ToolBar {
 				onActivated: copy.triggered()
 			}
 			onTriggered: {
-				fileSystem.copy([ mediaSelection.currentMedia.path ]);
+				fileSystem.copy([ selection.currentMedia.path ]);
 				_sourceFolderPath = folderBrowser.currentFolderPath;
 			}
 		}
 		MenuItem {
 			id: cut
 			text: "Cut"
-			enabled: mediaSelection.currentMedia !== null
+			enabled: selection.currentMedia !== null
 			Shortcut {
 				enabled: cut.enabled
 				sequence: "Ctrl+X"
@@ -60,7 +63,7 @@ ToolBar {
 				onActivated: cut.triggered()
 			}
 			onTriggered: {
-				fileSystem.cut([ mediaSelection.currentMedia.path ]);
+				fileSystem.cut([ selection.currentMedia.path ]);
 				_sourceFolderPath = folderBrowser.currentFolderPath;
 			}
 		}
@@ -83,7 +86,7 @@ ToolBar {
 		MenuItem {
 			id: del
 			text: "Delete"
-			enabled: mediaSelection.currentMedia !== null
+			enabled: selection.currentMedia !== null
 			Shortcut {
 				enabled: del.enabled
 				sequence: "Del"
@@ -93,17 +96,17 @@ ToolBar {
 			onTriggered: {
 				// clear selection (AnimatedImage locks the file, preventing the deletion
 				// to work) and remove the file
-				var path = mediaSelection.currentMedia.path,
-					index = mediaSelection.currentMediaIndex,
-					hasNext = mediaSelection.hasNext();
-				mediaSelection.clearCurrentIndex();
+				var path = selection.currentMedia.path,
+					index = selection.currentMediaIndex,
+					hasNext = selection.hasNext();
+				selection.clearCurrentIndex();
 				fileSystem.remove([ path ]);
 
 				// re-select the correct index
 				if (hasNext === true) {
-					mediaSelection.selectByIndex(index);
+					selection.selectByIndex(index);
 				} else if (index > 0) {
-					mediaSelection.selectByIndex(index - 1);
+					selection.selectByIndex(index - 1);
 				}
 			}
 		}

@@ -11,24 +11,20 @@ Item {
 	id: root
 
 	// expose the source (like ImageViewer and AnimatedImageViewer)
-	property alias source: mediaPlayer.source
+	property alias source: player.source
 
-	//
+	// acquire focus for movie specific shortcuts
 	focus: true
-
-	// externally set
-	property var selection
-	property var stateManager
 
 	// the media player
 	VideoOutput {
-		id: mediaOutput
-		source: mediaPlayer
+		id: output
+		source: player
 		autoOrientation: true
 
 		// resize
 		function resize() {
-			var size = mediaPlayer.metaData.resolution;
+			var size = player.metaData.resolution;
 			if (size.width >= root.width || size.height >= root.height) {
 				anchors.centerIn = undefined;
 				anchors.fill = root;
@@ -43,44 +39,34 @@ Item {
 
 	// the player
 	MediaPlayer {
-		id: mediaPlayer
+		id: player
 		autoPlay: false
 		muted: true
 
-		// if set to true, as soon as a new media resolution
-		// is available, the video player will resize and show
-		// the first frame
-		property bool needInit: true
-
 		// update the sizing when ready to play
 		onStatusChanged: {
-			if (needInit === true && metaData.resolution !== undefined) {
-				mediaOutput.resize();
-				root.setPosition(0);
-				needInit = false;
+			if (status === MediaPlayer.Buffered) {
+				output.resize();
+				player.play();
+				player.seek(0);
+				player.pause();
 			}
 		}
-	}
-
-	// detect current media changes
-	Connections {
-		target: mediaPlayer
-		onSourceChanged: mediaPlayer.needInit = true
 	}
 
 	// detect size changes
 	Connections {
 		target: root
-		onWidthChanged: { mediaOutput.resize(); root.setPosition(mediaPlayer.position); }
-		onHeightChanged: { mediaOutput.resize(); root.setPosition(mediaPlayer.position); }
+		onWidthChanged: { output.resize(); root.setPosition(player.position); }
+		onHeightChanged: { output.resize(); root.setPosition(player.position); }
 	}
 
 	// set the image at the given position
 	function setPosition(position) {
-		mediaPlayer.seek(position);
-		if (mediaPlayer.playbackState !== MediaPlayer.PlayingState) {
-			mediaPlayer.play();
-			mediaPlayer.pause();
+		player.seek(position);
+		if (player.playbackState !== player.PlayingState) {
+			player.play();
+			player.pause();
 		}
 	}
 
@@ -109,16 +95,16 @@ Item {
 				MouseArea {
 					anchors.fill: parent
 					acceptedButtons: Qt.LeftButton
-					onClicked: { mediaPlayer.pause(); mediaPlayer.seek(0); }
+					onClicked: { player.stop(); root.setPosition(0); }
 				}
 			}
 			Image {
 				sourceSize { width: 40; height: 40 }
-				source: mediaPlayer.playbackState === MediaPlayer.PlayingState ? "qrc:/icons/pause" : "qrc:/icons/play"
+				source: player.playbackState === MediaPlayer.PlayingState ? "qrc:/icons/pause" : "qrc:/icons/play"
 				MouseArea {
 					anchors.fill: parent
 					acceptedButtons: Qt.LeftButton
-					onClicked: mediaPlayer.playbackState === MediaPlayer.PlayingState ? mediaPlayer.pause() : mediaPlayer.play()
+					onClicked: player.playbackState === MediaPlayer.PlayingState ? player.pause() : player.play()
 				}
 			}
 		}
@@ -142,14 +128,14 @@ Item {
 					bottom: parent.bottom
 				}
 				color: Qt.rgba(1, 1, 1, 1)
-				width: parent.width * (mediaPlayer.position / mediaPlayer.duration)
+				width: parent.width * (player.position / player.duration)
 			}
 
 			// detect user click to seek the movie
 			MouseArea {
 				anchors.fill: parent
 				acceptedButtons: Qt.LeftButton
-				onClicked: mediaPlayer.seek((mouseX / width) * mediaPlayer.duration);
+				onClicked: player.seek((mouseX / width) * player.duration);
 			}
 		}
 
@@ -171,7 +157,7 @@ Item {
 			}
 
 			color: Qt.rgba(1, 1, 1, 1)
-			text: formatTime(mediaPlayer.position) + " / " + formatTime(mediaPlayer.duration)
+			text: formatTime(player.position) + " / " + formatTime(player.duration)
 		}
 	}
 
@@ -181,7 +167,7 @@ Item {
 			// play / pause
 			case Qt.Key_Space:
 				event.accepted = true;
-				mediaPlayer.playbackState === MediaPlayer.PlayingState ? mediaPlayer.pause() : mediaPlayer.play();
+				player.playbackState === player.PlayingState ? player.pause() : player.play();
 				break;
 
 			// let the rest be handled by the parent

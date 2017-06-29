@@ -1,4 +1,5 @@
 import QtQuick 2.5
+import QtQuick.Controls 1.4 as Controls
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.2
 import QtMultimedia 5.8
@@ -26,7 +27,7 @@ Item {
 
 	// use a scroll view to show a scroll bar (GridView is a flickable, so
 	// it doesn't show any scroll bar)
-	ScrollView {
+	Controls.ScrollView {
 		id: scrollView
 		anchors.fill: parent
 
@@ -47,87 +48,6 @@ Item {
 
 			// bind the model
 			model: selection ? selection.model : undefined
-
-			// handle preview of an imagee
-			Component {
-				id: imagePreview
-				Image {
-					source: "file:///" + sourcePath
-					fillMode: sourceSize.width >= width || sourceSize.height >= height ? Image.PreserveAspectFit : Image.Pad
-					asynchronous: false
-					antialiasing: true
-					autoTransform: true
-					smooth: true
-					mipmap: true
-				}
-			}
-
-			// handle preview of an animated
-			Component {
-				id: animatedImagePreview
-				AnimatedImage {
-					source: "file:///" + sourcePath
-					fillMode: sourceSize.width >= width || sourceSize.height >= height ? Image.PreserveAspectFit : Image.Pad
-					asynchronous: false
-					antialiasing: true
-					autoTransform: true
-					smooth: true
-					mipmap: true
-					playing: settings.playAnimatedImages === 0
-					paused: settings.playAnimatedImages === 1 && parent.mouseHover === false
-					property bool mouseHover: false
-
-					// mouse hover detection
-					MouseArea {
-						anchors.fill: parent
-						hoverEnabled: true
-						onEntered: parent.mouseHover = true
-						onExited: parent.mouseHover = false
-					}
-				}
-			}
-
-			// handle preview of a movie
-			Component {
-				id: moviePreview
-				VideoOutput {
-					id: output
-					source: mediaPlayer
-					autoOrientation: true
-					property bool _playing: settings.playAnimatedImages === 0
-					property bool _paused: settings.playAnimatedImages === 1 && _mouseHover === false
-					property bool _mouseHover: false
-
-					// handle playing state changes
-					on_PlayingChanged: _playing === true ? mediaPlayer.play() : mediaPlayer.stop();
-					on_PausedChanged: _paused === true ? mediaPlayer.pause() : mediaPlayer.stop();
-
-					// the player
-					MediaPlayer {
-						id: mediaPlayer
-						source: "file:///" + sourcePath
-						loops: MediaPlayer.Infinite
-						muted: true
-						onStatusChanged: {
-							if (status === MediaPlayer.Loaded) {
-								mediaPlayer.seek(0);
-								mediaPlayer.play();
-								if (settings.playAnimatedImages === 0 || _paused === true) {
-									mediaPlayer.pause();
-								}
-							}
-						}
-					}
-
-					// to detect mouse hover
-					MouseArea {
-						anchors.fill: parent
-						hoverEnabled: true
-						onEntered: parent._mouseHover = true
-						onExited: parent._mouseHover = false
-					}
-				}
-			}
 
 			// delegate used to draw an item
 			Component {
@@ -155,11 +75,11 @@ Item {
 							property string sourcePath: path
 
 							// load the correct component
-							sourceComponent: {
+							source: {
 								switch (type) {
-									case Media.Movie:			return moviePreview;
-									case Media.AnimatedImage:	return animatedImagePreview;
-									case Media.Image:			return imagePreview;
+									case Media.Movie:			return "qrc:///Previews/Movie.qml";
+									case Media.AnimatedImage:	return "qrc:///Previews/AnimatedImage.qml";
+									case Media.Image:			return "qrc:///Previews/Image.qml";
 								}
 							}
 						}
