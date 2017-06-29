@@ -36,6 +36,7 @@
 #include <QQmlContext>
 #include <QQmlExtensionPlugin>
 #include <QQuickImageProvider>
+#include <QQuickStyle>
 #include <QRunnable>
 #include <QSize>
 #include <QString>

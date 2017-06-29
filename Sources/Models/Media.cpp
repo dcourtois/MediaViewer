@@ -49,7 +49,8 @@ namespace MediaViewer
 	//! Copy constructor
 	//!
 	Media::Media(const Media & other)
-		: m_Path(other.m_Path)
+		: QObject(nullptr)
+		, m_Path(other.m_Path)
 		, m_Name(other.m_Name)
 		, m_Date(other.m_Date)
 		, m_Size(other.m_Size)

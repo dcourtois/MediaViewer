@@ -2,7 +2,6 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3
 import QtMultimedia 5.8
-import MediaViewer 0.1
 
 
 //
@@ -11,209 +10,91 @@ import MediaViewer 0.1
 Item {
 	id: root
 
+	// expose the source (like ImageViewer and AnimatedImageViewer)
+	property alias source: mediaPlayer.source
+
+	//
+	focus: true
+
 	// externally set
 	property var selection
 	property var stateManager
 
-	// only enable for movies
-	enabled: selection && selection.currentMedia && selection.currentMedia.type === Media.Movie
-	visible: enabled
-	focus: enabled && stateManager.state === "fullscreen"
-
 	// the media player
 	VideoOutput {
-		id: output
+		id: mediaOutput
 		source: mediaPlayer
 		autoOrientation: true
 
-		// the player
-		MediaPlayer {
-			id: mediaPlayer
-			source: enabled ? "file:///" + selection.currentMedia.path : ""
-			autoPlay: false
-			muted: true
-
-			// update the output size
-			function updateSizing() {
-				if (metaData.resolution !== undefined) {
-					var size = metaData.resolution;
-					if (size.width >= root.width || size.height >= root.height) {
-						output.anchors.centerIn = undefined;
-						output.anchors.fill = root;
-					} else {
-						output.anchors.fill = undefined;
-						output.width = size.width;
-						output.height = size.height;
-						output.anchors.centerIn = root;
-					}
-				}
+		// resize
+		function resize() {
+			var size = mediaPlayer.metaData.resolution;
+			if (size.width >= root.width || size.height >= root.height) {
+				anchors.centerIn = undefined;
+				anchors.fill = root;
+			} else {
+				anchors.fill = undefined;
+				width = size.width;
+				height = size.height;
+				anchors.centerIn = root;
 			}
+		}
+	}
 
-			// update the sizing when needed
-			onStatusChanged: if (status === MediaPlayer.Loaded) { updateSizing(); }
+	// the player
+	MediaPlayer {
+		id: mediaPlayer
+		autoPlay: false
+		muted: true
+
+		// if set to true, as soon as a new media resolution
+		// is available, the video player will resize and show
+		// the first frame
+		property bool needInit: true
+
+		// update the sizing when ready to play
+		onStatusChanged: {
+			if (needInit === true && metaData.resolution !== undefined) {
+				mediaOutput.resize();
+				root.setPosition(0);
+				needInit = false;
+			}
 		}
 	}
 
 	// detect current media changes
 	Connections {
-		target: selection
-		onCurrentMediaChanged: {
-			// always stop playback and show controls
-			mediaPlayer.stop();
-			controls.show();
-
-			// the following only needs to be done when it's a movie
-			if (root.enabled) {
-				// update the preview
-				preview.update(mediaPlayer.position / mediaPlayer.duration);
-
-				// if we are in fullscreen, show controls again
-				if (stateManager.state === "fullscreen") {
-					controls.autoHide();
-				}
-			}
-		}
+		target: mediaPlayer
+		onSourceChanged: mediaPlayer.needInit = true
 	}
 
-	// check the fullscreen / preview state to force controls on preview
+	// detect size changes
 	Connections {
-		target: stateManager
-		onStateChanged: {
-			// update the mediaPlayer's sizing
-			mediaPlayer.updateSizing();
-
-			// update preview
-			preview.update(mediaPlayer.position / mediaPlayer.duration);
-
-			// display or hide the controls
-			if (stateManager.state === "preview") {
-				controls.show();
-			} else if (stateManager.state === "fullscreen") {
-				controls.autoHide();
-			}
-		}
+		target: root
+		onWidthChanged: { mediaOutput.resize(); root.setPosition(mediaPlayer.position); }
+		onHeightChanged: { mediaOutput.resize(); root.setPosition(mediaPlayer.position); }
 	}
 
-	// preview image
-	Image {
-		id: preview
-		anchors.fill: parent
-		visible: mediaPlayer.playbackState === MediaPlayer.StoppedState
-		fillMode: sourceSize.width >= width || sourceSize.height >= height ? Image.PreserveAspectFit : Image.Pad
-		function update(time) {
-			if (mediaPlayer.playbackState === MediaPlayer.StoppedState) {
-				source = selection.currentMedia ? "image://Thumbnail/" + time + "/" + selection.currentMedia.path : "";
-			}
-		}
-	}
-
-	// keyboard navigation
-	Keys.onPressed: {
-		if (activeFocus === false) {
-			return;
-		}
-
-		switch (event.key) {
-			case Qt.Key_Left:
-			case Qt.Key_Up:
-				event.accepted = true;
-				selection.selectPrevious();
-				break;
-
-			case Qt.Key_Right:
-			case Qt.Key_Down:
-				event.accepted = true;
-				selection.selectNext();
-				break;
-
-			case Qt.Key_Return:
-			case Qt.Key_Enter:
-			case Qt.Key_Escape:
-				stateManager.state = "preview";
-				break;
-
-			case Qt.Key_Space:
-				mediaPlayer.playbackState === MediaPlayer.PlayingState ? mediaPlayer.pause() : mediaPlayer.play();
-				break;
-		}
-	}
-
-	// Mouse area on the whole video
-	MouseArea {
-		anchors.fill: parent
-		acceptedButtons: Qt.LeftButton
-		hoverEnabled: true
-
-		// detect mouse moves to show the cursor
-		onPositionChanged: {
-			if (stateManager.state == "fullscreen") {
-				controls.autoHide();
-			}
-		}
-
-		// double click toggles fullscreen / preview
-		onDoubleClicked: {
-			if (stateManager.state == "fullscreen") {
-				stateManager.state = "preview";
-			} else {
-				stateManager.state = "fullscreen";
-			}
-		}
-
-		// on simple clicks, pause / resume video
-		onClicked: {
-			if (mediaPlayer.playbackState === MediaPlayer.PlayingState) {
-				mediaPlayer.pause();
-			} else {
-				mediaPlayer.play();
-			}
+	// set the image at the given position
+	function setPosition(position) {
+		mediaPlayer.seek(position);
+		if (mediaPlayer.playbackState !== MediaPlayer.PlayingState) {
+			mediaPlayer.play();
+			mediaPlayer.pause();
 		}
 	}
 
 	// movie controls
 	Rectangle {
 		id: controls
-		property bool _containsCursor: false
-
-		// show the controls and disable auto-hide
-		function show() {
-			controls.visible = true;
-			cursor.hidden = false;
-			timer.stop();
-		}
-
-		// show the controls and restart the auto-hide
-		function autoHide() {
-			if (_containsCursor === false) {
-				controls.visible = true;
-				cursor.hidden = false;
-				timer.restart();
-			}
-		}
 
 		// size and color
+		height: 80
+		color: Qt.rgba(0.3, 0.3, 0.3, 0.3)
 		anchors {
 			bottom: parent.bottom
 			left: parent.left
 			right: parent.right
-		}
-		height: 80
-		color: Qt.rgba(0.3, 0.3, 0.3, 0.3)
-
-		// when the cursor is in the mouse area, let the controls visible
-		MouseArea {
-			anchors.fill: parent
-			acceptedButtons: Qt.LeftButton
-			hoverEnabled: true
-
-			// disable the play / pause on the controls (override the whole video mouse area)
-			onClicked: mouse.accepted = true
-
-			// when entering the area, show the controls
-			onEntered: { parent._containsCursor = true; parent.show(); }
-
-			// when leaving, autohide
-			onExited: { parent._containsCursor = false; parent.autoHide(); }
 		}
 
 		// playback controls
@@ -228,10 +109,7 @@ Item {
 				MouseArea {
 					anchors.fill: parent
 					acceptedButtons: Qt.LeftButton
-					onClicked: {
-						mediaPlayer.stop();
-						preview.update(0);
-					}
+					onClicked: { mediaPlayer.pause(); mediaPlayer.seek(0); }
 				}
 			}
 			Image {
@@ -271,10 +149,7 @@ Item {
 			MouseArea {
 				anchors.fill: parent
 				acceptedButtons: Qt.LeftButton
-				onClicked: {
-					mediaPlayer.seek((mouseX / width) * mediaPlayer.duration);
-					preview.update(mouseX / width);
-				}
+				onClicked: mediaPlayer.seek((mouseX / width) * mediaPlayer.duration);
 			}
 		}
 
@@ -298,15 +173,20 @@ Item {
 			color: Qt.rgba(1, 1, 1, 1)
 			text: formatTime(mediaPlayer.position) + " / " + formatTime(mediaPlayer.duration)
 		}
+	}
 
-		// the timer used to hide / show the controls
-		Timer {
-			id: timer
-			interval: 2000
-			onTriggered: {
-				controls.visible = false;
-				cursor.hidden = true;
-			}
+	// Movie specific keyboard handling
+	Keys.onPressed: {
+		switch (event.key) {
+			// play / pause
+			case Qt.Key_Space:
+				event.accepted = true;
+				mediaPlayer.playbackState === MediaPlayer.PlayingState ? mediaPlayer.pause() : mediaPlayer.play();
+				break;
+
+			// let the rest be handled by the parent
+			default:
+				event.accepted = false;
 		}
 	}
 }

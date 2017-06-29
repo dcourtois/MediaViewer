@@ -1,7 +1,6 @@
 #include "MediaViewerPCH.h"
 #include "RegisterQMLTypes.h"
 #include "ImageProviders/FolderIconProvider.h"
-#include "ImageProviders/ThumbnailProvider.h"
 #include "Utils/Cursor.h"
 #include "Utils/FileSystem.h"
 
@@ -16,7 +15,6 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 
 	// set the image provider for the folders
 	engine.addImageProvider("FolderIcon", new MediaViewer::FolderIconProvider);
-	engine.addImageProvider("Thumbnail", new MediaViewer::ThumbnailProvider);
 
 	// set a few global QML helpers
 	engine.rootContext()->setContextProperty("cursor", new Cursor);
@@ -88,6 +86,9 @@ int main(int argc, char *argv[])
 		app.setOrganizationDomain("pcitron.fr");
 		app.setApplicationName("MediaViewer");
 		app.setApplicationVersion("0.1");
+
+		// set style
+		QQuickStyle::setStyle("Material");
 
 		// create and setup application engine
 		QQmlApplicationEngine engine;

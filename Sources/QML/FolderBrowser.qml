@@ -1,23 +1,21 @@
 import QtQuick 2.5
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.2
+import QtQuick.Controls 1.4 as Controls
 import QtQuick.Layouts 1.2
 import QtQml.Models 2.2
 import Qt.labs.settings 1.0
 
 
-
 //
 // A tree view used to browse the folders' contents
 //
-TreeView {
+Controls.TreeView {
 	id: root
 
 	// The currently selected path
 	property string currentFolderPath: ""
 
-	//
 	// set the currently selected item from its path
-	//
 	function setCurrentFolderPath(path) {
 		// get the index from the path
 		var index = model.getIndexByPath(path);
@@ -27,7 +25,7 @@ TreeView {
 			// select the item
 			folderSelectionModel.setCurrentIndex(index, ItemSelectionModel.Current);
 
-			// expand the items
+			// expand the items up to the root
 			while (index.valid) {
 				root.expand(index);
 				index = index.parent;
@@ -35,24 +33,18 @@ TreeView {
 		}
 	}
 
-	//
 	// default settings
-	//
 	Settings {
 		id: settings
 		property string currentFolderPath: ""
 	}
 
-	//
 	// Initialization
-	//
 	Component.onCompleted: {
 		setCurrentFolderPath(settings.currentFolderPath);
 	}
 
-	//
 	// Bindings
-	//
 	onCurrentFolderPathChanged: settings.currentFolderPath = currentFolderPath
 
 	//-------------------------------------------------------------------------
@@ -76,17 +68,25 @@ TreeView {
 
 	// Draw the row's background
 	rowDelegate: Rectangle {
-		height: 20
+		height: 24
 		color: styleData.selected ? selectedColor : (styleData.alternate ? evenColor : oddColor)
 	}
 
+	// disable the item delegate
+	// note: we're using a TableViewColumn to access the folders, and custom draw each
+	// rows. When doing this, the itemDelegate of TreeView is no longer used (try replacing
+	// null by Text { text: "foo" })
+	// But the TreeView style still seems to be trying to instanciate it at least once.
+	// And since the default implementation is a Text, and since we used the "folder"
+	// role, the style will try to assign a MediaViewer::Folder to a text property.
+	// So this here ensurs that the itemDelegate will never be used.
+	itemDelegate: null
+
 	// Display the content
-	TableViewColumn {
+	Controls.TableViewColumn {
 		role: "folder"
 
-		// todo: investigate why we receive 2 calls to the delegate,
-		// one with styleData.value being an empty string, and the next
-		// one being the correct value.
+		// draw a row delegate
 		delegate: Item {
 
 			// folder icon
@@ -98,15 +98,13 @@ TreeView {
 			}
 
 			// folder name
-			Text {
+			Label {
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.left: delegateIcon.right
 				anchors.leftMargin: 5
 				anchors.right: delegateMediaCount.visible ? delegateMediaCount.left : parent.right
 				anchors.rightMargin: 5
 				elide: Text.ElideRight
-				font.pixelSize: sourceSans.size
-				font.family: sourceSans.name
 				text: styleData.value ? styleData.value.name : ""
 			}
 
@@ -128,14 +126,11 @@ TreeView {
 				radius: 10
 				color: styleData.selected ? evenColor : selectedColor;
 
-				Text {
+				Label {
 					id: delegateMediaCountText
-
 					anchors.centerIn: parent
-
-					font.pixelSize: 12
-					font.family: sourceSans.name
 					text: styleData.value ? styleData.value.mediaCount : ""
+					font.pixelSize: 12
 				}
 			}
 		}

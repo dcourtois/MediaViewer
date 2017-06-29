@@ -1,6 +1,4 @@
 import QtQuick 2.5
-import QtQuick.Controls 1.4
-import MediaViewer 0.1
 
 
 //
@@ -8,22 +6,19 @@ import MediaViewer 0.1
 //
 Image {
 	id: image
-	anchors.fill: parent
 
 	// externally set
 	property var selection
 	property var stateManager
 
-	// only enable for images
-	enabled: selection && selection.currentMediaType === Media.Image
-	visible: enabled
-	focus: enabled && stateManager.state === "fullscreen"
-
-	// bind the source
-	source: (enabled && selection) ? selection.currentMediaPath : "qrc:///images/empty"
-
-	// only fit when the image is greater than the view size
-	fillMode: sourceSize.width > width || sourceSize.height > height ? Image.PreserveAspectFit : Image.Pad
+	// resize to only fit when the image is greater than the view size
+	function resize() {
+		if (sourceSize.width > width || sourceSize.height > height) {
+			fillMode = Image.PreserveAspectFit;
+		} else {
+			fillMode = Image.Pad;
+		}
+	}
 
 	// configure the image for best quality
 	asynchronous: true
@@ -32,40 +27,8 @@ Image {
 	smooth: true
 	mipmap: true
 
-	// Mouse area to catch double clicks
-	MouseArea {
-		anchors.fill: parent
-		acceptedButtons: Qt.LeftButton
-		onDoubleClicked: {
-			if (stateManager.state == "fullscreen") {
-				stateManager.state = "preview";
-			} else {
-				stateManager.state = "fullscreen";
-			}
-		}
-	}
-
-	// keyboard navigation
-	Keys.onPressed: {
-		if (activeFocus === false) {
-			return;
-		}
-		switch (event.key) {
-			case Qt.Key_Left:
-			case Qt.Key_Up:
-				event.accepted = true;
-				selection.selectPrevious();
-				break;
-			case Qt.Key_Right:
-			case Qt.Key_Down:
-				event.accepted = true;
-				selection.selectNext();
-				break;
-			case Qt.Key_Return:
-			case Qt.Key_Enter:
-			case Qt.Key_Escape:
-				stateManager.state = "preview";
-				break;
-		}
-	}
+	// resize when needed
+	onStatusChanged: if (status === Image.Ready) { resize(); }
+	onWidthChanged: resize();
+	onHeightChanged: resize();
 }

@@ -53,7 +53,10 @@ namespace MediaViewer
 		}
 
 		// remove the old path from the file watcher
-		m_FileWatcher.removePath(m_Root);
+		if (m_Root.isEmpty() == false)
+		{
+			m_FileWatcher.removePath(m_Root);
+		}
 
 		// reset the model
 		this->beginResetModel();
@@ -262,11 +265,9 @@ namespace MediaViewer
 	//!
 	QModelIndex MediaModel::getPreviousModelIndex(const QModelIndex & index) const
 	{
-		if (index.isValid() == false || index.row() <= 0)
-		{
-			return QModelIndex();
-		}
-		return this->createIndex(index.row() - 1, 0, this->GetMedias()[index.row() - 1]);
+		Q_ASSERT(index.isValid() == true && index.row() >= 0 && index.row() < this->GetMedias().size());
+		int newIndex = qMax(index.row() - 1, 0);
+		return this->createIndex(newIndex, 0, this->GetMedias()[newIndex]);
 	}
 
 	//!
@@ -274,11 +275,9 @@ namespace MediaViewer
 	//!
 	QModelIndex MediaModel::getNextModelIndex(const QModelIndex & index) const
 	{
-		if (index.isValid() == false || index.row() >= this->GetMedias().size() - 1)
-		{
-			return QModelIndex();
-		}
-		return this->createIndex(index.row() + 1, 0, this->GetMedias()[index.row() + 1]);
+		Q_ASSERT(index.isValid() == true && index.row() >= 0 && index.row() < this->GetMedias().size());
+		int newIndex = qMin(index.row() + 1, this->GetMedias().size() - 1);
+		return this->createIndex(newIndex, 0, this->GetMedias()[newIndex]);
 	}
 
 	//!

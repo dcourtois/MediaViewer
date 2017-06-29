@@ -29,7 +29,8 @@ namespace MediaViewer
 	//! Copy constructor
 	//!
 	Folder::Folder(const Folder & other)
-		: m_Parent(other.m_Parent)
+		: QObject(nullptr)
+		, m_Parent(other.m_Parent)
 		, m_MediaCount(0)
 		, m_Dirty(true)
 	{
@@ -63,14 +64,20 @@ namespace MediaViewer
 		if (m_Path != path)
 		{
 			// remove old path
-			m_FileWatcher.removePath(m_Path);
+			if (m_Path.isEmpty() == false)
+			{
+				m_FileWatcher.removePath(m_Path);
+			}
 
 			// update
 			m_Path = path;
 			m_Dirty = true;
 
 			// add new path
-			m_FileWatcher.addPath(path);
+			if (path.isEmpty() == false)
+			{
+				m_FileWatcher.addPath(path);
+			}
 
 			// get the name
 			QDir dir = QDir(path);
@@ -135,7 +142,7 @@ namespace MediaViewer
 			QDir dir(m_Path);
 			if (dir.exists() == true)
 			{
-				for (const auto & child : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::NoSort))
+				for (const auto & child : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name))
 				{
 					m_Children.push_back(NEW Folder(dir.absoluteFilePath(child.filePath()), this));
 				}

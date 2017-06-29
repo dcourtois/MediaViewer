@@ -2,6 +2,7 @@ QT += \
     qml \
     gui \
     quick \
+	quickcontrols2 \
     widgets \
     multimedia
 
@@ -14,7 +15,6 @@ SOURCES += \
     Sources/MediaViewerPCH.cpp \
     Sources/RegisterQMLTypes.cpp \
     Sources/ImageProviders/FolderIconProvider.cpp \
-    Sources/ImageProviders/ThumbnailProvider.cpp \
     Sources/Models/Folder.cpp \
     Sources/Models/FolderModel.cpp \
     Sources/Models/Media.cpp \
@@ -33,7 +33,6 @@ HEADERS += \
     Sources/MediaViewerPCH.h \
     Sources/RegisterQMLTypes.h \
     Sources/ImageProviders/FolderIconProvider.h \
-    Sources/ImageProviders/ThumbnailProvider.h \
     Sources/Models/Folder.h \
     Sources/Models/FolderModel.h \
     Sources/Models/Media.h \

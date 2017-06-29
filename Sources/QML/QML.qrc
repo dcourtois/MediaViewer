@@ -1,19 +1,23 @@
-<!DOCTYPE RCC>
 <RCC>
-
-	<!-- QML files -->
 	<qresource prefix="/">
 		<file>AnimatedImageViewer.qml</file>
 		<file>FolderBrowser.qml</file>
 		<file>ImageViewer.qml</file>
 		<file>Main.qml</file>
+		<file>MainWindow.qml</file>
 		<file>MediaBrowser.qml</file>
 		<file>MediaSelection.qml</file>
 		<file>MediaViewer.qml</file>
+		<file>MainMenu.qml</file>
 		<file>MovieViewer.qml</file>
+		<file>Preferences.qml</file>
 		<file>StateManager.qml</file>
 		<file>WindowSettings.qml</file>
 		<file>WindowState.qml</file>
-	</qresource>
 
+		<!-- media previews used in the media browser -->
+		<file>Previews/AnimatedImage.qml</file>
+		<file>Previews/Image.qml</file>
+		<file>Previews/Movie.qml</file>
+	</qresource>
 </RCC>

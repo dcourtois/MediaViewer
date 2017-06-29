@@ -106,7 +106,7 @@ void CheckAllocatedBlocks(void)
 //! @note
 //!		Do not use anything that might use a new or delete operator (std::string, std::stringstream, etc.)
 //!		because this function is called upon static variables destruction, and we don't want to call our
-//!		overriden operators at that moment (that would screw the AllocatedBlocks which are being iterated over) 
+//!		overriden operators at that moment (that would screw the AllocatedBlocks which are being iterated over)
 //!
 void DumpMemory(void)
 {
@@ -123,13 +123,13 @@ void DumpMemory(void)
 	{
 		char line[1024];
 		auto blocks = AllocatedBlocks;
-		sprintf(line, "Memory leak detected - %d block%s still allocated :", blocks->size(), blocks->size() > 1 ? "s" : "");
+		sprintf(line, "Memory leak detected - %lu block%s still allocated :", blocks->size(), blocks->size() > 1 ? "s" : "");
 		qDebug() << line;
 		for (auto entry : *AllocatedBlocks)
 		{
 			sprintf(
 				line,
-				"%s(%d): %d bytes at location 0x%x",
+				"%s(%d): %lu bytes at location %p",
 				std::get< 1 >(entry.second),
 				std::get< 2 >(entry.second),
 				std::get< 0 >(entry.second),
@@ -152,7 +152,7 @@ void * operator new(size_t size, const char * filename, int line)
 	void * pointer = malloc(size);
 	AllocatedBlocks->insert(std::make_pair(pointer, std::make_tuple(size, filename, line)));
 	return pointer;
-};
+}
 
 //!
 //! Override of new []
@@ -164,7 +164,7 @@ void * operator new [](size_t size, const char * filename, int line)
 	void * pointer = malloc(size);
 	AllocatedBlocks->insert(std::make_pair(pointer, std::make_tuple(size, filename, line)));
 	return pointer;
-};
+}
 
 //!
 //! Override of delete

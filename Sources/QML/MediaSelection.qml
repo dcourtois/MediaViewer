@@ -9,10 +9,10 @@ import MediaViewer 0.1
 ItemSelectionModel {
 
 	// the current media
-	property var currentMedia: null
-	property var currentMediaPath: "qrc:///images/empty"
-	property var currentMediaType: Media.NotSupported
-	property var currentMediaIndex: -1
+	property var currentMedia
+	property string currentMediaPath: "qrc:///images/empty"
+	property int currentMediaType: Media.NotSupported
+	property int currentMediaIndex: -1
 
 	// check if we have a previous media
 	function hasPrevious() {
@@ -61,14 +61,14 @@ ItemSelectionModel {
 		if (model) {
 			if (current.valid) {
 				currentMedia = model.getMedia(current);
+				currentMediaType = currentMedia.type;
 				currentMediaPath = "file:///" + currentMedia.path;
 				currentMediaIndex = model.getIndex(current);
-				currentMediaType = currentMedia.type;
 			} else {
-				currentMedia = null;
+				currentMedia = undefined;
+				currentMediaType = Media.NotSupported
 				currentMediaPath = "qrc:///images/empty";
-				currentMediaIndex = -1;
-				currentMediaType = Media.NotSupported;
+				currentMediaIndex = -1;;
 			}
 		}
 	}
