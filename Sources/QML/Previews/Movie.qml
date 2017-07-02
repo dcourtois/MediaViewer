@@ -22,7 +22,7 @@ Item {
 		muted: true
 		onStatusChanged: {
 			if (status === MediaPlayer.Loaded) {
-				player.seek(0);
+				player.seek(100);
 				player.play();
 				player.pause();
 			}

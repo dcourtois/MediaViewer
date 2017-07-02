@@ -48,7 +48,7 @@ Item {
 		// update the sizing when ready to play
 		onStatusChanged: {
 			if (status === MediaPlayer.Loaded) {
-				root.setPosition(0);
+				root.setPosition(100);
 				output.resize();
 			}
 		}
