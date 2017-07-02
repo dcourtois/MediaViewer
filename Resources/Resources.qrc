@@ -8,10 +8,6 @@
 
 	<!-- Fonts -->
 	<qresource prefix="/fonts">
-		<!-- Source Code Pro: https://github.com/adobe-fonts/source-code-pro -->
-		<file alias="SourceCodePro-Regular">Fonts/SourceCodePro-Regular.ttf</file>
-		<!-- Source Sans Pro: https://github.com/adobe-fonts/source-sans-pro -->
-		<file alias="SourceSansPro-Regular">Fonts/SourceSansPro-Regular.ttf</file>
 	</qresource>
 
 	<!-- Icons -->
