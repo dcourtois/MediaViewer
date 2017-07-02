@@ -37,62 +37,42 @@ ToolBar {
 		x: editButton.x
 		y: editButton.y + editButton.height
 
-		MenuItem {
+		ShortcutMenuItem {
 			id: copy
 			text: "Copy"
 			enabled: selection.currentMedia !== undefined
-			Shortcut {
-				enabled: copy.enabled
-				sequence: "Ctrl+C"
-				context: Qt.ApplicationShortcut
-				onActivated: copy.triggered()
-			}
+			sequence: "Ctrl+C"
 			onTriggered: {
 				fileSystem.copy([ selection.currentMedia.path ]);
 				_sourceFolderPath = folderBrowser.currentFolderPath;
 			}
 		}
-		MenuItem {
+		ShortcutMenuItem {
 			id: cut
 			text: "Cut"
 			enabled: selection.currentMedia !== undefined
-			Shortcut {
-				enabled: cut.enabled
-				sequence: "Ctrl+X"
-				context: Qt.ApplicationShortcut
-				onActivated: cut.triggered()
-			}
+			sequence: "Ctrl+X"
 			onTriggered: {
 				fileSystem.cut([ selection.currentMedia.path ]);
 				_sourceFolderPath = folderBrowser.currentFolderPath;
 			}
 		}
-		MenuItem {
+		ShortcutMenuItem {
 			id: paste
 			text: "Paste"
 			enabled: fileSystem.canPaste
-			Shortcut {
-				enabled: paste.enabled
-				sequence: "Ctrl+V"
-				context: Qt.ApplicationShortcut
-				onActivated: paste.triggered()
-			}
+			sequence: "Ctrl+V"
 			onTriggered: {
 				if (_sourceFolderPath !== folderBrowser.currentFolderPath) {
 					fileSystem.paste(folderBrowser.currentFolderPath);
 				}
 			}
 		}
-		MenuItem {
+		ShortcutMenuItem {
 			id: del
 			text: "Delete"
 			enabled: selection.currentMedia !== undefined
-			Shortcut {
-				enabled: del.enabled
-				sequence: "Del"
-				context: Qt.ApplicationShortcut
-				onActivated: del.triggered()
-			}
+			sequence: "Del"
 			onTriggered: {
 				// clear selection (AnimatedImage locks the file, preventing the deletion
 				// to work) and remove the file
@@ -116,14 +96,11 @@ ToolBar {
 		id: optionMenu
 		x: optionButton.x
 		y: optionButton.y + optionButton.height
+		width: 250
 
-		MenuItem {
+		ShortcutMenuItem {
 			text: "Preferences"
-			Shortcut {
-				sequence: "Ctrl+Shift+P"
-				context: Qt.ApplicationShortcut
-				onActivated: preferences.open()
-			}
+			sequence: "Ctrl+Shift+P"
 			onTriggered: preferences.open()
 		}
 	}

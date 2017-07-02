@@ -8,6 +8,7 @@
 		<file>MediaViewer.qml</file>
 		<file>MainMenu.qml</file>
 		<file>Preferences.qml</file>
+		<file>ShortcutMenuItem.qml</file>
 		<file>StateManager.qml</file>
 		<file>WindowSettings.qml</file>
 		<file>WindowState.qml</file>
