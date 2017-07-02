@@ -1,5 +1,6 @@
 import QtQuick 2.5
 import QtQuick.Controls 2.2
+import QtQuick.Controls.Material 2.2
 import QtQuick.Controls 1.4 as Controls
 import QtQuick.Layouts 1.2
 import QtQml.Models 2.2
@@ -52,7 +53,7 @@ Controls.TreeView {
 	//
 
 	// Colors
-	property color selectedColor: Qt.rgba(0.68, 0.85, 0.91, 1)
+	property color selectedColor: Material.color(Material.LightBlue, Material.Shade300)
 	property color evenColor: Qt.rgba(1, 1, 1, 1)
 	property color oddColor: Qt.rgba(0.96, 0.96, 0.96, 1)
 

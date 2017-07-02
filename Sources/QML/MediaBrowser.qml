@@ -1,6 +1,7 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4 as Controls
 import QtQuick.Controls 2.2
+import QtQuick.Controls.Material 2.2
 import QtQuick.Layouts 1.2
 import QtMultimedia 5.8
 import Qt.labs.settings 1.0
@@ -17,6 +18,9 @@ Item {
 	property var selection
 	property var stateManager
 	property var settings
+
+	// configure looks
+	property color highlightColor: Material.color(Material.LightBlue, Material.Shade300)
 
 	// bind settings
 	Connections {
@@ -107,7 +111,7 @@ Item {
 					y: grid.currentItem ? grid.currentItem.y : 0
 					width: grid.cellWidth
 					height: grid.cellHeight
-					color: "lightBlue"
+					color: highlightColor
 				}
 			}
 
