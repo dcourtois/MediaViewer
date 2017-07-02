@@ -94,21 +94,12 @@ Rectangle {
 		}
 	}
 
-	// set the focus to the correct item, depending on the various states
-	// of the viewer.
+	// update focus
 	function updateFocus() {
-		// do nothing when no selection
 		if (selection.currentMedia) {
 			var isFullScreen = stateManager.state === "fullscreen";
-
-			// if we have a movie, give focus to the inner loader
-			if (selection.currentMedia.type === Media.Movie) {
-				root.focus = isFullScreen;
-				viewer.focus = isFullScreen;
-			} else {
-				viewer.focus = false;
-				root.focus = isFullScreen;
-			}
+			root.focus = isFullScreen;
+			viewer.focus = isFullScreen;
 		}
 	}
 

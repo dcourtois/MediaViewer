@@ -9,7 +9,7 @@ import MediaViewer 0.1
 ItemSelectionModel {
 
 	// the current media
-	property var currentMedia
+	property var currentMedia: undefined
 
 	// the current media's numerical index
 	property int currentMediaIndex: -1
