@@ -24,15 +24,17 @@ Item {
 
 		// resize
 		function resize() {
-			var size = player.metaData.resolution;
-			if (size.width >= root.width || size.height >= root.height) {
-				anchors.centerIn = undefined;
-				anchors.fill = root;
-			} else {
-				anchors.fill = undefined;
-				width = size.width;
-				height = size.height;
-				anchors.centerIn = root;
+			if (player.metaData && player.metaData.resolution) {
+				var size = player.metaData.resolution;
+				if (size.width >= root.width || size.height >= root.height) {
+					anchors.centerIn = undefined;
+					anchors.fill = root;
+				} else {
+					anchors.fill = undefined;
+					width = size.width;
+					height = size.height;
+					anchors.centerIn = root;
+				}
 			}
 		}
 	}
@@ -45,11 +47,9 @@ Item {
 
 		// update the sizing when ready to play
 		onStatusChanged: {
-			if (status === MediaPlayer.Buffered) {
+			if (status === MediaPlayer.Loaded) {
+				root.setPosition(0);
 				output.resize();
-				player.play();
-				player.seek(0);
-				player.pause();
 			}
 		}
 	}
@@ -167,7 +167,7 @@ Item {
 			// play / pause
 			case Qt.Key_Space:
 				event.accepted = true;
-				player.playbackState === player.PlayingState ? player.pause() : player.play();
+				player.playbackState === MediaPlayer.PlayingState ? player.pause() : player.play();
 				break;
 
 			// let the rest be handled by the parent
