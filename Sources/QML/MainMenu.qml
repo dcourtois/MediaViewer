@@ -40,7 +40,7 @@ ToolBar {
 		MenuItem {
 			id: copy
 			text: "Copy"
-			enabled: selection.currentMedia !== null
+			enabled: selection.currentMedia !== undefined
 			Shortcut {
 				enabled: copy.enabled
 				sequence: "Ctrl+C"
@@ -55,7 +55,7 @@ ToolBar {
 		MenuItem {
 			id: cut
 			text: "Cut"
-			enabled: selection.currentMedia !== null
+			enabled: selection.currentMedia !== undefined
 			Shortcut {
 				enabled: cut.enabled
 				sequence: "Ctrl+X"
@@ -86,7 +86,7 @@ ToolBar {
 		MenuItem {
 			id: del
 			text: "Delete"
-			enabled: selection.currentMedia !== null
+			enabled: selection.currentMedia !== undefined
 			Shortcut {
 				enabled: del.enabled
 				sequence: "Del"
