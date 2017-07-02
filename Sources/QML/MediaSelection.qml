@@ -10,18 +10,18 @@ ItemSelectionModel {
 
 	// the current media
 	property var currentMedia
-	property string currentMediaPath: "qrc:///images/empty"
-	property int currentMediaType: Media.NotSupported
+
+	// the current media's numerical index
 	property int currentMediaIndex: -1
 
 	// check if we have a previous media
 	function hasPrevious() {
-		return model ? model.getPreviousModelIndex(currentIndex).valid : false;
+		return model ? model.getPreviousModelIndex(currentIndex) !== currentIndex : false;
 	}
 
 	// check if we have a next media
 	function hasNext() {
-		return model ? model.getNextModelIndex(currentIndex).valid : false;
+		return model ? model.getNextModelIndex(currentIndex) !== currentIndex : false;
 	}
 
 	// set the current media by path
@@ -61,14 +61,10 @@ ItemSelectionModel {
 		if (model) {
 			if (current.valid) {
 				currentMedia = model.getMedia(current);
-				currentMediaType = currentMedia.type;
-				currentMediaPath = "file:///" + currentMedia.path;
 				currentMediaIndex = model.getIndex(current);
 			} else {
 				currentMedia = undefined;
-				currentMediaType = Media.NotSupported
-				currentMediaPath = "qrc:///images/empty";
-				currentMediaIndex = -1;;
+				currentMediaIndex = -1;
 			}
 		}
 	}

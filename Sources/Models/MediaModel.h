@@ -85,6 +85,10 @@ namespace MediaViewer
 	private:
 
 		void	Clear(void);
+		void	UpdateMedias(const QString & folder);
+
+		//! todo: replace hugly std::function by auto when c++14 is supported
+		std::function< bool (const Media *, const Media *) > GetSortOperator(void) const;
 
 		//! The root folder
 		QString m_Root;

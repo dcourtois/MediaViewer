@@ -6,22 +6,6 @@ namespace MediaViewer
 {
 
 	//!
-	//! Compare 2 medias (compare their path)
-	//!
-	bool Media::operator == (const Media & other) const
-	{
-		return m_Path == other.m_Path;
-	}
-
-	//!
-	//! Compare a media to a full path
-	//!
-	bool Media::operator == (const QString & path) const
-	{
-		return m_Path == path;
-	}
-
-	//!
 	//! Get the media's path
 	//!
 	const QString & Media::GetPath(void) const

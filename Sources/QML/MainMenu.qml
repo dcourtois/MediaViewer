@@ -14,6 +14,7 @@ ToolBar {
 
 	// externally set
 	property var selection
+	property var preferences
 
 	RowLayout {
 		anchors.fill: parent
@@ -37,57 +38,56 @@ ToolBar {
 		x: editButton.x
 		y: editButton.y + editButton.height
 
+		// used to know wether we can paste or not
+		property string _sourceFolder
+
 		ShortcutMenuItem {
-			id: copy
 			text: "Copy"
 			enabled: selection.currentMedia !== undefined
 			sequence: "Ctrl+C"
 			onTriggered: {
 				fileSystem.copy([ selection.currentMedia.path ]);
-				_sourceFolderPath = folderBrowser.currentFolderPath;
+				editMenu._sourceFolder = folderBrowser.currentFolderPath;
 			}
 		}
 		ShortcutMenuItem {
-			id: cut
 			text: "Cut"
 			enabled: selection.currentMedia !== undefined
 			sequence: "Ctrl+X"
 			onTriggered: {
 				fileSystem.cut([ selection.currentMedia.path ]);
-				_sourceFolderPath = folderBrowser.currentFolderPath;
+				editMenu._sourceFolder = folderBrowser.currentFolderPath;
 			}
 		}
 		ShortcutMenuItem {
-			id: paste
 			text: "Paste"
-			enabled: fileSystem.canPaste
+			enabled: fileSystem.canPaste && editMenu._sourceFolder !== folderBrowser.currentFolderPath
 			sequence: "Ctrl+V"
-			onTriggered: {
-				if (_sourceFolderPath !== folderBrowser.currentFolderPath) {
-					fileSystem.paste(folderBrowser.currentFolderPath);
-				}
-			}
+			onTriggered: fileSystem.paste(folderBrowser.currentFolderPath)
 		}
+
 		ShortcutMenuItem {
-			id: del
 			text: "Delete"
 			enabled: selection.currentMedia !== undefined
 			sequence: "Del"
 			onTriggered: {
-				// clear selection (AnimatedImage locks the file, preventing the deletion
-				// to work) and remove the file
-				var path = selection.currentMedia.path,
-					index = selection.currentMediaIndex,
+				// handle selection behavior after a deletion, because the
+				// view does a really crappy job at that.
+				var index = selection.currentMediaIndex,
+					path = selection.currentMedia.path,
 					hasNext = selection.hasNext();
-				selection.clearCurrentIndex();
-				fileSystem.remove([ path ]);
 
-				// re-select the correct index
+				// select the next one if needed
 				if (hasNext === true) {
-					selection.selectByIndex(index);
-				} else if (index > 0) {
+					selection.selectByIndex(index + 1);
+				} else if (index > 0){
 					selection.selectByIndex(index - 1);
+				} else {
+					selection.clearCurrentIndex();
 				}
+
+				// remove
+				fileSystem.remove([ path ]);
 			}
 		}
 	}

@@ -17,13 +17,7 @@ namespace MediaViewer
 		, m_SortOrder(SortOrder::Ascending)
 	{
 		// setup file watching
-		QObject::connect(&m_FileWatcher, &QFileSystemWatcher::directoryChanged, [&] (const QString &) {
-			this->beginResetModel();
-			this->Clear();
-			m_Dirty = true;
-			this->GetMedias();
-			this->endResetModel();
-		});
+		QObject::connect(&m_FileWatcher, &QFileSystemWatcher::directoryChanged, this, &MediaModel::UpdateMedias);
 	}
 
 	//!
@@ -77,6 +71,99 @@ namespace MediaViewer
 	}
 
 	//!
+	//! Update the medias after a folder change
+	//!
+	void MediaModel::UpdateMedias(const QString & folder)
+	{
+		Q_UNUSED(folder);
+
+		// rescan the folder
+		QDir root(m_Root);
+		QVector< QString > medias;
+		for (const auto & file : root.entryList(QDir::Files, QDir::NoSort))
+		{
+			if (Media::IsMedia(file) == true)
+			{
+				medias.push_back(file);
+			}
+		}
+
+		// check deleted images
+		int index = 0;
+		QVector< int > toRemove;
+		for (const Media * media : m_Medias)
+		{
+			if (medias.contains(media->GetName()) == false)
+			{
+				toRemove.push_back(index);
+			}
+			++index;
+		}
+
+		// check added images
+		QVector< QString > toAdd;
+		for (const QString & file : medias)
+		{
+			bool found = false;
+			for (const Media * media : m_Medias)
+			{
+				if (media->GetName() == file)
+				{
+					found = true;
+					break;
+				}
+			}
+			if (found == false)
+			{
+				toAdd.push_back(file);
+			}
+		}
+
+		// remove
+		while (toRemove.isEmpty() == false)
+		{
+			index = toRemove.back();
+			this->beginRemoveRows(QModelIndex(), index, index);
+			DELETE m_Medias[index];
+			m_Medias.remove(index);
+			this->endRemoveRows();
+			toRemove.pop_back();
+		}
+
+		// add
+		auto sort = this->GetSortOperator();
+		for (const QString & file : toAdd)
+		{
+			Media * media = NEW Media(root.absoluteFilePath(file));
+			index = 0;
+			for (Media * m : m_Medias)
+			{
+				bool res = sort(media, m);
+				if (res == false)
+				{
+					++index;
+				}
+				else
+				{
+					this->beginInsertRows(QModelIndex(), index, index);
+					m_Medias.insert(index, media);
+					this->endInsertRows();
+					index = -1;
+					break;
+				}
+			}
+
+			// if we reach here, push back
+			if (index != -1)
+			{
+				this->beginInsertRows(QModelIndex(), index, index);
+				m_Medias.push_back(media);
+				this->endInsertRows();
+			}
+		}
+	}
+
+	//!
 	//! Get the medias in the root folder
 	//!
 	const QVector< Media * > &	MediaModel::GetMedias(void) const
@@ -127,60 +214,95 @@ namespace MediaViewer
 	}
 
 	//!
-	//! Sort the model
+	//! Get the sort operator
 	//!
-	void MediaModel::Sort(void) const
+	std::function< bool (const Media *, const Media *) > MediaModel::GetSortOperator(void) const
 	{
 		switch (m_SortBy)
 		{
 			case SortBy::Name:
-				if (m_SortOrder == SortOrder::Ascending)
-				{
-					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetName() < r->GetName(); });
-				}
-				else
-				{
-					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetName() > r->GetName(); });
-				}
-				break;
+				return m_SortOrder == SortOrder::Ascending ?
+					[](const Media * l, const Media * r) -> bool { return l->GetName() < r->GetName(); } :
+					[](const Media * l, const Media * r) -> bool { return l->GetName() > r->GetName(); };
 
 			case SortBy::Date:
-				if (m_SortOrder == SortOrder::Ascending)
-				{
-					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetDate() < r->GetDate(); });
-				}
-				else
-				{
-					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetDate() > r->GetDate(); });
-				}
-				break;
+				return m_SortOrder == SortOrder::Ascending ?
+					[](const Media * l, const Media * r) -> bool { return l->GetDate() < r->GetDate(); } :
+					[](const Media * l, const Media * r) -> bool { return l->GetDate() > r->GetDate(); };
 
 			case SortBy::Size:
-				if (m_SortOrder == SortOrder::Ascending)
-				{
-					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetSize() < r->GetSize(); });
-				}
-				else
-				{
-					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetSize() > r->GetSize(); });
-				}
-				break;
+				return m_SortOrder == SortOrder::Ascending ?
+					[](const Media * l, const Media * r) -> bool { return l->GetSize() < r->GetSize(); } :
+					[](const Media * l, const Media * r) -> bool { return l->GetSize() > r->GetSize(); };
 
 			case SortBy::Type:
-				if (m_SortOrder == SortOrder::Ascending)
-				{
-					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetType() < r->GetType(); });
-				}
-				else
-				{
-					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetType() > r->GetType(); });
-				}
-				break;
+				return m_SortOrder == SortOrder::Ascending ?
+					[](const Media * l, const Media * r) -> bool { return l->GetType() < r->GetType(); } :
+					[](const Media * l, const Media * r) -> bool { return l->GetType() > r->GetType(); };
 
 			case SortBy::None:
 			default:
-				break;
+				return [](const Media *, const Media *) -> bool { return false; };
 		}
+
+	}
+
+	//!
+	//! Sort the model
+	//!
+	void MediaModel::Sort(void) const
+	{
+		Utils::Sort(m_Medias, this->GetSortOperator());
+//		switch (m_SortBy)
+//		{
+//			case SortBy::Name:
+//				if (m_SortOrder == SortOrder::Ascending)
+//				{
+//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetName() < r->GetName(); });
+//				}
+//				else
+//				{
+//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetName() > r->GetName(); });
+//				}
+//				break;
+
+//			case SortBy::Date:
+//				if (m_SortOrder == SortOrder::Ascending)
+//				{
+//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetDate() < r->GetDate(); });
+//				}
+//				else
+//				{
+//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetDate() > r->GetDate(); });
+//				}
+//				break;
+
+//			case SortBy::Size:
+//				if (m_SortOrder == SortOrder::Ascending)
+//				{
+//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetSize() < r->GetSize(); });
+//				}
+//				else
+//				{
+//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetSize() > r->GetSize(); });
+//				}
+//				break;
+
+//			case SortBy::Type:
+//				if (m_SortOrder == SortOrder::Ascending)
+//				{
+//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetType() < r->GetType(); });
+//				}
+//				else
+//				{
+//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetType() > r->GetType(); });
+//				}
+//				break;
+
+//			case SortBy::None:
+//			default:
+//				break;
+//		}
 	}
 
 	//!

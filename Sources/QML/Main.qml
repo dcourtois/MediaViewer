@@ -81,6 +81,7 @@ MainWindow {
 	// Menu
 	header: MainMenu {
 		selection: selection
+		preferences: preferences
 	}
 
 	// The split between the media preview and folder browser on the left,
