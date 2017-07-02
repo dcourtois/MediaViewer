@@ -14,6 +14,14 @@ namespace MediaViewer
 	}
 
 	//!
+	//! Compare a media to a full path
+	//!
+	bool Media::operator == (const QString & path) const
+	{
+		return m_Path == path;
+	}
+
+	//!
 	//! Get the media's path
 	//!
 	const QString & Media::GetPath(void) const

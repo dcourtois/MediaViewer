@@ -55,6 +55,7 @@ namespace MediaViewer
 		Media(const Media & other);
 		~Media(void);
 		inline bool operator == (const Media & other) const;
+		inline bool operator == (const QString & path) const;
 
 		// public API
 		inline const QString &		GetPath(void) const;
