@@ -35,14 +35,6 @@ namespace MediaViewer
 	}
 
 	//!
-	//! Get the current root's path.
-	//!
-	const QString & MediaModel::GetRoot(void) const
-	{
-		return m_Root;
-	}
-
-	//!
 	//! Set the root's path.
 	//!
 	void MediaModel::SetRoot(const QString & path)
@@ -111,14 +103,6 @@ namespace MediaViewer
 	}
 
 	//!
-	//! Get the sort type
-	//!
-	MediaModel::SortBy MediaModel::GetSortBy(void) const
-	{
-		return m_SortBy;
-	}
-
-	//!
 	//! Set the sort type
 	//!
 	void MediaModel::SetSortBy(SortBy by)
@@ -128,14 +112,6 @@ namespace MediaViewer
 			this->sort(by, m_SortOrder);
 			emit sortByChanged(by);
 		}
-	}
-
-	//!
-	//! Get the sort direction
-	//!
-	MediaModel::SortOrder MediaModel::GetSortOrder(void) const
-	{
-		return m_SortOrder;
 	}
 
 	//!
@@ -317,13 +293,13 @@ namespace MediaViewer
 	//!
 	QHash< int, QByteArray > MediaModel::roleNames(void) const
 	{
-		QHash< int, QByteArray > roles;
-		roles.insert(Qt::DisplayRole,	"name");
-		roles.insert(Qt::UserRole,		"path");
-		roles.insert(Qt::UserRole + 1,	"date");
-		roles.insert(Qt::UserRole + 2,	"size");
-		roles.insert(Qt::UserRole + 3,	"type");
-		return roles;
+		return {
+			{ Qt::DisplayRole,	"name" },
+			{ Qt::UserRole,		"path" },
+			{ Qt::UserRole + 1,	"date" },
+			{ Qt::UserRole + 2,	"size" },
+			{ Qt::UserRole + 3,	"type" }
+		};
 	}
 
 	//!

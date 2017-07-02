@@ -89,7 +89,7 @@ Rectangle {
 						break;
 				}
 			} else {
-				viewer.source = undefined;
+				viewer.source = "";
 			}
 		}
 	}

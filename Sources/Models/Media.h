@@ -54,17 +54,18 @@ namespace MediaViewer
 		Media(const QString & path = "");
 		Media(const Media & other);
 		~Media(void);
+		inline bool operator == (const Media & other) const;
 
 		// public API
-		const QString &		GetPath(void) const;
-		const QString &		GetName(void) const;
-		const QDateTime &	GetDate(void) const;
-		uint64_t			GetSize(void) const;
-		Type				GetType(void) const;
+		inline const QString &		GetPath(void) const;
+		inline const QString &		GetName(void) const;
+		inline const QDateTime &	GetDate(void) const;
+		inline uint64_t				GetSize(void) const;
+		inline Type					GetType(void) const;
 
 		// utilities
-		static bool		IsMedia(const QString & filename);
-		static Type		GetType(const QString & filename);
+		inline static bool		IsMedia(const QString & filename);
+		static Type				GetType(const QString & filename);
 
 	private:
 
@@ -86,6 +87,9 @@ namespace MediaViewer
 	};
 
 } // namespace MediaViewer
+
+
+#include "Media.inl"
 
 
 #endif // __MEDIA_H__

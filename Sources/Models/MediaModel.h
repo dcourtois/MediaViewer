@@ -62,12 +62,12 @@ namespace MediaViewer
 		int							columnCount(const QModelIndex & parent = QModelIndex()) const final;
 
 		// public API
-		const QString &				GetRoot(void) const;
+		inline const QString &		GetRoot(void) const;
 		void						SetRoot(const QString & path);
 		const QVector< Media * > &	GetMedias(void) const;
-		SortBy						GetSortBy(void) const;
+		inline SortBy				GetSortBy(void) const;
 		void						SetSortBy(SortBy by);
-		SortOrder					GetSortOrder(void) const;
+		inline SortOrder			GetSortOrder(void) const;
 		void						SetSortOrder(SortOrder order);
 		void						Sort(void) const;
 
@@ -107,6 +107,9 @@ namespace MediaViewer
 	};
 
 } // namespace MediaViewer
+
+
+#include "MediaModel.inl"
 
 
 #endif // __MEDIA_MODEL_H__

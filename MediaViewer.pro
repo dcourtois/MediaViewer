@@ -34,9 +34,13 @@ HEADERS += \
     Sources/RegisterQMLTypes.h \
     Sources/ImageProviders/FolderIconProvider.h \
     Sources/Models/Folder.h \
+    Sources/Models/Folder.inl \
     Sources/Models/FolderModel.h \
+    Sources/Models/FolderModel.inl \
     Sources/Models/Media.h \
+    Sources/Models/Media.inl \
     Sources/Models/MediaModel.h \
+    Sources/Models/MediaModel.inl \
     Sources/Utils/Cursor.h \
     Sources/Utils/FileSystem.h \
     Sources/Utils/Job.h \

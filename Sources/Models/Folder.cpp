@@ -20,6 +20,7 @@ namespace MediaViewer
 
 		// setup the file watcher
 		QObject::connect(&m_FileWatcher, &QFileSystemWatcher::directoryChanged, [&] (const QString &) {
+			// TODO: scan for new/deleted folders
 			this->UpdateMedias();
 		});
 
@@ -46,14 +47,6 @@ namespace MediaViewer
 		{
 			DELETE folder;
 		}
-	}
-
-	//!
-	//! Get the folder's path
-	//!
-	const QString & Folder::GetPath(void) const
-	{
-		return m_Path;
 	}
 
 	//!
@@ -96,39 +89,6 @@ namespace MediaViewer
 			// update the medias
 			this->UpdateMedias();
 		}
-	}
-
-	//!
-	//! Get the folder's name
-	//!
-	const QString & Folder::GetName(void) const
-	{
-		return m_Name;
-	}
-
-	//!
-	//! Get the number of medias in this folder
-	//!
-	int Folder::GetMediaCount(void) const
-	{
-		return m_MediaCount;
-	}
-
-	//!
-	//! Get the folder's parent
-	//!
-	const Folder * Folder::GetParent(void) const
-	{
-		return m_Parent;
-	}
-
-	//!
-	//! Get the children
-	//!
-	const QVector< Folder * > & Folder::GetChildren(void) const
-	{
-		this->UpdateChildren();
-		return m_Children;
 	}
 
 	//!

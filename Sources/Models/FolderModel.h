@@ -40,13 +40,13 @@ namespace MediaViewer
 	protected:
 
 		// C++ API
-		QQmlListProperty< Folder >	GetRoots(void) const;
-		static int					GetRootCount(QQmlListProperty< Folder > * roots);
-		static Folder *				GetRoot(QQmlListProperty< Folder > * roots, int index);
-		static void					AddRoot(QQmlListProperty< Folder > * roots, Folder * root);
-		static void					Clear(QQmlListProperty< Folder > * roots);
-		QStringList					GetRootPaths(void) const;
-		void						SetRootPaths(const QStringList & paths);
+		inline QQmlListProperty< Folder >	GetRoots(void) const;
+		inline static int					GetRootCount(QQmlListProperty< Folder > * roots);
+		inline static Folder *				GetRoot(QQmlListProperty< Folder > * roots, int index);
+		static void							AddRoot(QQmlListProperty< Folder > * roots, Folder * root);
+		static void							Clear(QQmlListProperty< Folder > * roots);
+		QStringList							GetRootPaths(void) const;
+		void								SetRootPaths(const QStringList & paths);
 
 	private:
 
@@ -56,6 +56,9 @@ namespace MediaViewer
 	};
 
 } // namespace MediaViewer
+
+
+#include "FolderModel.inl"
 
 
 #endif // __FOLDER_MODEL_H__

@@ -31,11 +31,11 @@ namespace MediaViewer
 		~Folder(void);
 
 		// public API
-		const QString &					GetPath(void) const;
-		const QString &					GetName(void) const;
-		int								GetMediaCount(void) const;
-		const Folder *					GetParent(void) const;
-		const QVector< Folder * > &		GetChildren(void) const;
+		inline const QString &					GetPath(void) const;
+		inline const QString &					GetName(void) const;
+		inline int								GetMediaCount(void) const;
+		inline const Folder *					GetParent(void) const;
+		inline const QVector< Folder * > &		GetChildren(void) const;
 
 	private:
 
@@ -68,6 +68,9 @@ namespace MediaViewer
 	};
 
 } // namespace MediaViewer
+
+
+#include "Folder.inl"
 
 
 #endif // __FOLDER_H__

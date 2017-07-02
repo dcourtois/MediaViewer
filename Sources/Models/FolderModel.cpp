@@ -66,39 +66,6 @@ namespace MediaViewer
 	}
 
 	//!
-	//! Get the roots
-	//!
-	QQmlListProperty< Folder > FolderModel::GetRoots(void) const
-	{
-		return QQmlListProperty< Folder >(
-			const_cast< QObject * >(static_cast< const QObject * >(this)),
-			nullptr,
-			&FolderModel::AddRoot,
-			&FolderModel::GetRootCount,
-			&FolderModel::GetRoot,
-			&FolderModel::Clear
-		);
-	}
-
-	//!
-	//! Get the number of roots
-	//!
-	int FolderModel::GetRootCount(QQmlListProperty< Folder > * roots)
-	{
-		FolderModel * self = static_cast< FolderModel * >(roots->object);
-		return self->m_Roots.count();
-	}
-
-	//!
-	//! Get a specific root
-	//!
-	Folder * FolderModel::GetRoot(QQmlListProperty< Folder > * roots, int index)
-	{
-		FolderModel * self = static_cast< FolderModel * >(roots->object);
-		return self->m_Roots.at(index);
-	}
-
-	//!
 	//! Add a new root
 	//!
 	void FolderModel::AddRoot(QQmlListProperty< Folder > * roots, Folder * root)
@@ -165,12 +132,12 @@ namespace MediaViewer
 	//!
 	QHash< int, QByteArray > FolderModel::roleNames(void) const
 	{
-		QHash< int, QByteArray > roles;
-		roles.insert(Qt::DisplayRole,	"name");
-		roles.insert(Qt::UserRole,		"path");
-		roles.insert(Qt::UserRole + 1,	"mediaCount");
-		roles.insert(Qt::UserRole + 2,	"folder");
-		return roles;
+		return {
+			{ Qt::DisplayRole,		"name" },
+			{ Qt::UserRole,			"path" },
+			{ Qt::UserRole + 1,		"mediaCount" },
+			{ Qt::UserRole + 2,		"folder" }
+		};
 	}
 
 	//!

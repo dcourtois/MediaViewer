@@ -66,54 +66,6 @@ namespace MediaViewer
 	}
 
 	//!
-	//! Get the media's path
-	//!
-	const QString & Media::GetPath(void) const
-	{
-		return m_Path;
-	}
-
-	//!
-	//! Get the media's name
-	//!
-	const QString & Media::GetName(void) const
-	{
-		return m_Name;
-	}
-
-	//!
-	//! Get the media's last modification date
-	//!
-	const QDateTime & Media::GetDate(void) const
-	{
-		return m_Date;
-	}
-
-	//!
-	//! Get the media's name
-	//!
-	uint64_t Media::GetSize(void) const
-	{
-		return m_Size;
-	}
-
-	//!
-	//! Get the media's type
-	//!
-	Media::Type Media::GetType(void) const
-	{
-		return m_Type;
-	}
-
-	//!
-	//! Checks if a file is a supported media
-	//!
-	bool Media::IsMedia(const QString & filename)
-	{
-		return GetType(filename) != Type::NotSupported;
-	}
-
-	//!
 	//! Get the type of a file
 	//!
 	Media::Type Media::GetType(const QString & filename)
