@@ -95,7 +95,7 @@ Item {
 				MouseArea {
 					anchors.fill: parent
 					acceptedButtons: Qt.LeftButton
-					onClicked: { player.stop(); root.setPosition(0); }
+					onClicked: { player.stop(); root.setPosition(100); }
 				}
 			}
 			Image {
