@@ -75,6 +75,8 @@ MainWindow {
 			property int sortBy: 4
 			property int sortOrder: 0
 			property double thumbnailSize: 0.5
+			property string lastVisitedFolder: ""
+			property bool restoreLastVisitedFolder: false
 		}
 	}
 
@@ -99,6 +101,7 @@ MainWindow {
 				id: folderBrowser
 				Layout.fillHeight: true
 				model: folderModel
+				settings: preferences.settings
 			}
 
 			// media preview

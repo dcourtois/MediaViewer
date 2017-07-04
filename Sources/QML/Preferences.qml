@@ -15,7 +15,7 @@ Dialog {
 	property var settings
 
 	// private properties
-	property int _labelWidth: 200
+	property int _labelWidth: 250
 
 	// init (to avoid binding loops)
 	onVisibleChanged: {
@@ -25,129 +25,182 @@ Dialog {
 			sortBy.currentIndex					= settings.sortBy;
 			sortOrder.currentIndex				= settings.sortOrder;
 			thumbnailSize.value					= settings.thumbnailSize;
+			restoreLastVisitedFolder.checked	= settings.restoreLastVisitedFolder;
 		}
 	}
 
-	// main layout
 	ColumnLayout {
+		id: column
 		anchors.fill: parent
 
-		// Play mode of animated images in preview
-		RowLayout {
-			spacing: 10
-			Label {
-				Layout.minimumWidth: _labelWidth
-				text: "Auto Play Animated Images"
-				horizontalAlignment: Text.AlignRight
+		// tab bar header
+		TabBar {
+			id: bar
+			width: parent.width
+
+			TabButton {
+				width: column.width / 2
+				text: "General"
 			}
-			ComboBox {
-				id: playAnimatedImages
-				Layout.fillWidth: true
-				model: [
-					"On",
-					"Mouse Hover",
-					"Off"
-				]
-				onCurrentIndexChanged: {
-					if (root.visible === true) {
-						settings.playAnimatedImages = currentIndex
+
+			TabButton {
+				width: column.width / 2
+				text: "Interface"
+			}
+		}
+
+		// tabs content
+		StackLayout {
+			width: parent.width
+			currentIndex: bar.currentIndex
+
+			// general options
+			ColumnLayout {
+				// Remmber last visited folder
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Remember Last Visited Folder"
+						horizontalAlignment: Text.AlignRight
+					}
+					CheckBox {
+						id: restoreLastVisitedFolder
+						onCheckedChanged: {
+							if (root.visible === true) {
+								settings.restoreLastVisitedFolder = checked
+							}
+						}
 					}
 				}
-			}
-		}
 
-		// Play mode of movies in preview
-		RowLayout {
-			spacing: 10
-			Label {
-				Layout.minimumWidth: _labelWidth
-				text: "Auto Play Movies"
-				horizontalAlignment: Text.AlignRight
-			}
-			ComboBox {
-				id: playMovies
-				Layout.fillWidth: true
-				model: [
-					"On",
-					"Mouse Hover",
-					"Off"
-				]
-				onCurrentIndexChanged: {
-					if (root.visible === true) {
-						settings.playMovies = currentIndex
-					}
+				// fill the remaining space
+				Item {
+					Layout.fillHeight: true
+					Layout.columnSpan: 2
 				}
 			}
-		}
 
-		// Sort by
-		RowLayout {
-			spacing: 10
-			Label {
-				Layout.minimumWidth: _labelWidth
-				text: "Sort By"
-				horizontalAlignment: Text.AlignRight
-			}
-			ComboBox {
-				id: sortBy
-				Layout.fillWidth: true
-				model: [
-					"Name",
-					"Size",
-					"Date",
-					"Type",
-					"None"
-				]
-				onCurrentIndexChanged: {
-					if (root.visible === true) {
-						settings.sortBy = currentIndex
+			// interface options
+			ColumnLayout {
+				// Play mode of animated images in preview
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Auto Play Animated Images"
+						horizontalAlignment: Text.AlignRight
+					}
+					ComboBox {
+						id: playAnimatedImages
+						Layout.fillWidth: true
+						model: [
+							"On",
+							"Mouse Hover",
+							"Off"
+						]
+						onCurrentIndexChanged: {
+							if (root.visible === true) {
+								settings.playAnimatedImages = currentIndex
+							}
+						}
 					}
 				}
-			}
-		}
 
-		// Sort order
-		RowLayout {
-			spacing: 10
-			Label {
-				Layout.minimumWidth: _labelWidth
-				text: "Sort Order"
-				horizontalAlignment: Text.AlignRight
-			}
-			ComboBox {
-				id: sortOrder
-				Layout.fillWidth: true
-				model: [
-					"Ascending",
-					"Descending"
-				]
-				onCurrentIndexChanged: {
-					if (root.visible === true) {
-						settings.sortOrder = currentIndex
+				// Play mode of movies in preview
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Auto Play Movies"
+						horizontalAlignment: Text.AlignRight
+					}
+					ComboBox {
+						id: playMovies
+						Layout.fillWidth: true
+						model: [
+							"On",
+							"Mouse Hover",
+							"Off"
+						]
+						onCurrentIndexChanged: {
+							if (root.visible === true) {
+								settings.playMovies = currentIndex
+							}
+						}
 					}
 				}
-			}
-		}
 
-		// Browser thumbnails size in pixels
-		RowLayout {
-			spacing: 10
-			Label {
-				Layout.minimumWidth: _labelWidth
-				text: "Thumbnail Size"
-				horizontalAlignment: Text.AlignRight
-			}
-			Slider {
-				id: thumbnailSize
-				Layout.fillWidth: true
-				onValueChanged: settings.thumbnailSize = value
-			}
-		}
+				// Sort by
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Sort By"
+						horizontalAlignment: Text.AlignRight
+					}
+					ComboBox {
+						id: sortBy
+						Layout.fillWidth: true
+						model: [
+							"Name",
+							"Size",
+							"Date",
+							"Type",
+							"None"
+						]
+						onCurrentIndexChanged: {
+							if (root.visible === true) {
+								settings.sortBy = currentIndex
+							}
+						}
+					}
+				}
 
-		// fill the remaining space
-		Item {
-			Layout.fillHeight: true
-			Layout.columnSpan: 2
+				// Sort order
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Sort Order"
+						horizontalAlignment: Text.AlignRight
+					}
+					ComboBox {
+						id: sortOrder
+						Layout.fillWidth: true
+						model: [
+							"Ascending",
+							"Descending"
+						]
+						onCurrentIndexChanged: {
+							if (root.visible === true) {
+								settings.sortOrder = currentIndex
+							}
+						}
+					}
+				}
+
+				// Browser thumbnails size in pixels
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Thumbnail Size"
+						horizontalAlignment: Text.AlignRight
+					}
+					Slider {
+						id: thumbnailSize
+						Layout.fillWidth: true
+						onValueChanged: settings.thumbnailSize = value
+					}
+				}
+
+				// fill the remaining space
+				Item {
+					Layout.fillHeight: true
+					Layout.columnSpan: 2
+				}
+			}
 		}
 	}
 }

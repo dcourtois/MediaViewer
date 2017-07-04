@@ -13,6 +13,9 @@ import Qt.labs.settings 1.0
 Controls.TreeView {
 	id: root
 
+	// externally set
+	property var settings
+
 	// The currently selected path
 	property string currentFolderPath: ""
 
@@ -34,19 +37,15 @@ Controls.TreeView {
 		}
 	}
 
-	// default settings
-	Settings {
-		id: settings
-		property string currentFolderPath: ""
-	}
-
 	// Initialization
 	Component.onCompleted: {
-		setCurrentFolderPath(settings.currentFolderPath);
+		if (settings.restoreLastVisitedFolder === true) {
+			setCurrentFolderPath(settings.lastVisitedFolder);
+		}
 	}
 
 	// Bindings
-	onCurrentFolderPathChanged: settings.currentFolderPath = currentFolderPath
+	onCurrentFolderPathChanged: settings.lastVisitedFolder = currentFolderPath
 
 	//-------------------------------------------------------------------------
 	// Privates
