@@ -46,7 +46,7 @@ MainWindow {
 
 	// global media selection (needed to share selection between the
 	// media browser and the media preview)
-	MediaSelection {
+	Selection {
 		id: selection
 		model: mediaModel
 	}
