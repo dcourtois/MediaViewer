@@ -71,6 +71,9 @@ namespace MediaViewer
 		void						SetSortOrder(SortOrder order);
 		void						Sort(void) const;
 
+		// needed to silence warnings on hidden functions
+		using QAbstractItemModel::sort;
+
 		// public QML API
 		Q_INVOKABLE int				getIndexByPath(const QString & path) const;
 		Q_INVOKABLE QModelIndex		getModelIndexByPath(const QString & path) const;

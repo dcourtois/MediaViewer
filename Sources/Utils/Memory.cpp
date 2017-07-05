@@ -2,7 +2,7 @@
 #include "Memory.h"
 
 
-#if !defined(RETAIL)
+#if MEMORY_CHECK == 1
 
 
 #include <unordered_map>
@@ -73,7 +73,7 @@ typedef std::unordered_map<
 	std::tuple< size_t, const char *, int >,
 	std::hash< void * >,
 	std::equal_to< void * >,
-	Allocator< std::pair< void *, std::tuple< size_t, const char *, int > > >
+	Allocator< std::pair< void * const, std::tuple< size_t, const char *, int > > >
 > AllocatedBlockMap;
 
 //!
