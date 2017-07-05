@@ -33,7 +33,15 @@ namespace MediaViewer
 	{
 		Folder * folder = nullptr;
 		int row = 0;
-		QStringList tokens = QString(path).replace('\\', '/').split('/', QString::SkipEmptyParts);
+		QStringList tokens = QString(path).replace('\\', '/').split('/');
+
+		// remove trailing slash
+		if (tokens.last().isEmpty() == true)
+		{
+			tokens.pop_back();
+		}
+
+		// reconstruct the path from the beginning
 		QString current;
 		for (const auto & token : tokens)
 		{
@@ -51,12 +59,6 @@ namespace MediaViewer
 					folder = folders.at(i);
 					break;
 				}
-			}
-
-			// not found
-			if (folder == nullptr)
-			{
-				return QModelIndex();
 			}
 		}
 
