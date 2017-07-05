@@ -7,8 +7,28 @@
 //!
 //! This file contains helper macros used to track allocated memory.
 //!
+//! By default, memory allocations are tracked and reported only in
+//! debug. You can override this behavior by simply defining the
+//! @a MEMORY_CHECK macro.
+//!
 
-#if !defined(RETAIL)
+//!
+//! @a MEMORY_CHECK
+//!
+//! By default, memory tracking and leak reporting is only done in
+//! debug. Set this macro to 1 to always activate this, or to 0 to
+//! always disable it.
+//!
+#if !defined(MEMORY_CHECK)
+#	if (QT_NO_DEBUG)
+#		define MEMORY_CHECK 0
+#	else
+#		define MEMORY_CHECK 1
+#	endif
+#endif
+
+
+#if MEMORY_CHECK == 1
 
 extern void * operator new(size_t size, const char * filename, int line);
 extern void * operator new [] (size_t size, const char * filename, int line);

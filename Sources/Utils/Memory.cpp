@@ -2,7 +2,7 @@
 #include "Memory.h"
 
 
-#if !defined(RETAIL)
+#if MEMORY_CHECK == 1
 
 
 #include <unordered_map>
