@@ -46,14 +46,12 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 		drives << storage.rootPath();
 	}
 #else
-	static_assert(false, "initialize drives for your platform");1
+	static_assert(false, "initialize drives for your platform");
 #endif
 	engine.rootContext()->setContextProperty("drives", drives);
 
 	// open the initial folder / media
 	QStringList args = app.arguments();
-	engine.rootContext()->setContextProperty("initMedia", "");
-	engine.rootContext()->setContextProperty("initFolder", "");
 	if (args.size() > 1)
 	{
 		QString path = args[1];
@@ -67,6 +65,11 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 		{
 			engine.rootContext()->setContextProperty("initFolder", info.absoluteFilePath());
 		}
+	}
+	else
+	{
+		engine.rootContext()->setContextProperty("initMedia", "");
+		engine.rootContext()->setContextProperty("initFolder", "");
 	}
 
 	// set the source
