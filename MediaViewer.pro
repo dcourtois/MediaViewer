@@ -63,3 +63,6 @@ linux {
 win32 {
     DEFINES += WINDOWS
 }
+mac {
+    DEFINES += MACOS
+}

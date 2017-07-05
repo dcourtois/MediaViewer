@@ -45,6 +45,12 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 		}
 		drives << storage.rootPath();
 	}
+#elif defined(MACOS)
+	// get the user home
+	for (auto drive : QStandardPaths::standardLocations(QStandardPaths::HomeLocation))
+	{
+		drives << drive;
+	}
 #else
 	static_assert(false, "initialize drives for your platform");
 #endif
