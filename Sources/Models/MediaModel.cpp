@@ -379,14 +379,6 @@ namespace MediaViewer
 	}
 
 	//!
-	//! Get the last model index
-	//!
-	QModelIndex MediaModel::getLastModelIndex(void) const
-	{
-		return this->getModelIndexByIndex(this->GetMedias().size() - 1);
-	}
-
-	//!
 	//! Get a model index from an index
 	//!
 	QModelIndex MediaModel::getModelIndexByIndex(int index) const

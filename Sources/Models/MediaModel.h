@@ -79,7 +79,6 @@ namespace MediaViewer
 		Q_INVOKABLE QModelIndex		getModelIndexByPath(const QString & path) const;
 		Q_INVOKABLE QModelIndex		getPreviousModelIndex(const QModelIndex & index) const;
 		Q_INVOKABLE QModelIndex		getNextModelIndex(const QModelIndex & index) const;
-		Q_INVOKABLE QModelIndex		getLastModelIndex(void) const;
 		Q_INVOKABLE QModelIndex		getModelIndexByIndex(int index) const;
 		Q_INVOKABLE Media *			getMedia(const QModelIndex & index) const;
 		Q_INVOKABLE int				getIndex(const QModelIndex & index) const;

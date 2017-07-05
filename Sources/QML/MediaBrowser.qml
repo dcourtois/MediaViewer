@@ -19,8 +19,10 @@ Item {
 	property var stateManager
 	property var settings
 
-	// configure looks
-	property color highlightColor: Material.color(Material.LightBlue, Material.Shade300)
+	// privates
+	property bool _controlDown: false
+	property bool _shiftDown: false
+	property color _highlight: Material.color(Material.LightBlue, Material.Shade300)
 
 	// bind settings
 	Connections {
@@ -48,7 +50,6 @@ Item {
 
 			// delegates
 			delegate: itemDelegate
-			highlight: highlightDelegate
 
 			// bind the model
 			model: selection ? selection.model : undefined
@@ -56,10 +57,20 @@ Item {
 			// delegate used to draw an item
 			Component {
 				id: itemDelegate
-				Item {
+
+				Rectangle {
+					id: thumbnailBackground
 					property string currentPath: path
 					width: grid.cellWidth
 					height: grid.cellHeight
+
+					// check selection change to update the background
+					Connections {
+						target: selection
+						onSelectionChanged: thumbnailBackground.color = selection.isSelected(index) ? _highlight : "white"
+					}
+
+					// used to center the media in the cell
 					Item {
 						width: image.width
 						height: image.height + label.height
@@ -103,27 +114,27 @@ Item {
 				}
 			}
 
-			// delegate used to draw the selected highlight
-			Component {
-				id: highlightDelegate
-				Rectangle {
-					x: grid.currentItem ? grid.currentItem.x : 0
-					y: grid.currentItem ? grid.currentItem.y : 0
-					width: grid.cellWidth
-					height: grid.cellHeight
-					color: highlightColor
+			// notify the selection manager that the index changed
+			onCurrentIndexChanged: {
+				if (stateManager.state === "preview") {
+					if (_controlDown === true) {
+						selection.toggleSelection(grid.currentIndex);
+					} else if (_shiftDown === true) {
+						selection.extendSelection(grid.currentIndex);
+					} else {
+						selection.setCurrent(grid.currentIndex);
+					}
 				}
 			}
 
-			// notify the selection manager that the index changed
-			onCurrentItemChanged: selection.selectByPath(currentItem ? currentItem.currentPath : "")
-
 			// update the view's current item when the selection manager's current index changed
-			Binding {
-				target: grid
-				property: "currentIndex"
-				value: selection.currentMediaIndex
-				when: selection
+			Connections {
+				target: selection
+				onCurrentChanged: {
+					if (stateManager.state === "fullscreen") {
+						grid.currentIndex = selection.current.row;
+					}
+				}
 			}
 
 			// Mouse handling
@@ -140,10 +151,17 @@ Item {
 					scrollView.focus = true;
 
 					// select the item under the mouse
+					var index = grid.currentIndex;
 					grid.currentIndex = grid.indexAt(
 						mouse.x + grid.contentX,
 						mouse.y + grid.contentY
 					);
+
+					// if the selection is the same, force notification since we might want to
+					// toggle the active item's selection
+					if (index === grid.currentIndex) {
+						grid.currentIndexChanged(index);
+					}
 				}
 
 				// toggle fullscreen
@@ -158,6 +176,14 @@ Item {
 		// Keyboard handling
 		Keys.onPressed: {
 			switch (event.key) {
+				case Qt.Key_Control:
+					event.accepted = true;
+					_controlDown = true;
+					break;
+				case Qt.Key_Shift:
+					event.accepted = true;
+					_shiftDown = true;
+					break;
 				case Qt.Key_Down:
 					event.accepted = true;
 					grid.moveCurrentIndexDown();
@@ -177,6 +203,18 @@ Item {
 				case Qt.Key_Enter:
 				case Qt.Key_Return:
 					stateManager.state = "fullscreen";
+					break;
+			}
+		}
+		Keys.onReleased: {
+			switch (event.key) {
+				case Qt.Key_Control:
+					event.accepted = true;
+					_controlDown = false;
+					break;
+				case Qt.Key_Shift:
+					event.accepted = true;
+					_shiftDown = false;
 					break;
 			}
 		}
