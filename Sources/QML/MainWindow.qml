@@ -11,6 +11,7 @@ import MediaViewer 0.1
 //
 ApplicationWindow {
 	id: mainWindow
+	visible: true
 
 	// default size
 	width: 1000
