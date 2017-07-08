@@ -1,22 +1,35 @@
 <RCC>
 	<qresource prefix="/">
-		<file>FolderBrowser.qml</file>
+		<!-- Main entry point -->
 		<file>Main.qml</file>
+
+		<!-- Main Window + Menu -->
 		<file>MainWindow.qml</file>
-		<file>MediaBrowser.qml</file>
-		<file>MediaViewer.qml</file>
 		<file>MainMenu.qml</file>
-		<file>Preferences.qml</file>
-		<file>Selection.qml</file>
-		<file>ShortcutMenuItem.qml</file>
-		<file>StateManager.qml</file>
 		<file>WindowSettings.qml</file>
 		<file>WindowState.qml</file>
+		<file>ShortcutMenuItem.qml</file>
+
+		<!-- Globa states -->
+		<file>Selection.qml</file>
+		<file>StateManager.qml</file>
+
+		<!-- Main parts of the application -->
+		<file>FolderBrowser.qml</file>
+		<file>MediaBrowser.qml</file>
+		<file>MediaViewer.qml</file>
+
+		<!-- Medias viewers (handle both preview and fullscreen) -->
 		<file>Viewers/AnimatedImage.qml</file>
 		<file>Viewers/Image.qml</file>
 		<file>Viewers/Movie.qml</file>
+
+		<!-- Media thumbnails in the browser -->
 		<file>Previews/AnimatedImage.qml</file>
 		<file>Previews/Image.qml</file>
 		<file>Previews/Movie.qml</file>
+
+		<!-- Tools -->
+		<file>Preferences.qml</file>
 	</qresource>
 </RCC>

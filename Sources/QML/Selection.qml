@@ -15,13 +15,15 @@ Item {
 	property var selection: []
 
 	// check if we have a previous media
-	function hasPrevious() {
-		return model.getPreviousModelIndex(current) !== current;
+	function hasPrevious(index) {
+		index = index ? index : current;
+		return model.getPreviousModelIndex(index) !== index;
 	}
 
 	// check if we have a next media
-	function hasNext() {
-		return model.getNextModelIndex(current) !== current;
+	function hasNext(index) {
+		index = index ? index : current;
+		return model.getNextModelIndex(index) !== index;
 	}
 
 	// set the current media by path
@@ -130,6 +132,25 @@ Item {
 			}
 		}
 		return -1;
+	}
+
+	// return a list of selected paths
+	function getSelectedPaths() {
+		var paths = [];
+		for (var i = 0; i < selection.length; ++i) {
+			paths.push(model.getMedia(selection[i]).path);
+		}
+		return paths;
+	}
+
+	// get the first selected model index
+	function getFirstSelected() {
+		return selection.length > 0 ? selection[0] : { valid: false };
+	}
+
+	// get the last selected model index
+	function getLastSelected() {
+		return selection.length > 0 ? selection[selection.length - 1] : { valid: false };
 	}
 
 	// update the current media

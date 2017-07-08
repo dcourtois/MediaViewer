@@ -46,7 +46,7 @@ ToolBar {
 			enabled: selection.currentMedia !== undefined
 			sequence: "Ctrl+C"
 			onTriggered: {
-				fileSystem.copy([ selection.currentMedia.path ]);
+				fileSystem.copy(selection.getSelectedPaths());
 				editMenu._sourceFolder = folderBrowser.currentFolderPath;
 			}
 		}
@@ -55,7 +55,7 @@ ToolBar {
 			enabled: selection.currentMedia !== undefined
 			sequence: "Ctrl+X"
 			onTriggered: {
-				fileSystem.cut([ selection.currentMedia.path ]);
+				fileSystem.cut(selection.getSelectedPaths());
 				editMenu._sourceFolder = folderBrowser.currentFolderPath;
 			}
 		}
@@ -71,23 +71,32 @@ ToolBar {
 			enabled: selection.currentMedia !== undefined
 			sequence: "Del"
 			onTriggered: {
+				// collect paths
+				var paths = selection.getSelectedPaths();
+
 				// handle selection behavior after a deletion, because the
 				// view does a really crappy job at that.
-				var index = selection.currentMediaIndex,
-					path = selection.currentMedia.path,
-					hasNext = selection.hasNext();
+				// In the case of multiple selection, it's a lot trickier, so
+				// only handle single selection for now.
+				if (paths.length === 1) {
+					var index = selection.current.row,
+						path = selection.currentMedia.path,
+						hasNext = selection.hasNext();
 
-				// select the next one if needed
-				if (hasNext === true) {
-					selection.selectByIndex(index + 1);
-				} else if (index > 0){
-					selection.selectByIndex(index - 1);
+					// select the next one if needed
+					if (hasNext === true) {
+						selection.setCurrent(index + 1);
+					} else if (index > 0){
+						selection.setCurrent(index - 1);
+					} else {
+						selection.clear();
+					}
 				} else {
-					selection.clearCurrentIndex();
+					selection.clear();
 				}
 
 				// remove
-				fileSystem.remove([ path ]);
+				fileSystem.remove(paths);
 			}
 		}
 	}
