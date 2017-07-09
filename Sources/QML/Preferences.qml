@@ -26,6 +26,7 @@ Dialog {
 			sortOrder.currentIndex				= settings.sortOrder;
 			thumbnailSize.value					= settings.thumbnailSize;
 			restoreLastVisitedFolder.checked	= settings.restoreLastVisitedFolder;
+			deletePermanently.checked			= settings.deletePermanently;
 		}
 	}
 
@@ -56,6 +57,7 @@ Dialog {
 
 			// general options
 			ColumnLayout {
+
 				// Remmber last visited folder
 				RowLayout {
 					spacing: 10
@@ -69,6 +71,24 @@ Dialog {
 						onCheckedChanged: {
 							if (root.visible === true) {
 								settings.restoreLastVisitedFolder = checked
+							}
+						}
+					}
+				}
+
+				// Delet permanently
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Delete Permanently"
+						horizontalAlignment: Text.AlignRight
+					}
+					CheckBox {
+						id: deletePermanently
+						onCheckedChanged: {
+							if (root.visible === true) {
+								settings.deletePermanently = checked
 							}
 						}
 					}

@@ -19,6 +19,9 @@ signals:
 
 public:
 
+	// constructor
+	FileSystem(void);
+
 	// QML API
 	Q_INVOKABLE void	copy(QStringList files);
 	Q_INVOKABLE void	cut(QStringList files);
@@ -28,13 +31,18 @@ public:
 private:
 
 	// private API
-	bool CanPaste(void) const;
+	bool	CanPaste(void) const;
+	void	InitTrashFolder(void);
+	void	MoveToTrash(const QString & path);
 
 	//! The list of copied files
 	QStringList m_CopiedFiles;
 
 	//! The list of cut files
 	QStringList m_CutFiles;
+
+	//! The trash folder
+	QString m_TrashFolder;
 
 };
 
