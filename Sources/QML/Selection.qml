@@ -90,6 +90,41 @@ Item {
 		current = index;
 	}
 
+	// check if we have a selection
+	function hasSelection() {
+		return selection.length !== 0;
+	}
+
+	// select everything
+	function selectAll() {
+		selection.length = 0;
+		var index = { valid: false },
+			newIndex = convertIndex(0);
+		while (newIndex.valid === true && index !== newIndex) {
+			selection.push(newIndex);
+			index = newIndex;
+			newIndex = model.getNextModelIndex(index);
+		}
+		current = selection.length !== 0 ? selection[0] : { valid: false };
+		selectionChanged();
+	}
+
+	// inverse selection
+	function selectInverse() {
+		var index = { valid: false },
+			newIndex = convertIndex(0),
+			newSelection = [];
+		while (newIndex.valid === true && index !== newIndex) {
+			if (indexOf(newIndex) === -1) {
+				newSelection.push(newIndex);
+			}
+			index = newIndex;
+			newIndex = model.getNextModelIndex(index);
+		}
+		current = newSelection.length !== 0 ? newSelection[0] : { valid: false };
+		selection = newSelection;
+	}
+
 	// extend the selection
 	function extendSelection(index) {
 		// reset the selection

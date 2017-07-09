@@ -19,6 +19,11 @@ ToolBar {
 	RowLayout {
 		anchors.fill: parent
 		ToolButton {
+			id: fileButton
+			text: "File"
+			onClicked: fileMenu.open()
+		}
+		ToolButton {
 			id: editButton
 			text: "Edit"
 			onClicked: editMenu.open()
@@ -34,9 +39,9 @@ ToolBar {
 	}
 
 	Menu {
-		id: editMenu
-		x: editButton.x
-		y: editButton.y + editButton.height
+		id: fileMenu
+		x: fileButton.x
+		y: fileButton.y + fileButton.height
 
 		// used to know wether we can paste or not
 		property string _sourceFolder
@@ -47,7 +52,7 @@ ToolBar {
 			sequence: "Ctrl+C"
 			onTriggered: {
 				fileSystem.copy(selection.getSelectedPaths());
-				editMenu._sourceFolder = folderBrowser.currentFolderPath;
+				fileMenu._sourceFolder = folderBrowser.currentFolderPath;
 			}
 		}
 		ShortcutMenuItem {
@@ -56,12 +61,12 @@ ToolBar {
 			sequence: "Ctrl+X"
 			onTriggered: {
 				fileSystem.cut(selection.getSelectedPaths());
-				editMenu._sourceFolder = folderBrowser.currentFolderPath;
+				fileMenu._sourceFolder = folderBrowser.currentFolderPath;
 			}
 		}
 		ShortcutMenuItem {
 			text: "Paste"
-			enabled: fileSystem.canPaste && editMenu._sourceFolder !== folderBrowser.currentFolderPath
+			enabled: fileSystem.canPaste && fileMenu._sourceFolder !== folderBrowser.currentFolderPath
 			sequence: "Ctrl+V"
 			onTriggered: fileSystem.paste(folderBrowser.currentFolderPath)
 		}
@@ -98,6 +103,30 @@ ToolBar {
 				// remove
 				fileSystem.remove(paths);
 			}
+		}
+	}
+
+	Menu {
+		id: editMenu
+		x: editButton.x
+		y: editButton.y + editButton.height
+
+		ShortcutMenuItem {
+			text: "Select All"
+			sequence: "Ctrl+A"
+			onTriggered: selection.selectAll();
+		}
+		ShortcutMenuItem {
+			text: "Select Inverse"
+			enabled: selection.hasSelection() === true
+			sequence: "Ctrl+I"
+			onTriggered: selection.selectInverse();
+		}
+		ShortcutMenuItem {
+			text: "Select None"
+			enabled: selection.hasSelection() === true
+			sequence: "Ctrl+D"
+			onTriggered: selection.clear();
 		}
 	}
 
