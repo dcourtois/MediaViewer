@@ -15,23 +15,24 @@ ToolBar {
 	// externally set
 	property var selection
 	property var preferences
+	property var slideShow
 
 	RowLayout {
 		anchors.fill: parent
 		ToolButton {
 			id: fileButton
 			text: "File"
-			onClicked: fileMenu.open()
+			onClicked: fileMenu.visible ? fileMenu.close() : fileMenu.open()
 		}
 		ToolButton {
 			id: editButton
 			text: "Edit"
-			onClicked: editMenu.open()
+			onClicked: editMenu.visible ? editMenu.close() : editMenu.open()
 		}
 		ToolButton {
 			id: optionButton
 			text: "Options"
-			onClicked: optionMenu.open()
+			onClicked: optionMenu.visible ? optionMenu.close() : optionMenu.open()
 		}
 		Item {
 			Layout.fillWidth: true
@@ -49,7 +50,7 @@ ToolBar {
 		ShortcutMenuItem {
 			text: "Copy"
 			enabled: selection.currentMedia !== undefined
-			sequence: "Ctrl+C"
+			sequence: StandardKey.Copy
 			onTriggered: {
 				fileSystem.copy(selection.getSelectedPaths());
 				fileMenu._sourceFolder = folderBrowser.currentFolderPath;
@@ -58,7 +59,7 @@ ToolBar {
 		ShortcutMenuItem {
 			text: "Cut"
 			enabled: selection.currentMedia !== undefined
-			sequence: "Ctrl+X"
+			sequence: StandardKey.Cut
 			onTriggered: {
 				fileSystem.cut(selection.getSelectedPaths());
 				fileMenu._sourceFolder = folderBrowser.currentFolderPath;
@@ -67,7 +68,7 @@ ToolBar {
 		ShortcutMenuItem {
 			text: "Paste"
 			enabled: fileSystem.canPaste && fileMenu._sourceFolder !== folderBrowser.currentFolderPath
-			sequence: "Ctrl+V"
+			sequence: StandardKey.Paste
 			onTriggered: fileSystem.paste(folderBrowser.currentFolderPath)
 		}
 
@@ -135,6 +136,17 @@ ToolBar {
 		x: optionButton.x
 		y: optionButton.y + optionButton.height
 		width: 250
+
+		ShortcutMenuItem {
+			text: "Slide Show"
+			sequence: "S"
+			onTriggered: slideShow.start()
+		}
+
+		MenuSeparator {
+			x: 10
+			width: 230
+		}
 
 		ShortcutMenuItem {
 			text: "Preferences"

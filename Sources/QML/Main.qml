@@ -65,6 +65,14 @@ MainWindow {
 		mainWindow: mainWindow
 	}
 
+	// the slide show
+	SlideShow {
+		id: slideShow
+		settings: preferences.settings
+		stateManager: stateManager
+		selection: selection
+	}
+
 	// the preferences dialog
 	Preferences {
 		id: preferences
@@ -79,6 +87,9 @@ MainWindow {
 			property bool restoreLastVisitedFolder: false
 			property bool deletePermanently: false
 			property bool showLabel: false
+			property int slideShowDelay: 2500
+			property bool slideShowLoop: true
+			property bool slideShowSelection: false
 		}
 	}
 
@@ -86,6 +97,7 @@ MainWindow {
 	header: MainMenu {
 		selection: selection
 		preferences: preferences
+		slideShow: slideShow
 	}
 
 	// The split between the media preview and folder browser on the left,

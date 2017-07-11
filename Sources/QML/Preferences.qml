@@ -17,7 +17,7 @@ Dialog {
 	// private properties
 	property int _labelWidth: 250
 
-	// init (to avoid binding loops)
+	// setup when the dialog is shown (to avoid binding loops)
 	onVisibleChanged: {
 		if (visible === true) {
 			playAnimatedImages.currentIndex		= settings.playAnimatedImages;
@@ -28,6 +28,9 @@ Dialog {
 			restoreLastVisitedFolder.checked	= settings.restoreLastVisitedFolder;
 			deletePermanently.checked			= fileSystem.canTrash === true ? settings.deletePermanently : true;
 			showLabel.checked					= settings.showLabel;
+			slideShowDelay.text					= settings.slideShowDelay;
+			slideShowLoop.checked				= settings.slideShowLoop;
+			slideShowSelection.checked			= settings.slideShowSelection;
 		}
 	}
 
@@ -41,13 +44,18 @@ Dialog {
 			width: parent.width
 
 			TabButton {
-				width: column.width / 2
+				width: column.width / 3
 				text: "General"
 			}
 
 			TabButton {
-				width: column.width / 2
+				width: column.width / 3
 				text: "Interface"
+			}
+
+			TabButton {
+				width: column.width / 3
+				text: "Slide Show"
 			}
 		}
 
@@ -283,6 +291,88 @@ Dialog {
 						ToolTip.text: {
 							return	"If checked, will display the name of the medias under\n" +
 									"the thumbnails in the media browser view.";
+						}
+					}
+				}
+
+				// fill the remaining space
+				Item {
+					Layout.fillHeight: true
+					Layout.columnSpan: 2
+				}
+			}
+
+			// slideshow options
+			ColumnLayout {
+
+				// Delay between 2 images
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Delay"
+						horizontalAlignment: Text.AlignRight
+					}
+					TextField {
+						id: slideShowDelay
+						verticalAlignment: Text.BottomLeft
+						placeholderText: "Milliseconds"
+						onTextChanged: {
+							if (root.visible === true) {
+								settings.slideShowDelay = parseInt(text);
+							}
+						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"Delay in milliseconds between 2 images.";
+						}
+					}
+				}
+
+				// Loop
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Loop"
+						horizontalAlignment: Text.AlignRight
+					}
+					CheckBox {
+						id: slideShowLoop
+						onCheckedChanged: {
+							if (root.visible === true) {
+								settings.slideShowLoop = checked
+							}
+						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"If checked, the slide show will start again when\n" +
+									"reaching the last image. Otherwise, it stops.";
+						}
+					}
+				}
+
+				// Use selection
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Use Selection"
+						horizontalAlignment: Text.AlignRight
+					}
+					CheckBox {
+						id: slideShowSelection
+						onCheckedChanged: {
+							if (root.visible === true) {
+								settings.slideShowSelection = checked
+							}
+						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"If checked, the slide show will use only the current selection.";
 						}
 					}
 				}

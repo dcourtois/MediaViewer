@@ -31,5 +31,6 @@
 
 		<!-- Tools -->
 		<file>Preferences.qml</file>
+		<file>SlideShow.qml</file>
 	</qresource>
 </RCC>
