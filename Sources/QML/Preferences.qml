@@ -26,7 +26,7 @@ Dialog {
 			sortOrder.currentIndex				= settings.sortOrder;
 			thumbnailSize.value					= settings.thumbnailSize;
 			restoreLastVisitedFolder.checked	= settings.restoreLastVisitedFolder;
-			deletePermanently.checked			= settings.deletePermanently;
+			deletePermanently.checked			= fileSystem.canTrash === true ? settings.deletePermanently : true;
 		}
 	}
 
@@ -79,6 +79,7 @@ Dialog {
 				// Delet permanently
 				RowLayout {
 					spacing: 10
+					enabled: fileSystem.canTrash
 					Label {
 						Layout.minimumWidth: _labelWidth
 						text: "Delete Permanently"

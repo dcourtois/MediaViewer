@@ -67,7 +67,7 @@ void FileSystem::paste(QString destination)
 void FileSystem::remove(QStringList files)
 {
 	// check if we need to permanently delete
-	bool permanent = QSettings().value("Preferences/deletePermanently", false).toBool();
+	bool permanent = QSettings().value("Preferences/deletePermanently", false).toBool() && this->CanTrash() == true;
 	for (const QString & file : files)
 	{
 		if (permanent == true)
@@ -90,14 +90,23 @@ bool FileSystem::CanPaste(void) const
 }
 
 //!
+//! Check if the system can move things to trash
+//!
+bool FileSystem::CanTrash(void) const
+{
+#if defined(LINUX)
+	return m_TrashFolder.isEmpty() == false;
+#else
+	static_assert(false, "implement FileSystem::CanTrash for your platform");
+#endif
+}
+
+//!
 //! Initialize the trash folder
 //!
 void FileSystem::InitTrashFolder(void)
 {
 #if defined(LINUX)
-	// as always, Linux is a pain in the ass. There's no API, and even if there is
-	// a sembling of standard (freedesktop.org) the location of the trash folder
-	// is not always the same on all desktops.
 	// note: following https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
 	QVector< QString > trashes = {
 		QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.local/share/Trash",
@@ -110,11 +119,10 @@ void FileSystem::InitTrashFolder(void)
 			QDir(trash + "/files").exists() == true)
 		{
 			m_TrashFolder = trash;
-			return;
+			emit canTrashChanged(true);
+			break;
 		}
 	}
-#elif defined(MACOS)
-#elif defined(WINDOWS)
 #else
 	static_assert(false, "implement FileSystem::InitTrash for your platform");
 #endif
@@ -158,10 +166,7 @@ void FileSystem::MoveToTrash(const QString & path)
 	QFile info(m_TrashFolder + "/info/" + trashName + ".trashinfo");
 	info.open(QIODevice::WriteOnly);
 	info.write(trashInfo.toUtf8());
-
-#elif defined(MACOS)
-#elif defined(WINDOWS)
 #else
-	static_assert(false, "implement FileSystem::InitTrash for your platform");
+	static_assert(false, "implement FileSystem::MoveToTrash for your platform");
 #endif
 }
