@@ -11,7 +11,7 @@ import MediaViewer 0.1
 //
 // The media browser.
 //
-Item {
+Rectangle {
 	id: root
 
 	// externally set
@@ -23,6 +23,7 @@ Item {
 	property bool _controlDown: false
 	property bool _shiftDown: false
 	property color _highlight: Material.color(Material.LightBlue, Material.Shade300)
+	property color _background: root.color
 
 	// bind settings
 	Connections {
@@ -63,52 +64,55 @@ Item {
 					property string currentPath: path
 					width: grid.cellWidth
 					height: grid.cellHeight
+					color: _background
 
 					// check selection change to update the background
 					Connections {
 						target: selection
-						onSelectionChanged: thumbnailBackground.color = selection.isSelected(index) ? _highlight : "white"
+						onSelectionChanged: thumbnailBackground.color = selection.isSelected(index) ? _highlight : _background
 					}
 
-					// used to center the media in the cell
-					Item {
-						width: image.width
-						height: image.height + label.height
-						anchors.centerIn: parent
+					// the media preview
+					Loader {
+						id: image
+						asynchronous: true
 
-						// the media preview
-						Loader {
-							id: image
-							asynchronous: true
+						// size and anchoring
+						height: parent.height - 20 - (label.active ? label.height + 10 : 0)
+						width: parent.width - 20
+						anchors.horizontalCenter: parent.horizontalCenter
+						anchors.top: parent.top
+						anchors.topMargin: 10
 
-							// size and anchoring
-							width: grid.cellWidth - 20
-							height: grid.cellHeight - 20 - label.height - 20
-							anchors.horizontalCenter: parent.horizontalCenter
+						// make path accessible to components
+						property string sourcePath: path
 
-							// make path accessible to components
-							property string sourcePath: path
-
-							// load the correct component
-							source: {
-								switch (type) {
-									case Media.Movie:			return "qrc:///Previews/Movie.qml";
-									case Media.AnimatedImage:	return "qrc:///Previews/AnimatedImage.qml";
-									case Media.Image:			return "qrc:///Previews/Image.qml";
-								}
+						// load the correct component
+						source: {
+							switch (type) {
+								case Media.Movie:			return "qrc:///Previews/Movie.qml";
+								case Media.AnimatedImage:	return "qrc:///Previews/AnimatedImage.qml";
+								case Media.Image:			return "qrc:///Previews/Image.qml";
 							}
 						}
+					}
+
+					// the label
+					Loader {
+						id: label
+						active: settings.showLabel
+
+						// position in the thumbnail
+						width: parent.width - 20
+						anchors.horizontalCenter: parent.horizontalCenter
+						anchors.bottom: parent.bottom
+						anchors.bottomMargin: 10
 
 						// the label
-						Label {
-							id: label
-							width: grid.cellWidth - 20
+						sourceComponent: Label {
 							horizontalAlignment: Text.AlignHCenter
-							elide: Text.ElideRight
+							elide: Text.ElideMiddle
 							text: name
-							anchors.top: image.bottom
-							anchors.topMargin: 10
-							anchors.horizontalCenter: parent.horizontalCenter
 						}
 					}
 				}

@@ -27,6 +27,7 @@ Dialog {
 			thumbnailSize.value					= settings.thumbnailSize;
 			restoreLastVisitedFolder.checked	= settings.restoreLastVisitedFolder;
 			deletePermanently.checked			= fileSystem.canTrash === true ? settings.deletePermanently : true;
+			showLabel.checked					= settings.showLabel;
 		}
 	}
 
@@ -82,7 +83,7 @@ Dialog {
 					}
 				}
 
-				// Delet permanently
+				// Delete permanently
 				RowLayout {
 					spacing: 10
 					enabled: fileSystem.canTrash
@@ -254,11 +255,35 @@ Dialog {
 						id: thumbnailSize
 						Layout.fillWidth: true
 						onValueChanged: settings.thumbnailSize = value
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"Control the size of the thumbnails in the media browser view.";
+						}
 					}
-					ToolTip.delay: 1000
-					ToolTip.visible: hovered
-					ToolTip.text: {
-						return	"Control the size of the thumbnails in the media browser view.";
+				}
+
+				// Delete permanently
+				RowLayout {
+					spacing: 10
+					Label {
+						Layout.minimumWidth: _labelWidth
+						text: "Show Labels"
+						horizontalAlignment: Text.AlignRight
+					}
+					CheckBox {
+						id: showLabel
+						onCheckedChanged: {
+							if (root.visible === true) {
+								settings.showLabel = checked
+							}
+						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"If checked, will display the name of the medias under\n" +
+									"the thumbnails in the media browser view.";
+						}
 					}
 				}
 

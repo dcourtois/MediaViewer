@@ -78,6 +78,7 @@ MainWindow {
 			property string lastVisitedFolder: ""
 			property bool restoreLastVisitedFolder: false
 			property bool deletePermanently: false
+			property bool showLabel: false
 		}
 	}
 
