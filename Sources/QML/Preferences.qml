@@ -73,6 +73,12 @@ Dialog {
 								settings.restoreLastVisitedFolder = checked
 							}
 						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"If checked, when reopened the viewer will restore\n" +
+									"its last visited folder.";
+						}
 					}
 				}
 
@@ -91,6 +97,13 @@ Dialog {
 							if (root.visible === true) {
 								settings.deletePermanently = checked
 							}
+						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"If your platform supports trashing things, you\n" +
+									"can use this setting to control wether deleting\n" +
+									"something will move it to the trash or delete it.";
 						}
 					}
 				}
@@ -125,6 +138,15 @@ Dialog {
 								settings.playAnimatedImages = currentIndex
 							}
 						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"Select auto play mode for animated images in the\n" +
+									"media browser:\n" +
+									"  - On : always play\n" +
+									"  - Mouse Hover : only play when the mouse is over the media\n" +
+									"  - Off : never play\n";
+						}
 					}
 				}
 
@@ -148,6 +170,14 @@ Dialog {
 							if (root.visible === true) {
 								settings.playMovies = currentIndex
 							}
+						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"Select auto play mode for movies in the media browser:\n" +
+									"  - On : always play\n" +
+									"  - Mouse Hover : only play when the mouse is over the media\n" +
+									"  - Off : never play\n";
 						}
 					}
 				}
@@ -175,6 +205,12 @@ Dialog {
 								settings.sortBy = currentIndex
 							}
 						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"Select the sorting criteria. None will disable sort,\n" +
+									"and the order will be undefined.";
+						}
 					}
 				}
 
@@ -198,6 +234,11 @@ Dialog {
 								settings.sortOrder = currentIndex
 							}
 						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: {
+							return	"For a given sort criteria, sort by ascending or descending order.";
+						}
 					}
 				}
 
@@ -213,6 +254,11 @@ Dialog {
 						id: thumbnailSize
 						Layout.fillWidth: true
 						onValueChanged: settings.thumbnailSize = value
+					}
+					ToolTip.delay: 1000
+					ToolTip.visible: hovered
+					ToolTip.text: {
+						return	"Control the size of the thumbnails in the media browser view.";
 					}
 				}
 
