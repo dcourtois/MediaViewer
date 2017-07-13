@@ -105,6 +105,17 @@ ToolBar {
 				fileSystem.remove(paths);
 			}
 		}
+
+		MenuSeparator {
+			x: 15
+			width: 220
+		}
+
+		ShortcutMenuItem {
+			text: "Close"
+			sequence: StandardKey.Quit
+			onTriggered: Qt.quit();
+		}
 	}
 
 	Menu {
@@ -144,8 +155,8 @@ ToolBar {
 		}
 
 		MenuSeparator {
-			x: 10
-			width: 230
+			x: 15
+			width: 220
 		}
 
 		ShortcutMenuItem {
