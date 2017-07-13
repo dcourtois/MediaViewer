@@ -76,6 +76,7 @@ MainWindow {
 	// the preferences dialog
 	Preferences {
 		id: preferences
+		mediaBrowser: mediaBrowser
 		settings: Settings {
 			category: "Preferences"
 			property int playAnimatedImages: 2

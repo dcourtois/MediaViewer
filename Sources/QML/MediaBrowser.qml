@@ -32,6 +32,11 @@ Rectangle {
 		onSortOrderChanged: selection.model.sortOrder = settings.sortOrder
 	}
 
+	// handle focus
+	function forceFocus() {
+		scrollView.forceActiveFocus();
+	}
+
 	// use a scroll view to show a scroll bar (GridView is a flickable, so
 	// it doesn't show any scroll bar)
 	Controls.ScrollView {

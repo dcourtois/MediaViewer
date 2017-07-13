@@ -23,9 +23,6 @@ Item {
 		state = state === "preview" ? "fullscreen" : "preview";
 	}
 
-	// when going to full screen, remember the item that had the focus
-	property var _lastFocusItem;
-
 	// state changes (see notes on state)
 	onStateChanged: {
 		if (state === "preview") {
@@ -33,20 +30,13 @@ Item {
 			mainWindow.setFullScreen();
 
 			// restore focus
-			mediaViewer.focus = false;
-			if (_lastFocusItem !== undefined) {
-				_lastFocusItem.focus = true;
-			}
+			mediaBrowser.forceFocus();
 		} else {
 			// toggle fullscreen
 			mainWindow.setFullScreen(mediaViewer);
 
 			// backup focus and give it to the viewer
-			_lastFocusItem = mainWindow.activeFocusItem;
-			if (_lastFocusItem) {
-				_lastFocusItem.focus = false;
-			}
-			mediaViewer.focus = true;
+			mediaViewer.forceActiveFocus();
 		}
 	}
 }

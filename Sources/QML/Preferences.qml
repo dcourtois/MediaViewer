@@ -12,6 +12,7 @@ Dialog {
 	width: 600
 
 	// externally set
+	property var mediaBrowser
 	property var settings
 
 	// private properties
@@ -31,6 +32,9 @@ Dialog {
 			slideShowDelay.text					= settings.slideShowDelay;
 			slideShowLoop.checked				= settings.slideShowLoop;
 			slideShowSelection.checked			= settings.slideShowSelection;
+		} else {
+			// restore the previous focus item
+			mediaBrowser.forceFocus();
 		}
 	}
 
