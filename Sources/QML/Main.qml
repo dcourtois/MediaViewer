@@ -71,6 +71,7 @@ MainWindow {
 		settings: preferences.settings
 		stateManager: stateManager
 		selection: selection
+		_mediaViewer: mediaViewer
 	}
 
 	// the preferences dialog
