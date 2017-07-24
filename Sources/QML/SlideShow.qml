@@ -21,6 +21,7 @@ Item {
 	// if the viewer exists fullscreen, stop the timer
 	Connections {
 		target: stateManager
+		enabled: timer.running === true
 		onStateChanged: {
 			if (stateManager.state === "preview") {
 				timer.stop();
