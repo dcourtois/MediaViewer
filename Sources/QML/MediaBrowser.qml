@@ -51,9 +51,6 @@ Rectangle {
 			cellWidth: settings.thumbnailSize * 350 + 50
 			cellHeight: settings.thumbnailSize * 350 + 50
 
-			// disable animation of the selection
-			highlightFollowsCurrentItem: false
-
 			// delegates
 			delegate: itemDelegate
 
