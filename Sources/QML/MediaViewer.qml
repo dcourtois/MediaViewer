@@ -20,10 +20,31 @@ Rectangle {
 	// default mouse handling
 	MouseArea {
 		anchors.fill: parent
-		acceptedButtons: Qt.LeftButton
+		acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+
+		// middle button click, toggle fullscreen
+		onClicked: {
+			if (selection.currentMedia && mouse.button === Qt.MiddleButton) {
+				stateManager.toggleFullScreen();
+			}
+		}
 
 		// double click: toggle fullscreen state
-		onDoubleClicked: if (selection.currentMedia) { stateManager.toggleFullScreen(); }
+		onDoubleClicked: {
+			if (selection.currentMedia) {
+				stateManager.toggleFullScreen();
+			}
+		}
+
+		// mouse wheel, image navigation
+		onWheel: {
+			wheel.accepted = true;
+			if (wheel.angleDelta.y > 0) {
+				selection.selectPrevious();
+			} else {
+				selection.selectNext();
+			}
+		}
 	}
 
 	// default key handling

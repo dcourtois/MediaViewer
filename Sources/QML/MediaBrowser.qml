@@ -149,7 +149,7 @@ Rectangle {
 			// Mouse handling
 			MouseArea {
 				anchors.fill: parent
-				acceptedButtons: Qt.LeftButton
+				acceptedButtons: Qt.LeftButton | Qt.MiddleButton
 
 				// update selection
 				onClicked: {
@@ -170,6 +170,11 @@ Rectangle {
 					// toggle the active item's selection
 					if (index === grid.currentIndex) {
 						grid.currentIndexChanged(index);
+					}
+
+					// middle click, toggle fullscreen
+					if (selection.currentMedia && mouse.button === Qt.MiddleButton) {
+						stateManager.state = "fullscreen";
 					}
 				}
 
