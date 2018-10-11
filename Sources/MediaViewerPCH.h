@@ -1,5 +1,5 @@
-#ifndef	__MEDIA_VIEWER_PCH_H__
-#define	__MEDIA_VIEWER_PCH_H__
+#ifndef MEDIA_VIEWER_PCH_H
+#define MEDIA_VIEWER_PCH_H
 
 
 //------------------------------------------------------------------------------
@@ -36,11 +36,11 @@
 #include <QQmlContext>
 #include <QQmlExtensionPlugin>
 #include <QQuickImageProvider>
-#include <QQuickStyle>
 #include <QRunnable>
 #include <QSize>
 #include <QString>
 #include <QVector>
+#include <QWidget>
 #include <QtDebug>
 #include <QtQml>
 
@@ -70,4 +70,4 @@
 #include "Utils/Memory.h"
 
 
-#endif // __MEDIA_VIEWER_PCH_H__
+#endif // MEDIA_VIEWER_PCH_H

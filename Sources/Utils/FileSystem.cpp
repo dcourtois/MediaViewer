@@ -96,6 +96,8 @@ bool FileSystem::CanTrash(void) const
 {
 #if defined(LINUX)
 	return m_TrashFolder.isEmpty() == false;
+#elif defined(WINDOWS)
+	return false;
 #else
 	static_assert(false, "implement FileSystem::CanTrash for your platform");
 #endif
@@ -123,6 +125,7 @@ void FileSystem::InitTrashFolder(void)
 			break;
 		}
 	}
+#elif defined(WINDOWS)
 #else
 	static_assert(false, "implement FileSystem::InitTrash for your platform");
 #endif
@@ -166,6 +169,8 @@ void FileSystem::MoveToTrash(const QString & path)
 	QFile info(m_TrashFolder + "/info/" + trashName + ".trashinfo");
 	info.open(QIODevice::WriteOnly);
 	info.write(trashInfo.toUtf8());
+#elif defined(WINDOWS)
+	Q_UNUSED(path);
 #else
 	static_assert(false, "implement FileSystem::MoveToTrash for your platform");
 #endif

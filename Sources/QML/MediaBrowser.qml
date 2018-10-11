@@ -1,7 +1,5 @@
 import QtQuick 2.5
-import QtQuick.Controls 1.4 as Controls
-import QtQuick.Controls 2.2
-import QtQuick.Controls.Material 2.2
+import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
 import QtMultimedia 5.8
 import Qt.labs.settings 1.0
@@ -22,7 +20,6 @@ Rectangle {
 	// privates
 	property bool _controlDown: false
 	property bool _shiftDown: false
-	property color _highlight: Material.color(Material.LightBlue, Material.Shade300)
 	property color _background: root.color
 
 	// bind settings
@@ -37,9 +34,14 @@ Rectangle {
 		scrollView.forceActiveFocus();
 	}
 
+	// palette (used to get theme colors)
+	SystemPalette {
+		id: palette
+	}
+
 	// use a scroll view to show a scroll bar (GridView is a flickable, so
 	// it doesn't show any scroll bar)
-	Controls.ScrollView {
+	ScrollView {
 		id: scrollView
 		anchors.fill: parent
 
@@ -71,7 +73,11 @@ Rectangle {
 					// check selection change to update the background
 					Connections {
 						target: selection
-						onSelectionChanged: thumbnailBackground.color = selection.isSelected(index) ? _highlight : _background
+						onSelectionChanged: {
+							var selected = selection.isSelected(index);
+							thumbnailBackground.color = selected ? palette.highlight : _background;
+							label.item.color = selected ? palette.highlightedText : palette.windowText;
+						}
 					}
 
 					// the media preview

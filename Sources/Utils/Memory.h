@@ -1,5 +1,5 @@
-#ifndef __UTILS_MEMORY_H__
-#define	__UTILS_MEMORY_H__
+#ifndef UTILS_UTILS_MEMORY_H
+#define UTILS_UTILS_MEMORY_H
 
 
 //!
@@ -52,4 +52,4 @@ extern void operator delete [] (void * pointer, const char * filename, int line)
 #endif
 
 
-#endif // __UTILS_MEMORY_H__
+#endif // UTILS_UTILS_MEMORY_H

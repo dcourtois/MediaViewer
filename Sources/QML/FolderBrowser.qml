@@ -1,7 +1,6 @@
 import QtQuick 2.5
-import QtQuick.Controls 2.2
-import QtQuick.Controls.Material 2.2
-import QtQuick.Controls 1.4 as Controls
+import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.2
 import QtQml.Models 2.2
 import Qt.labs.settings 1.0
@@ -10,7 +9,7 @@ import Qt.labs.settings 1.0
 //
 // A tree view used to browse the folders' contents
 //
-Controls.TreeView {
+TreeView {
 	id: root
 
 	// externally set
@@ -51,10 +50,10 @@ Controls.TreeView {
 	// Privates
 	//
 
-	// Colors
-	property color selectedColor: Material.color(Material.LightBlue, Material.Shade300)
-	property color evenColor: Qt.rgba(1, 1, 1, 1)
-	property color oddColor: Qt.rgba(0.96, 0.96, 0.96, 1)
+	// palette (used to get theme colors)
+	SystemPalette {
+		id: palette
+	}
 
 	// Don't need the headers
 	headerVisible: false
@@ -66,10 +65,10 @@ Controls.TreeView {
 		onCurrentChanged: currentFolderPath = (current.valid ? model.data(current, 256) : "")
 	}
 
-	// Draw the row's background
+	// override the row delegate to be able to change its height...
 	rowDelegate: Rectangle {
-		height: 24
-		color: styleData.selected ? selectedColor : (styleData.alternate ? evenColor : oddColor)
+		height: 20
+		color: styleData.selected ? palette.highlight : (styleData.alternate ? palette.alternateBase : palette.base)
 	}
 
 	// disable the item delegate
@@ -83,7 +82,7 @@ Controls.TreeView {
 	itemDelegate: null
 
 	// Display the content
-	Controls.TableViewColumn {
+	TableViewColumn {
 		role: "folder"
 
 		// draw a row delegate
@@ -106,6 +105,7 @@ Controls.TreeView {
 				anchors.rightMargin: 5
 				elide: Text.ElideRight
 				text: styleData.value ? styleData.value.name : ""
+				color: styleData.selected ? palette.highlightedText : palette.windowText
 			}
 
 			// media count
@@ -124,13 +124,12 @@ Controls.TreeView {
 				width: delegateMediaCountText.contentWidth + 10
 
 				radius: 10
-				color: styleData.selected ? evenColor : selectedColor;
+				color: Qt.rgba(0.9, 0.9, 0.9, 1.0);
 
 				Label {
 					id: delegateMediaCountText
 					anchors.centerIn: parent
 					text: styleData.value ? styleData.value.mediaCount : ""
-					font.pixelSize: 12
 				}
 			}
 		}

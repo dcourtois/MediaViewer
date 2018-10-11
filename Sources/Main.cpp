@@ -96,9 +96,6 @@ int main(int argc, char *argv[])
 		app.setApplicationName("MediaViewer");
 		app.setApplicationVersion("0.1");
 
-		// set style
-		QQuickStyle::setStyle("Material");
-
 		// create and setup application engine
 		QQmlApplicationEngine engine;
 		Setup(app, engine);

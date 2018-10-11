@@ -96,7 +96,7 @@ MainWindow {
 	}
 
 	// Menu
-	header: MainMenu {
+	menuBar: MainMenu {
 		selection: selection
 		preferences: preferences
 		slideShow: slideShow

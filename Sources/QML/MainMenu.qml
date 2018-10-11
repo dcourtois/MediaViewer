@@ -1,6 +1,5 @@
 import QtQuick 2.5
-import QtQuick.Controls 2.2
-import QtQuick.Controls.Material 2.1
+import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.0
 import MediaViewer 0.1
 
@@ -8,74 +7,48 @@ import MediaViewer 0.1
 //
 // The main menu
 //
-ToolBar {
-	Material.background: Material.BlueGrey
-	Material.elevation: 0
-
+MenuBar {
 	// externally set
 	property var selection
 	property var preferences
 	property var slideShow
 
-	RowLayout {
-		anchors.fill: parent
-		ToolButton {
-			id: fileButton
-			text: "File"
-			onClicked: fileMenu.visible ? fileMenu.close() : fileMenu.open()
-		}
-		ToolButton {
-			id: editButton
-			text: "Edit"
-			onClicked: editMenu.visible ? editMenu.close() : editMenu.open()
-		}
-		ToolButton {
-			id: optionButton
-			text: "Options"
-			onClicked: optionMenu.visible ? optionMenu.close() : optionMenu.open()
-		}
-		Item {
-			Layout.fillWidth: true
-		}
-	}
-
 	Menu {
 		id: fileMenu
-		x: fileButton.x
-		y: fileButton.y + fileButton.height
+		title: "File"
 
 		// used to know wether we can paste or not
 		property string _sourceFolder
 
-		ShortcutMenuItem {
+		MenuItem {
 			text: "Copy"
 			enabled: selection.currentMedia !== undefined
-			sequence: StandardKey.Copy
+			shortcut: StandardKey.Copy
 			onTriggered: {
 				fileSystem.copy(selection.getSelectedPaths());
 				fileMenu._sourceFolder = folderBrowser.currentFolderPath;
 			}
 		}
-		ShortcutMenuItem {
+		MenuItem {
 			text: "Cut"
 			enabled: selection.currentMedia !== undefined
-			sequence: StandardKey.Cut
+			shortcut: StandardKey.Cut
 			onTriggered: {
 				fileSystem.cut(selection.getSelectedPaths());
 				fileMenu._sourceFolder = folderBrowser.currentFolderPath;
 			}
 		}
-		ShortcutMenuItem {
+		MenuItem {
 			text: "Paste"
 			enabled: fileSystem.canPaste && fileMenu._sourceFolder !== folderBrowser.currentFolderPath
-			sequence: StandardKey.Paste
+			shortcut: StandardKey.Paste
 			onTriggered: fileSystem.paste(folderBrowser.currentFolderPath)
 		}
 
-		ShortcutMenuItem {
+		MenuItem {
 			text: "Delete"
 			enabled: selection.currentMedia !== undefined
-			sequence: "Del"
+			shortcut: "Del"
 			onTriggered: {
 				// collect paths
 				var paths = selection.getSelectedPaths();
@@ -107,61 +80,54 @@ ToolBar {
 		}
 
 		MenuSeparator {
-			x: 15
-			width: 220
 		}
 
-		ShortcutMenuItem {
+		MenuItem {
 			text: "Close"
-			sequence: StandardKey.Quit
+			shortcut: StandardKey.Quit
 			onTriggered: Qt.quit();
 		}
 	}
 
 	Menu {
 		id: editMenu
-		x: editButton.x
-		y: editButton.y + editButton.height
+		title: "Edit"
 
-		ShortcutMenuItem {
+		MenuItem {
 			text: "Select All"
-			sequence: "Ctrl+A"
+			shortcut: "Ctrl+A"
 			onTriggered: selection.selectAll();
 		}
-		ShortcutMenuItem {
+		MenuItem {
 			text: "Select Inverse"
 			enabled: selection.hasSelection() === true
-			sequence: "Ctrl+I"
+			shortcut: "Ctrl+I"
 			onTriggered: selection.selectInverse();
 		}
-		ShortcutMenuItem {
+		MenuItem {
 			text: "Select None"
 			enabled: selection.hasSelection() === true
-			sequence: "Ctrl+D"
+			shortcut: "Ctrl+D"
 			onTriggered: selection.clear();
 		}
 	}
 
 	Menu {
 		id: optionMenu
-		x: optionButton.x
-		y: optionButton.y + optionButton.height
-		width: 250
+		title: "Options"
 
-		ShortcutMenuItem {
+		MenuItem {
 			text: "Slide Show"
-			sequence: "S"
+			shortcut: "S"
 			onTriggered: slideShow.start()
 		}
 
 		MenuSeparator {
-			x: 15
-			width: 220
 		}
 
-		ShortcutMenuItem {
+		MenuItem {
 			text: "Preferences"
-			sequence: "Ctrl+Shift+P"
+			shortcut: "Ctrl+Shift+P"
 			onTriggered: preferences.open()
 		}
 	}

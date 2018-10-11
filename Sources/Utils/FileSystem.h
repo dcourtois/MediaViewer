@@ -1,5 +1,5 @@
-#ifndef __FILE_SYSTEM_H__
-#define __FILE_SYSTEM_H__
+#ifndef UTILS_FILE_SYSTEM_H
+#define UTILS_FILE_SYSTEM_H
 
 
 //!
@@ -50,4 +50,4 @@ private:
 };
 
 
-#endif // __FILE_SYSTEM_H__
+#endif // UTILS_FILE_SYSTEM_H
