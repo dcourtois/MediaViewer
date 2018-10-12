@@ -8,7 +8,6 @@
 		<file>MainMenu.qml</file>
 		<file>WindowSettings.qml</file>
 		<file>WindowState.qml</file>
-		<file>ShortcutMenuItem.qml</file>
 
 		<!-- Globa states -->
 		<file>Selection.qml</file>
