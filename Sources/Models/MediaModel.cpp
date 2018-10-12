@@ -1,7 +1,6 @@
 #include "MediaViewerPCH.h"
 #include "MediaModel.h"
 #include "Media.h"
-#include "Utils/Misc.h"
 
 
 namespace MediaViewer
@@ -64,7 +63,7 @@ namespace MediaViewer
 	{
 		for (Media * media : m_Medias)
 		{
-			DELETE media;
+			MT_DELETE media;
 		}
 		m_Medias.clear();
 		m_Dirty = true;
@@ -124,7 +123,7 @@ namespace MediaViewer
 		{
 			index = toRemove.back();
 			this->beginRemoveRows(QModelIndex(), index, index);
-			DELETE m_Medias[index];
+			MT_DELETE m_Medias[index];
 			m_Medias.remove(index);
 			this->endRemoveRows();
 			toRemove.pop_back();
@@ -134,7 +133,7 @@ namespace MediaViewer
 		auto sort = this->GetSortOperator();
 		for (const QString & file : toAdd)
 		{
-			Media * media = NEW Media(root.absoluteFilePath(file));
+			Media * media = MT_NEW Media(root.absoluteFilePath(file));
 			index = 0;
 			for (Media * m : m_Medias)
 			{
@@ -175,7 +174,7 @@ namespace MediaViewer
 			{
 				if (Media::IsMedia(file) == true)
 				{
-					m_Medias.push_back(NEW Media(dir.absoluteFilePath(file)));
+					m_Medias.push_back(MT_NEW Media(dir.absoluteFilePath(file)));
 					QQmlEngine::setObjectOwnership(m_Medias.back(), QQmlEngine::CppOwnership);
 				}
 			}
@@ -213,6 +212,9 @@ namespace MediaViewer
 		}
 	}
 
+#define SORT_FUNCTOR	\
+	std::function< bool (const Media *, const Media *) >([](const Media * l, const Media * r) -> bool
+
 	//!
 	//! Get the sort operator
 	//!
@@ -222,87 +224,41 @@ namespace MediaViewer
 		{
 			case SortBy::Name:
 				return m_SortOrder == SortOrder::Ascending ?
-					[](const Media * l, const Media * r) -> bool { return l->GetName() < r->GetName(); } :
-					[](const Media * l, const Media * r) -> bool { return l->GetName() > r->GetName(); };
+					SORT_FUNCTOR { return l->GetName() < r->GetName(); }) :
+					SORT_FUNCTOR { return l->GetName() > r->GetName(); });
 
 			case SortBy::Date:
 				return m_SortOrder == SortOrder::Ascending ?
-					[](const Media * l, const Media * r) -> bool { return l->GetDate() < r->GetDate(); } :
-					[](const Media * l, const Media * r) -> bool { return l->GetDate() > r->GetDate(); };
+					SORT_FUNCTOR { return l->GetDate() < r->GetDate(); }) :
+					SORT_FUNCTOR { return l->GetDate() > r->GetDate(); });
 
 			case SortBy::Size:
 				return m_SortOrder == SortOrder::Ascending ?
-					[](const Media * l, const Media * r) -> bool { return l->GetSize() < r->GetSize(); } :
-					[](const Media * l, const Media * r) -> bool { return l->GetSize() > r->GetSize(); };
+					SORT_FUNCTOR { return l->GetSize() < r->GetSize(); }) :
+					SORT_FUNCTOR { return l->GetSize() > r->GetSize(); });
 
 			case SortBy::Type:
 				return m_SortOrder == SortOrder::Ascending ?
-					[](const Media * l, const Media * r) -> bool { return l->GetType() < r->GetType(); } :
-					[](const Media * l, const Media * r) -> bool { return l->GetType() > r->GetType(); };
+					SORT_FUNCTOR { return l->GetType() < r->GetType(); }) :
+					SORT_FUNCTOR { return l->GetType() > r->GetType(); });
 
-			case SortBy::None:
 			default:
-				return [](const Media *, const Media *) -> bool { return false; };
+				return SORT_FUNCTOR {
+					Q_UNUSED(l);
+					Q_UNUSED(r);
+					return false;
+				});
 		}
-
 	}
+
+#undef SORT_FUNCTOR
 
 	//!
 	//! Sort the model
 	//!
 	void MediaModel::Sort(void) const
 	{
-		Utils::Sort(m_Medias, this->GetSortOperator());
-//		switch (m_SortBy)
-//		{
-//			case SortBy::Name:
-//				if (m_SortOrder == SortOrder::Ascending)
-//				{
-//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetName() < r->GetName(); });
-//				}
-//				else
-//				{
-//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetName() > r->GetName(); });
-//				}
-//				break;
-
-//			case SortBy::Date:
-//				if (m_SortOrder == SortOrder::Ascending)
-//				{
-//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetDate() < r->GetDate(); });
-//				}
-//				else
-//				{
-//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetDate() > r->GetDate(); });
-//				}
-//				break;
-
-//			case SortBy::Size:
-//				if (m_SortOrder == SortOrder::Ascending)
-//				{
-//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetSize() < r->GetSize(); });
-//				}
-//				else
-//				{
-//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetSize() > r->GetSize(); });
-//				}
-//				break;
-
-//			case SortBy::Type:
-//				if (m_SortOrder == SortOrder::Ascending)
-//				{
-//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetType() < r->GetType(); });
-//				}
-//				else
-//				{
-//					Utils::Sort(m_Medias, [](const Media * l, const Media * r) -> bool { return l->GetType() > r->GetType(); });
-//				}
-//				break;
-
-//			case SortBy::None:
-//			default:
-//				break;
-//		}
+		::Sort(m_Medias, this->GetSortOperator());
 	}
 
 	//!

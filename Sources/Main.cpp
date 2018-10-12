@@ -1,9 +1,16 @@
 #include "MediaViewerPCH.h"
 #include "RegisterQMLTypes.h"
 #include "ImageProviders/FolderIconProvider.h"
+#include "ImageProviders/MediaPreviewProvider.h"
 #include "Utils/Cursor.h"
 #include "Utils/FileSystem.h"
 
+//
+// those are exposed to QML through QQmlContext::setContextProperty, which
+// does not take ownership, so we'll need to delete them we leaving the app.
+//
+static Cursor *		cursor		= nullptr;
+static FileSystem *	fileSystem	= nullptr;
 
 //!
 //! Set the application engine with our main QML file
@@ -13,16 +20,30 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 	// register QML types
 	MediaViewer::RegisterQMLTypes();
 
+	// create data that's shared with QML
+	auto * mediaProvider	= MT_NEW MediaViewer::MediaPreviewProvider;
+	cursor					= MT_NEW Cursor;
+	fileSystem				= MT_NEW FileSystem;
+
 	// set the image provider for the folders
-	engine.addImageProvider("FolderIcon", new MediaViewer::FolderIconProvider);
+	engine.addImageProvider("FolderIcon", MT_NEW MediaViewer::FolderIconProvider);
+	engine.addImageProvider("MediaPreview", mediaProvider);
 
 	// set a few global QML helpers
-	engine.rootContext()->setContextProperty("cursor", new Cursor);
-	engine.rootContext()->setContextProperty("fileSystem", new FileSystem);
+	engine.rootContext()->setContextProperty("cursor", cursor);
+	engine.rootContext()->setContextProperty("fileSystem", fileSystem);
+	engine.rootContext()->setContextProperty("mediaProvider", mediaProvider);
 
 	// expose the list of drives to QML
 	QVariantList drives;
 #if defined(WINDOWS)
+	// user folders
+	for (auto drive : QStandardPaths::standardLocations(QStandardPaths::HomeLocation))
+	{
+		drives << drive;
+	}
+
+	// drives
 	for (auto drive : QDir::drives())
 	{
 		drives << drive.absolutePath();
@@ -103,6 +124,39 @@ int main(int argc, char *argv[])
 		// run the application
 		code = app.exec();
 	}
+
+	// cleanup
+	MT_DELETE cursor;
+	MT_DELETE fileSystem;
+
+#if MEMORY_CHECK == 1
+
+	// we no longer need to track memory
+	MT_SET_ENABLED(false);
+
+	// dump memory leaks
+	auto chunks = MemoryTracker::Instance().GetTrackedChunks();
+	if (chunks.empty() == true)
+	{
+		printf("No memory leaks, congratulations !\n");
+	}
+	else
+	{
+		printf("Memory leak detected - %llu block%s still allocated :\n", chunks.size(), chunks.size() > 1 ? "s" : "");
+		for (const auto & entry : chunks)
+		{
+			printf(
+				"%s(%d): [%lli] %llu bytes at location %p\n",
+				entry.second.Filename,
+				entry.second.Line,
+				entry.second.AllocationID,
+				entry.second.Bytes,
+				entry.first
+			);
+		}
+	}
+
+#endif // MEMORY_CHECK == 1
 
 	return code;
 }

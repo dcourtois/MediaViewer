@@ -2,16 +2,14 @@ import QtQuick 2.5
 
 
 //
-// Simple static image. It's loaded synchronously, so use in an asynchronously
-// loaded componenet :)
+// Simple static image.
 //
 Image {
-	source: "file:///" + sourcePath
-	fillMode: sourceSize.width >= width || sourceSize.height >= height ? Image.PreserveAspectFit : Image.Pad
-	asynchronous: false
+	source: "image://MediaPreview/" + sourcePath + "?" + parent.width + "&" + parent.height
+	fillMode: Image.PreserveAspectFit
+	asynchronous: true
 	antialiasing: true
 	autoTransform: true
 	smooth: true
 	mipmap: true
 }
-

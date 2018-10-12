@@ -1,0 +1,3 @@
+[submodule "Libs/CppUtils"]
+	path = Libs/CppUtils
+	url = https://github.com/dcourtois/CppUtils.git

@@ -6,7 +6,7 @@ QT += \
 	multimedia
 
 CONFIG += \
-	c++11 \
+	c++14 \
 	precompile_header
 
 SOURCES += \
@@ -14,15 +14,14 @@ SOURCES += \
 	Sources/MediaViewerPCH.cpp \
 	Sources/RegisterQMLTypes.cpp \
 	Sources/ImageProviders/FolderIconProvider.cpp \
+	Sources/ImageProviders/MediaPreviewProvider.cpp \
 	Sources/Models/Folder.cpp \
 	Sources/Models/FolderModel.cpp \
 	Sources/Models/Media.cpp \
 	Sources/Models/MediaModel.cpp \
 	Sources/Utils/Cursor.cpp \
 	Sources/Utils/FileSystem.cpp \
-	Sources/Utils/Job.cpp \
-	Sources/Utils/Memory.cpp \
-	Sources/Utils/Misc.cpp
+	Sources/Utils/Job.cpp
 
 RESOURCES += \
 	Sources/QML/QML.qrc \
@@ -32,6 +31,7 @@ HEADERS += \
 	Sources/MediaViewerPCH.h \
 	Sources/RegisterQMLTypes.h \
 	Sources/ImageProviders/FolderIconProvider.h \
+	Sources/ImageProviders/MediaPreviewProvider.h \
 	Sources/Models/Folder.h \
 	Sources/Models/Folder.inl \
 	Sources/Models/FolderModel.h \
@@ -42,16 +42,20 @@ HEADERS += \
 	Sources/Models/MediaModel.inl \
 	Sources/Utils/Cursor.h \
 	Sources/Utils/FileSystem.h \
-	Sources/Utils/Job.h \
-	Sources/Utils/Memory.h \
-	Sources/Utils/Misc.h \
-	Sources/Utils/Misc.inl
+	Sources/Utils/Job.h
 
 #
 # Global config
 #
-INCLUDEPATH += Sources
+INCLUDEPATH += Sources Libs
 PRECOMPILED_HEADER = Sources/MediaViewerPCH.h
+
+#
+# Debug config
+#
+debug {
+	DEFINES += MEMORY_CHECK=1
+}
 
 #
 # Platform specifics

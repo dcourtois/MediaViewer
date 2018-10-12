@@ -27,6 +27,7 @@
 #include <QFileInfo>
 #include <QIcon>
 #include <QImage>
+#include <QImageReader>
 #include <QList>
 #include <QMediaPlayer>
 #include <QObject>
@@ -67,7 +68,8 @@
 //------------------------------------------------------------------------------
 // memory leak detection
 
-#include "Utils/Memory.h"
+#include "CppUtils/MemoryTracker.h"
+#include "CppUtils/STLUtils.h"
 
 
 #endif // MEDIA_VIEWER_PCH_H

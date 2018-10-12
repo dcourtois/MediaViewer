@@ -1,7 +1,6 @@
 #include "MediaViewerPCH.h"
 #include "FolderModel.h"
 #include "Folder.h"
-#include "Utils/Misc.h"
 
 
 namespace MediaViewer
@@ -22,7 +21,7 @@ namespace MediaViewer
 	{
 		for (auto root : m_Roots)
 		{
-			DELETE root;
+			MT_DELETE root;
 		}
 	}
 
@@ -74,7 +73,7 @@ namespace MediaViewer
 	{
 		FolderModel * self = static_cast< FolderModel * >(roots->object);
 		self->beginInsertRows(QModelIndex(), self->m_Roots.size(), self->m_Roots.size());
-		self->m_Roots.push_back(NEW Folder(*root));
+		self->m_Roots.push_back(MT_NEW Folder(*root));
 		self->endInsertRows();
 	}
 
@@ -87,7 +86,7 @@ namespace MediaViewer
 		self->beginResetModel();
 		for (auto root : self->m_Roots)
 		{
-			DELETE root;
+			MT_DELETE root;
 		}
 		self->m_Roots.clear();
 		self->endResetModel();
@@ -115,14 +114,14 @@ namespace MediaViewer
 		this->beginResetModel();
 		for (auto root : m_Roots)
 		{
-			DELETE root;
+			MT_DELETE root;
 		}
 		m_Roots.clear();
 
 		// add the new roots
 		for (const QString & path : paths)
 		{
-			m_Roots.push_back(NEW Folder(path));
+			m_Roots.push_back(MT_NEW Folder(path));
 		}
 
 		// done
@@ -210,7 +209,7 @@ namespace MediaViewer
 
 		// find its row index (relative to its parent)
 		const QVector< Folder * > & children = folder->GetParent() ? folder->GetParent()->GetChildren() : m_Roots;
-		int row = Utils::IndexOf(children, folder);
+		int row = IndexOf(children, folder);
 		return this->createIndex(row, 0, const_cast< Folder * >(folder));
 	}
 

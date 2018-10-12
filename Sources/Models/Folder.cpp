@@ -45,7 +45,7 @@ namespace MediaViewer
 	{
 		for (Folder * folder : m_Children)
 		{
-			DELETE folder;
+			MT_DELETE folder;
 		}
 	}
 
@@ -104,7 +104,7 @@ namespace MediaViewer
 			{
 				for (const auto & child : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name))
 				{
-					m_Children.push_back(NEW Folder(dir.absoluteFilePath(child.filePath()), this));
+					m_Children.push_back(MT_NEW Folder(dir.absoluteFilePath(child.filePath()), this));
 				}
 			}
 
@@ -118,7 +118,7 @@ namespace MediaViewer
 	//!
 	void Folder::UpdateMedias(void) const
 	{
-		NEW Job([&] (void) {
+		MT_NEW Job([&] (void) {
 			// reset the media count
 			m_MediaCount = 0;
 

@@ -50,8 +50,8 @@ Rectangle {
 			id: grid
 
 			// size of the cells
-			cellWidth: settings.thumbnailSize * 350 + 50
-			cellHeight: settings.thumbnailSize * 350 + 50
+			cellWidth: Math.round(settings.thumbnailSize * 350 + 50)
+			cellHeight: Math.round(settings.thumbnailSize * 350 + 50)
 
 			// delegates
 			delegate: itemDelegate
