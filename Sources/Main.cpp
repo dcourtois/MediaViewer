@@ -5,10 +5,17 @@
 #include "Utils/Cursor.h"
 #include "Utils/FileSystem.h"
 
-//
+// application information
+#define ORGANIZATION_NAME	"Citron"
+#define ORGANIZATION_DOMAIN	"pcitron.fr"
+#define APPLICATION_NAME	"MediaViewer"
+#define APPLICATION_VERSION	"0.1"
+
+// the settings
+QSettings g_Settings(QSettings::IniFormat, QSettings::UserScope, ORGANIZATION_NAME, APPLICATION_NAME);
+
 // those are exposed to QML through QQmlContext::setContextProperty, which
 // does not take ownership, so we'll need to delete them we leaving the app.
-//
 static Cursor *		cursor		= nullptr;
 static FileSystem *	fileSystem	= nullptr;
 
@@ -112,10 +119,10 @@ int main(int argc, char *argv[])
 	{
 		// create the application
 		QApplication app(argc, argv);
-		app.setOrganizationName("Citron");
-		app.setOrganizationDomain("pcitron.fr");
-		app.setApplicationName("MediaViewer");
-		app.setApplicationVersion("0.1");
+		app.setOrganizationName(ORGANIZATION_NAME);
+		app.setOrganizationDomain(ORGANIZATION_DOMAIN);
+		app.setApplicationName(APPLICATION_NAME);
+		app.setApplicationVersion(APPLICATION_VERSION);
 
 		// create and setup application engine
 		QQmlApplicationEngine engine;
@@ -128,35 +135,7 @@ int main(int argc, char *argv[])
 	// cleanup
 	MT_DELETE cursor;
 	MT_DELETE fileSystem;
-
-#if MEMORY_CHECK == 1
-
-	// we no longer need to track memory
-	MT_SET_ENABLED(false);
-
-	// dump memory leaks
-	auto chunks = MemoryTracker::Instance().GetTrackedChunks();
-	if (chunks.empty() == true)
-	{
-		printf("No memory leaks, congratulations !\n");
-	}
-	else
-	{
-		printf("Memory leak detected - %llu block%s still allocated :\n", chunks.size(), chunks.size() > 1 ? "s" : "");
-		for (const auto & entry : chunks)
-		{
-			printf(
-				"%s(%d): [%lli] %llu bytes at location %p\n",
-				entry.second.Filename,
-				entry.second.Line,
-				entry.second.AllocationID,
-				entry.second.Bytes,
-				entry.first
-			);
-		}
-	}
-
-#endif // MEMORY_CHECK == 1
+	MT_SHUTDOWN(printf);
 
 	return code;
 }

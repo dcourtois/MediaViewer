@@ -72,4 +72,9 @@
 #include "CppUtils/STLUtils.h"
 
 
+//------------------------------------------------------------------------------
+// global stuff
+
+extern QSettings g_Settings;
+
 #endif // MEDIA_VIEWER_PCH_H

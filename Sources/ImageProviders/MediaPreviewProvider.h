@@ -16,7 +16,7 @@ namespace MediaViewer
 		Q_OBJECT
 
 		Q_PROPERTY(bool useCache READ GetUseCache WRITE SetUseCache NOTIFY useCacheChanged)
-		Q_PROPERTY(QString cachePath READ GetCachePath NOTIFY cachePathChanged)
+		Q_PROPERTY(QString cachePath READ GetCachePath WRITE SetCachePath NOTIFY cachePathChanged)
 
 	signals:
 
@@ -30,10 +30,14 @@ namespace MediaViewer
 		// reimplemented from QQuickImageProvider
 		QImage requestImage(const QString & id, QSize * size, const QSize & requestedSize) final;
 
-		// public API
+		// public C++ API
 		bool				GetUseCache(void) const;
 		void				SetUseCache(bool value);
 		const QString &		GetCachePath(void) const;
+		void				SetCachePath(const QString & path);
+
+		// public QML API
+		Q_INVOKABLE void	clearCache(void) const;
 
 	private:
 

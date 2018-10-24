@@ -3,6 +3,7 @@ import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.3
 import Qt.labs.settings 1.0
+import Qt.labs.platform 1.0 as PlatformDialog
 import MediaViewer 0.1
 
 
@@ -18,7 +19,7 @@ Dialog {
 	property var settings
 
 	// private properties
-	property int _labelWidth: Math.max(root.width / 2, 200)
+	property int _labelWidth: Math.max(root.width / 3, 200)
 
 	// restore the previous focus item on hiding
 	onVisibleChanged: {
@@ -108,8 +109,6 @@ Dialog {
 						return;
 					}
 
-					playAnimatedImages.currentIndex		= settings.playAnimatedImages;
-					playMovies.currentIndex				= settings.playMovies;
 					sortBy.currentIndex					= settings.sortBy;
 					sortOrder.currentIndex				= settings.sortOrder;
 					thumbnailSize.value					= settings.thumbnailSize;
@@ -117,54 +116,6 @@ Dialog {
 				}
 
 				ColumnLayout {
-
-					// Play mode of animated images in preview
-					RowLayout {
-						spacing: 10
-						Label {
-							Layout.minimumWidth: _labelWidth
-							text: "Auto Play Animated Images"
-							horizontalAlignment: Text.AlignRight
-						}
-						ComboBox {
-							id: playAnimatedImages
-							Layout.fillWidth: true
-							model: [
-								"On",
-								"Mouse Hover",
-								"Off"
-							]
-							onCurrentIndexChanged: {
-								if (root.visible === true) {
-									settings.playAnimatedImages = currentIndex
-								}
-							}
-						}
-					}
-
-					// Play mode of movies in preview
-					RowLayout {
-						spacing: 10
-						Label {
-							Layout.minimumWidth: _labelWidth
-							text: "Auto Play Movies"
-							horizontalAlignment: Text.AlignRight
-						}
-						ComboBox {
-							id: playMovies
-							Layout.fillWidth: true
-							model: [
-								"On",
-								"Mouse Hover",
-								"Off"
-							]
-							onCurrentIndexChanged: {
-								if (root.visible === true) {
-									settings.playMovies = currentIndex
-								}
-							}
-						}
-					}
 
 					// Sort by
 					RowLayout {
@@ -327,6 +278,86 @@ Dialog {
 							onCheckedChanged: {
 								if (root.visible === true) {
 									settings.slideShowSelection = checked
+								}
+							}
+						}
+					}
+
+					// fill the remaining space
+					Item {
+						Layout.fillHeight: true
+						Layout.columnSpan: 2
+					}
+				}
+			}
+		}
+
+		Tab {
+			id: cacheBar
+			title: "Thumbnail Cache"
+			anchors.margins: 10
+			active: true
+
+			ScrollView {
+
+				onVisibleChanged: {
+					if (visible === false) {
+						return;
+					}
+
+					useCache.checked	= mediaProvider.useCache;
+					cachePath.text		= mediaProvider.cachePath;
+				}
+
+				ColumnLayout {
+					width: cacheBar.width
+
+					// use the cache on not
+					RowLayout {
+						spacing: 10
+						Label {
+							Layout.minimumWidth: _labelWidth
+							text: "Use Cache"
+							horizontalAlignment: Text.AlignRight
+						}
+						CheckBox {
+							id: useCache
+							onCheckedChanged: {
+								if (root.visible === true) {
+									mediaProvider.useCache = checked
+								}
+							}
+						}
+					}
+
+					// where to store the thumbnails
+					RowLayout {
+						spacing: 10
+						Label {
+							Layout.minimumWidth: _labelWidth
+							text: "Cache Path"
+							horizontalAlignment: Text.AlignRight
+						}
+						TextField {
+							id: cachePath
+							Layout.fillWidth: true
+							enabled: false
+							placeholderText: "Folder"
+							onTextChanged: {
+								if (root.visible === true) {
+									mediaProvider.cachePath = text;
+								}
+							}
+						}
+						Button {
+							text: "..."
+							width: 30
+							onClicked: chooseCachePath.open()
+							PlatformDialog.FolderDialog {
+								id: chooseCachePath
+								onAccepted: {
+									console.log(folder.toString().replace(/^(file:\/{3})/,""));
+									cachePath.text = folder.toString().replace(/^(file:\/{3})/,"");
 								}
 							}
 						}

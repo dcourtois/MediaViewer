@@ -11,8 +11,8 @@ namespace MediaViewer
 	//!
 	MediaPreviewProvider::MediaPreviewProvider(void)
 		: QQuickImageProvider(QQuickImageProvider::Image)
-		, m_UseCache(false)
-		, m_CachePath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Cache")
+		, m_UseCache(g_Settings.value("imageProvider.useCache", true).toBool())
+		, m_CachePath(g_Settings.value("imageProvider.cachePath", QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Cache").toString())
 	{
 		QDir().mkpath(m_CachePath);
 	}
@@ -71,7 +71,7 @@ namespace MediaViewer
 
 		// check if we have a thumbnail already
 		QFile descFile(descName);
-		if (descFile.open(QIODevice::ReadOnly) == true)
+		if (m_UseCache == true && descFile.open(QIODevice::ReadOnly) == true)
 		{
 			const QJsonDocument desc(QJsonDocument::fromJson(descFile.readAll()));
 			const QJsonObject root = desc.object();
@@ -117,18 +117,24 @@ namespace MediaViewer
 			*size = image.size();
 		}
 
-		// save to cache
-		QDir().mkpath(cacheFolder);
-		image.save(thumbnailName);
-
-		// write description
-		QJsonObject root;
-		root["size"] = source.size();
-		root["date"] = source.lastModified().toString();
-		QFile desc(descName);
-		if (desc.open(QIODevice::WriteOnly) == true)
+		// update cache if needed
+		if (m_UseCache == true)
 		{
-			desc.write(QJsonDocument(root).toJson());
+			// ensure the folder exists
+			QDir().mkpath(cacheFolder);
+
+			// save the image
+			image.save(thumbnailName);
+
+			// write description
+			QJsonObject root;
+			root["size"] = source.size();
+			root["date"] = source.lastModified().toString();
+			QFile desc(descName);
+			if (desc.open(QIODevice::WriteOnly) == true)
+			{
+				desc.write(QJsonDocument(root).toJson());
+			}
 		}
 
 		// return the image
@@ -173,6 +179,7 @@ namespace MediaViewer
 		if (m_UseCache != value)
 		{
 			m_UseCache = value;
+			g_Settings.setValue("imageProvider.useCache", m_UseCache);
 			emit useCacheChanged(value);
 		}
 	}
@@ -183,6 +190,38 @@ namespace MediaViewer
 	const QString & MediaPreviewProvider::GetCachePath(void) const
 	{
 		return m_CachePath;
+	}
+
+	//!
+	//! Set the cache path.
+	//!
+	//! @param path
+	//!		The new path. The old cache images will be moved to the new path,
+	//!		and if the path is empty, it will fall back to the default location.
+	//!
+	void MediaPreviewProvider::SetCachePath(const QString & path)
+	{
+		QString newPath = path.size() != 0 ?
+			path :
+			QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Cache";
+		if (newPath != m_CachePath)
+		{
+			QDir(newPath).removeRecursively();
+			if (QDir().rename(m_CachePath, newPath) == true)
+			{
+				m_CachePath = newPath;
+				g_Settings.setValue("imageProvider.cachePath", m_CachePath);
+				emit cachePathChanged(m_CachePath);
+			}
+		}
+	}
+
+	//!
+	//! Remove the thumbnail cache folder
+	//!
+	void MediaPreviewProvider::clearCache(void) const
+	{
+		QDir(m_CachePath).removeRecursively();
 	}
 
 } // namespace MediaViewer
