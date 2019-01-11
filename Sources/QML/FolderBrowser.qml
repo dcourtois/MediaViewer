@@ -1,6 +1,7 @@
 import QtQuick 2.5
-import QtQuick.Controls 1.4
-import QtQuick.Controls.Styles 1.4
+import QtQuick.Controls 2.2
+import QtQuick.Controls.Material 2.2
+import QtQuick.Controls 1.4 as Controls
 import QtQuick.Layouts 1.2
 import QtQml.Models 2.2
 import Qt.labs.settings 1.0
@@ -9,7 +10,7 @@ import Qt.labs.settings 1.0
 //
 // A tree view used to browse the folders' contents
 //
-TreeView {
+Controls.TreeView {
 	id: root
 
 	// externally set
@@ -50,10 +51,10 @@ TreeView {
 	// Privates
 	//
 
-	// palette (used to get theme colors)
-	SystemPalette {
-		id: palette
-	}
+	// Colors
+	property color selectedColor: Material.color(Material.LightBlue, Material.Shade300)
+	property color evenColor: Qt.rgba(1, 1, 1, 1)
+	property color oddColor: Qt.rgba(0.96, 0.96, 0.96, 1)
 
 	// Don't need the headers
 	headerVisible: false
@@ -65,10 +66,10 @@ TreeView {
 		onCurrentChanged: currentFolderPath = (current.valid ? model.data(current, 256) : "")
 	}
 
-	// override the row delegate to be able to change its height...
+	// Draw the row's background
 	rowDelegate: Rectangle {
-		height: 20
-		color: styleData.selected ? palette.highlight : (styleData.alternate ? palette.alternateBase : palette.base)
+		height: 24
+		color: styleData.selected ? selectedColor : (styleData.alternate ? evenColor : oddColor)
 	}
 
 	// disable the item delegate
@@ -82,7 +83,7 @@ TreeView {
 	itemDelegate: null
 
 	// Display the content
-	TableViewColumn {
+	Controls.TableViewColumn {
 		role: "folder"
 
 		// draw a row delegate
@@ -105,7 +106,6 @@ TreeView {
 				anchors.rightMargin: 5
 				elide: Text.ElideRight
 				text: styleData.value ? styleData.value.name : ""
-				color: styleData.selected ? palette.highlightedText : palette.windowText
 			}
 
 			// media count
@@ -124,12 +124,13 @@ TreeView {
 				width: delegateMediaCountText.contentWidth + 10
 
 				radius: 10
-				color: Qt.rgba(0.9, 0.9, 0.9, 1.0);
+				color: styleData.selected ? evenColor : selectedColor;
 
 				Label {
 					id: delegateMediaCountText
 					anchors.centerIn: parent
 					text: styleData.value ? styleData.value.mediaCount : ""
+					font.pixelSize: 12
 				}
 			}
 		}

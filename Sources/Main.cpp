@@ -124,6 +124,9 @@ int main(int argc, char *argv[])
 		app.setApplicationName(APPLICATION_NAME);
 		app.setApplicationVersion(APPLICATION_VERSION);
 
+		// set style
+		QQuickStyle::setStyle("Material");
+
 		// create and setup application engine
 		QQmlApplicationEngine engine;
 		Setup(app, engine);

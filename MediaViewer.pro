@@ -2,6 +2,7 @@ QT += \
 	qml \
 	gui \
 	quick \
+	quickcontrols2 \
 	widgets \
 	multimedia
 
