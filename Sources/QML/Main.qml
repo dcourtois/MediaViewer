@@ -78,10 +78,10 @@ MainWindow {
 	Preferences {
 		id: preferences
 		mediaBrowser: mediaBrowser
+		x: (mainWindow.width - width) / 2
+		y: (mainWindow.height - height) / 2
 		settings: Settings {
 			category: "Preferences"
-			property int playAnimatedImages: 2
-			property int playMovies: 2
 			property int sortBy: 4
 			property int sortOrder: 0
 			property double thumbnailSize: 0.5
