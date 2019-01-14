@@ -6,13 +6,19 @@
 namespace MediaViewer
 {
 
+	//! Default cache folder
+	inline QString GetDefaultCachePath(void)
+	{
+		return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Cache";
+	}
+
 	//!
 	//! Constructor
 	//!
 	MediaPreviewProvider::MediaPreviewProvider(void)
 		: QQuickImageProvider(QQuickImageProvider::Image)
 		, m_UseCache(g_Settings.value("imageProvider.useCache", true).toBool())
-		, m_CachePath(g_Settings.value("imageProvider.cachePath", QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Cache").toString())
+		, m_CachePath(g_Settings.value("imageProvider.cachePath", GetDefaultCachePath()).toString())
 	{
 		QDir().mkpath(m_CachePath);
 	}
@@ -201,9 +207,12 @@ namespace MediaViewer
 	//!
 	void MediaPreviewProvider::SetCachePath(const QString & path)
 	{
-		QString newPath = path.size() != 0 ?
-			path :
-			QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Cache";
+		QString newPath = path.size() != 0 ? path : GetDefaultCachePath();
+		newPath.replace('\\', '/');
+		if (newPath.section('/', -1, -1) != "Cache")
+		{
+			newPath += "/Cache";
+		}
 		if (newPath != m_CachePath)
 		{
 			QDir(newPath).removeRecursively();
