@@ -161,7 +161,7 @@ ToolBar {
 
 		ShortcutMenuItem {
 			text: "Preferences"
-			sequence: StandardKey.Preferences
+			sequence: "Ctrl+Shift+P"
 			onTriggered: preferences.open()
 		}
 	}
