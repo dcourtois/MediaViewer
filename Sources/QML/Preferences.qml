@@ -8,6 +8,7 @@ import MediaViewer 0.1
 
 Dialog {
 	id: root
+	modal: true
 	title: "Preferences"
 	standardButtons: Dialog.Ok
 	width: 600
@@ -20,9 +21,22 @@ Dialog {
 	// private properties
 	property int _labelWidth: Math.max(root.width / 3, 200)
 
-	// restore the previous focus item on hiding
+	// setup when the dialog is shown (to avoid binding loops)
 	onVisibleChanged: {
-		if (visible === false) {
+		if (visible === true) {
+			sortBy.currentIndex					= settings.sortBy;
+			sortOrder.currentIndex				= settings.sortOrder;
+			thumbnailSize.value					= settings.thumbnailSize;
+			restoreLastVisitedFolder.checked	= settings.restoreLastVisitedFolder;
+			deletePermanently.checked			= fileSystem.canTrash === true ? settings.deletePermanently : true;
+			showLabel.checked					= settings.showLabel;
+			slideShowDelay.text					= settings.slideShowDelay;
+			slideShowLoop.checked				= settings.slideShowLoop;
+			slideShowSelection.checked			= settings.slideShowSelection;
+			useCache.checked					= mediaProvider.useCache;
+			cachePath.text						= mediaProvider.cachePath;
+		} else {
+			// restore the previous focus item
 			mediaBrowser.forceFocus();
 		}
 	}
@@ -334,11 +348,15 @@ Dialog {
 								mediaProvider.useCache = checked
 							}
 						}
+						ToolTip.delay: 1000
+						ToolTip.visible: hovered
+						ToolTip.text: "When checked, thumbnails will be stored in a cache."
 					}
 				}
 
 				// where to store the thumbnails
 				RowLayout {
+					Layout.fillWidth: true
 					spacing: 10
 					Label {
 						Layout.minimumWidth: _labelWidth
@@ -357,7 +375,7 @@ Dialog {
 						}
 						ToolTip.delay: 1000
 						ToolTip.visible: hovered
-						ToolTip.text: "Where the cached thumbnails will be stored."
+						ToolTip.text: "Where the cached thumbnails are stored."
 					}
 					Button {
 						text: "..."
@@ -369,7 +387,11 @@ Dialog {
 						}
 						ToolTip.delay: 1000
 						ToolTip.visible: hovered
-						ToolTip.text: "Open a dialog to choose where the cached thumbnails will be stored."
+						ToolTip.text: {
+							return	"Open a dialog to choose where the cached thumbnails will be stored.\n" +
+									"Note that a 'Cache' subdirectory will be added to the chosen dir:\n" +
+									"if you choose 'D:/Documents', then the actual folder will be 'D:/Document/Cache'";
+						}
 					}
 				}
 
