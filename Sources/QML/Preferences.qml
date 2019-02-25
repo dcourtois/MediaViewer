@@ -19,6 +19,7 @@ Dialog {
 	property var settings
 
 	// private properties
+	property int _tooltipDelay: 750
 	property int _labelWidth: Math.max(root.width / 3, 200)
 
 	// setup when the dialog is shown (to avoid binding loops)
@@ -94,7 +95,7 @@ Dialog {
 								settings.restoreLastVisitedFolder = checked
 							}
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
 							return	"If checked, when reopened the viewer will restore\n" +
@@ -119,7 +120,7 @@ Dialog {
 								settings.deletePermanently = checked
 							}
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
 							return	"If your platform supports trashing things, you\n" +
@@ -162,7 +163,7 @@ Dialog {
 								settings.sortBy = currentIndex
 							}
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
 							return	"Select the sorting criteria. None will disable sort,\n" +
@@ -191,7 +192,7 @@ Dialog {
 								settings.sortOrder = currentIndex
 							}
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
 							return	"For a given sort criteria, sort by ascending or descending order.";
@@ -211,7 +212,7 @@ Dialog {
 						id: thumbnailSize
 						Layout.fillWidth: true
 						onValueChanged: settings.thumbnailSize = value
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
 							return	"Control the size of the thumbnails in the media browser view.";
@@ -234,7 +235,7 @@ Dialog {
 								settings.showLabel = checked
 							}
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
 							return	"If checked, will display the name of the medias under\n" +
@@ -270,7 +271,7 @@ Dialog {
 								settings.slideShowDelay = parseInt(text);
 							}
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
 							return	"Delay in milliseconds between 2 images.";
@@ -293,7 +294,7 @@ Dialog {
 								settings.slideShowLoop = checked
 							}
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
 							return	"If checked, the slide show will start again when\n" +
@@ -317,7 +318,7 @@ Dialog {
 								settings.slideShowSelection = checked
 							}
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: "If checked, the slide show will use only the current selection."
 					}
@@ -348,7 +349,7 @@ Dialog {
 								mediaProvider.useCache = checked
 							}
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: "When checked, thumbnails will be stored in a cache."
 					}
@@ -373,7 +374,7 @@ Dialog {
 								mediaProvider.cachePath = text;
 							}
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: "Where the cached thumbnails are stored."
 					}
@@ -385,7 +386,7 @@ Dialog {
 							id: chooseCachePath
 							onAccepted: cachePath.text = folder.toString().replace(/^(file:\/{3})/,"");
 						}
-						ToolTip.delay: 1000
+						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
 							return	"Open a dialog to choose where the cached thumbnails will be stored.\n" +
