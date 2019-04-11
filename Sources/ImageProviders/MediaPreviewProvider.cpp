@@ -58,11 +58,11 @@ namespace MediaViewer
 		}
 
 		// get the hash corresponding to this thumbnail
-		uint32_t hash = Hash::Combine({
+		uint32_t hash = Hash::Combine(
 			Hash::Jenkins(path.toLocal8Bit().data(), size_t(path.size())),
 			static_cast< unsigned int >(width),
 			static_cast< unsigned int >(height)
-		});
+		);
 
 		// get the source file info and a few information
 		const QFileInfo source(path);
@@ -95,20 +95,20 @@ namespace MediaViewer
 			imageReader.setAutoTransform(true);
 			if (width != -1 && height != -1)
 			{
-				const QSize size = imageReader.size();
-				if (width < size.width() || height < size.height())
+				const QSize imageSize = imageReader.size();
+				if (width < imageSize.width() || height < imageSize.height())
 				{
-					if (size.width() > size.height())
+					if (imageSize.width() > imageSize.height())
 					{
 						imageReader.setScaledSize({
 							width,
-							int(width * (size.height() / double(size.width())))
+							int(width * (imageSize.height() / double(imageSize.width())))
 						});
 					}
 					else
 					{
 						imageReader.setScaledSize({
-							int(height * (size.width() / double(size.height()))),
+							int(height * (imageSize.width() / double(imageSize.height()))),
 							height
 						});
 					}

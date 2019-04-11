@@ -9,7 +9,6 @@ import MediaViewer 0.1
 // The main menu
 //
 ToolBar {
-	Material.background: Material.BlueGrey
 	Material.elevation: 0
 
 	// externally set
