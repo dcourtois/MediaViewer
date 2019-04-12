@@ -91,7 +91,7 @@ Item {
 			}
 			Image {
 				sourceSize { width: 40; height: 40 }
-				source: "qrc:/icons/stop"
+				source: "qrc:/Icons/Stop"
 				MouseArea {
 					anchors.fill: parent
 					acceptedButtons: Qt.LeftButton
@@ -100,7 +100,7 @@ Item {
 			}
 			Image {
 				sourceSize { width: 40; height: 40 }
-				source: player.playbackState === MediaPlayer.PlayingState ? "qrc:/icons/pause" : "qrc:/icons/play"
+				source: player.playbackState === MediaPlayer.PlayingState ? "qrc:/Icons/Pause" : "qrc:/Icons/Play"
 				MouseArea {
 					anchors.fill: parent
 					acceptedButtons: Qt.LeftButton

@@ -1,0 +1,18 @@
+import QtQuick 2.12
+import QtQuick.Controls 2.12
+
+
+//!
+//! Helper for ToolButton
+//!
+ToolButton {
+	id: root
+
+	// automatically size the icon
+	icon.height: height / 2
+	icon.width: height / 2
+
+	// source points to the icon's source
+	property alias source: root.icon.source
+
+}

@@ -45,8 +45,9 @@ set (CMAKE_AUTOMOC_MOC_OPTIONS "-bMediaViewerPCH.h")
 # The library
 #
 add_executable (MediaViewer
-	# application
+	# application and resources
 	Sources/Application/Application.qrc
+	Resources/Resources.qrc
 
 	# image providers
 	Sources/ImageProviders/FolderIconProvider.cpp

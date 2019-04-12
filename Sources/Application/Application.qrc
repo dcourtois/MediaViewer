@@ -1,4 +1,13 @@
+<!DOCTYPE RCC>
 <RCC>
+
+	<!-- Reusable components -->
+	<qresource prefix="Components">
+		<file alias="MenuItemEx.qml">Components/MenuItemEx.qml</file>
+		<file alias="ToolButtonEx.qml">Components/ToolButtonEx.qml</file>
+	</qresource>
+
+
 	<qresource prefix="/">
 		<!-- Main entry point -->
 		<file>Main.qml</file>
@@ -8,7 +17,6 @@
 		<file>MainMenu.qml</file>
 		<file>WindowSettings.qml</file>
 		<file>WindowState.qml</file>
-		<file>ShortcutMenuItem.qml</file>
 
 		<!-- Global states -->
 		<file>Selection.qml</file>
