@@ -1,0 +1,9 @@
+# Top-most EditorConfig file, apply to everyone
+root = true
+
+# Tabs, tabs everywhere !!!! (end newlines at end of files + remove trailing whitespces)
+[*]
+indent_style = tab
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
