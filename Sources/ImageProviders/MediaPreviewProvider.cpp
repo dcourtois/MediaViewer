@@ -6,6 +6,11 @@
 namespace MediaViewer
 {
 
+	//! Supported movie extensions
+	static const QVector< QString > movieExtensions = {
+		".mp4"
+	};
+
 	//! Default cache folder
 	inline QString GetDefaultCachePath(void)
 	{
@@ -69,7 +74,6 @@ namespace MediaViewer
 		const QString extension(source.suffix());
 		const QString cacheFolder	= this->GetCacheFolder(hash);
 		const QString cacheName		= cacheFolder + QString("%1").arg(hash);
-		const QString thumbnailName	= cacheName + '.' + extension;
 		const QString descName		= cacheFolder + ".json";
 
 		// the image
@@ -81,40 +85,28 @@ namespace MediaViewer
 		{
 			const QJsonDocument desc(QJsonDocument::fromJson(descFile.readAll()));
 			const QJsonObject root = desc.object();
-			if (source.size() == root["size"].toInt() && source.lastModified().toString() == root["date"].toString())
+			if (source.size() == root["size"].toInt() &&
+				source.lastModified().toString() == root["date"].toString() &&
+				QFile::exists(root["thumbnail"].toString()))
 			{
-				image = QImage(thumbnailName);
+				image = QImage(root["thumbnail"].toString());
 			}
 		}
 
-		// didn't load the image, read it
+		// didn't load the image, create it
+		QString thumbnail = cacheName + '.' + extension;
 		if (image.isNull() == true)
 		{
-			QImageReader imageReader(path);
-			imageReader.setAutoDetectImageFormat(true);
-			imageReader.setAutoTransform(true);
-			if (width != -1 && height != -1)
-			{
-				const QSize imageSize = imageReader.size();
-				if (width < imageSize.width() || height < imageSize.height())
-				{
-					if (imageSize.width() > imageSize.height())
-					{
-						imageReader.setScaledSize({
-							width,
-							int(width * (imageSize.height() / double(imageSize.width())))
-						});
-					}
-					else
-					{
-						imageReader.setScaledSize({
-							int(height * (imageSize.width() / double(imageSize.height()))),
-							height
-						});
-					}
-				}
-			}
-			image = imageReader.read();
+			image = this->GetImagePreview(path, width, height);
+		}
+		if (image.isNull() == true)
+		{
+			image = this->GetMoviePreview(path, width, height);
+			thumbnail += ".jpg";
+		}
+		if (image.isNull() == true)
+		{
+			return image;
 		}
 
 		// update the size
@@ -130,16 +122,22 @@ namespace MediaViewer
 			QDir().mkpath(cacheFolder);
 
 			// save the image
-			image.save(thumbnailName);
-
-			// write description
-			QJsonObject root;
-			root["size"] = source.size();
-			root["date"] = source.lastModified().toString();
-			QFile desc(descName);
-			if (desc.open(QIODevice::WriteOnly) == true)
+			if (image.save(thumbnail) == true)
 			{
-				desc.write(QJsonDocument(root).toJson());
+				// write description
+				QJsonObject root;
+				root["size"] = source.size();
+				root["date"] = source.lastModified().toString();
+				root["thumbnail"] = thumbnail;
+				QFile desc(descName);
+				if (desc.open(QIODevice::WriteOnly) == true)
+				{
+					desc.write(QJsonDocument(root).toJson());
+				}
+			}
+			else
+			{
+				qDebug("failed writing image preview %s to disk", qPrintable(thumbnail));
 			}
 		}
 
@@ -167,6 +165,107 @@ namespace MediaViewer
 			folder += '/';
 		}
 		return folder;
+	}
+	
+	//!
+	//! Try to get a preview for a static image
+	//!
+	QImage MediaPreviewProvider::GetImagePreview(const QString & path, int width, int height)
+	{
+		// check if we can read the image
+		QImageReader imageReader;
+		imageReader.setAutoDetectImageFormat(true);
+		imageReader.setAutoTransform(true);
+		imageReader.setFileName(path);
+		if (imageReader.canRead() == false)
+		{
+			return QImage();
+		}
+
+		// configure the reader if we had a required size
+		if (width != -1 && height != -1)
+		{
+			const QSize imageSize = imageReader.size();
+			if (imageSize.width() > 0 || imageSize.height() > 0)
+			{
+				if (width < imageSize.width() || height < imageSize.height())
+				{
+					if (imageSize.width() > imageSize.height())
+					{
+						imageReader.setScaledSize({
+							width,
+							int(width * (imageSize.height() / double(imageSize.width())))
+						});
+					}
+					else
+					{
+						imageReader.setScaledSize({
+							int(height * (imageSize.width() / double(imageSize.height()))),
+							height
+						});
+					}
+				}
+			}
+		}
+
+		// return the preview
+		return imageReader.read();
+	}
+
+	//!
+	//! Try to get a preview for a movie
+	//!
+	QImage MediaPreviewProvider::GetMoviePreview(const QString & path, int width, int height)
+	{
+		Q_UNUSED(path);
+		Q_UNUSED(width);
+		Q_UNUSED(height);
+
+		// create data needed for the video capture
+		QEventLoop loop;
+		QMediaPlayer player;
+		VideoCapture output(loop);
+		bool capture = false;
+
+		// when metadata is available, set the position to a third of the movie length
+		QObject::connect(&player, &QMediaObject::metaDataAvailableChanged, [&] (bool available) {
+			if (available == true)
+			{
+				capture = true;
+				player.setPosition(player.metaData("Duration").toInt() / 3);
+			}
+		});
+
+		// on error, just stop the loop
+		QObject::connect(&player, static_cast< void (QMediaPlayer::*)(QMediaPlayer::Error) >(&QMediaPlayer::error), [&] (QMediaPlayer::Error error) {
+			qDebug("failed generating preview for %s with error %d", qPrintable(path), error);
+			loop.quit();
+		});
+
+		// when the position changes, enabled capture and start playing
+		QObject::connect(&player, &QMediaPlayer::positionChanged, [&] (qint64 position) {
+			Q_UNUSED(position);
+			if (capture == true)
+			{
+				output.Capture();
+				player.play();
+			}
+		});
+
+		// setup the player
+		player.setVideoOutput(&output);
+		player.setMuted(true);
+		player.setMedia(QUrl::fromLocalFile(path));
+
+		// wait for the capture
+		loop.exec();
+
+		// cleanup
+		player.stop();
+		player.setVideoOutput(static_cast< QAbstractVideoSurface * >(nullptr));
+
+		// return the captured frame
+		return output.GetFrame().scaled({ width, height }, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
 	}
 
 	//!
@@ -202,26 +301,42 @@ namespace MediaViewer
 	//! Set the cache path.
 	//!
 	//! @param path
-	//!		The new path. The old cache images will be moved to the new path,
-	//!		and if the path is empty, it will fall back to the default location.
+	//!		The new path. If empty, the default path will be used.
 	//!
 	void MediaPreviewProvider::SetCachePath(const QString & path)
 	{
+		// get the path
 		QString newPath = path.size() != 0 ? path : GetDefaultCachePath();
 		newPath.replace('\\', '/');
 		if (newPath.section('/', -1, -1) != "Cache")
 		{
 			newPath += "/Cache";
 		}
+
+		// if different, update
 		if (newPath != m_CachePath)
 		{
+			// ensure the new path doesn't exist
 			QDir(newPath).removeRecursively();
-			if (QDir().rename(m_CachePath, newPath) == true)
+
+			// try moving the old cache if it exists
+			if (QFile::exists(m_CachePath) == true)
 			{
-				m_CachePath = newPath;
-				g_Settings.setValue("imageProvider.cachePath", m_CachePath);
-				emit cachePathChanged(m_CachePath);
+				if (QDir().rename(m_CachePath, newPath) == false)
+				{
+					QDir(m_CachePath).removeRecursively();
+					QDir().mkdir(newPath);
+				}
 			}
+			else
+			{
+				QDir().mkdir(newPath);
+			}
+
+			// update the path and notify
+			m_CachePath = newPath;
+			g_Settings.setValue("imageProvider.cachePath", m_CachePath);
+			emit cachePathChanged(m_CachePath);
 		}
 	}
 
@@ -230,7 +345,76 @@ namespace MediaViewer
 	//!
 	void MediaPreviewProvider::clearCache(void) const
 	{
-		QDir(m_CachePath).removeRecursively();
+		if (QDir(m_CachePath).removeRecursively() == true)
+		{
+			QDir().mkdir(m_CachePath);
+		}
+	}
+
+
+	//!
+	//! Constructor
+	//!
+	VideoCapture::VideoCapture(QEventLoop & loop)
+		: m_Loop(loop)
+		, m_Capture(false)
+	{
+	}
+
+	//!
+	//! Enable capture for the next presented frame
+	//!
+	void VideoCapture::Capture(void)
+	{
+		m_Capture = true;
+	}
+
+	//!
+	//! Get the captured frame
+	//!
+	const QImage & VideoCapture::GetFrame(void) const
+	{
+		return m_Frame;
+	}
+
+	//!
+	//! Reimplemented from QAbstractVideoSurface. This is called whenever a new frame is available.
+	//!
+	bool VideoCapture::present(const QVideoFrame & source)
+	{
+		if (m_Capture == true)
+		{
+			// map our frame (we need to make a local copy since we receive the frame as an immutable reference)
+			QVideoFrame frame(source);
+			if (frame.map(QAbstractVideoBuffer::MapMode::ReadOnly) == false)
+			{
+				return false;
+			}
+
+			// create the image and copy the pixels
+			m_Frame = QImage(frame.width(), frame.height(), QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat()));
+			memcpy(m_Frame.bits(), frame.bits(), frame.mappedBytes());
+
+			// release the frame
+			frame.unmap();
+
+			// stop the loop
+			m_Loop.quit();
+		}
+
+		return true;
+	}
+
+	//!
+	//! Reimplemented from QAbstractVideoSurface.
+	//!
+	QList< QVideoFrame::PixelFormat > VideoCapture::supportedPixelFormats(QAbstractVideoBuffer::HandleType type) const
+	{
+		Q_UNUSED(type);
+		return {
+			QVideoFrame::Format_RGB24,
+			QVideoFrame::Format_ARGB32
+		};
 	}
 
 } // namespace MediaViewer

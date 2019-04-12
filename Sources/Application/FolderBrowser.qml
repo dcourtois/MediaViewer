@@ -94,7 +94,7 @@ Controls.TreeView {
 				id: delegateIcon
 				anchors.verticalCenter: parent.verticalCenter
 				asynchronous: true
-				source: styleData.value ? "image://FolderIcon/" + styleData.value.path : "qrc:///images/empty"
+				source: styleData.value ? "image://FolderIcon/" + styleData.value.path : "qrc:///Images/empty"
 			}
 
 			// folder name

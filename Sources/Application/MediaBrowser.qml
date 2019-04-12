@@ -79,9 +79,8 @@ Rectangle {
 					}
 
 					// the media preview
-					Loader {
+					Image {
 						id: image
-						asynchronous: true
 
 						// size and anchoring
 						height: parent.height - 20 - (label.active ? label.height + 10 : 0)
@@ -90,17 +89,10 @@ Rectangle {
 						anchors.top: parent.top
 						anchors.topMargin: 10
 
-						// make path accessible to components
-						property string sourcePath: path
-
-						// load the correct component
-						source: {
-							switch (type) {
-								case Media.Movie:			return "qrc:///Previews/Movie.qml";
-								case Media.AnimatedImage:	return "qrc:///Previews/AnimatedImage.qml";
-								case Media.Image:			return "qrc:///Previews/Image.qml";
-							}
-						}
+						// generate the preview
+						source: "image://MediaPreview/" + path + "?" + width + "&" + height
+						asynchronous: true
+						fillMode: Image.PreserveAspectFit
 					}
 
 					// the label

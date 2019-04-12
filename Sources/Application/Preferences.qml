@@ -79,8 +79,9 @@ Dialog {
 
 			// general options
 			ColumnLayout {
+				Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-				// Remmber last visited folder
+				// Remember last visited folder
 				RowLayout {
 					spacing: 10
 					Label {
@@ -139,6 +140,7 @@ Dialog {
 
 			// interface options
 			ColumnLayout {
+				Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
 				// Sort by
 				RowLayout {
@@ -253,6 +255,7 @@ Dialog {
 
 			// slideshow options
 			ColumnLayout {
+				Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
 				// Delay between 2 images
 				RowLayout {
@@ -333,6 +336,7 @@ Dialog {
 
 			// Cache options
 			ColumnLayout {
+				Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
 				// use the cache on not
 				RowLayout {
@@ -395,6 +399,20 @@ Dialog {
 						}
 					}
 				}
+
+				Button {
+					Layout.fillWidth: true
+					text: "Clear Cache"
+					ToolTip.delay: _tooltipDelay
+					ToolTip.visible: hovered
+					ToolTip.text: "Empty the whole cache folder."
+					onClicked: {
+						if (root.visible === true) {
+							mediaProvider.clearCache();
+						}
+					}
+				}
+
 
 				// fill the remaining space
 				Item {

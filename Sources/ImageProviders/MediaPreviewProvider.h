@@ -42,7 +42,9 @@ namespace MediaViewer
 	private:
 
 		// private API
-		QString GetCacheFolder(uint32_t hash) const;
+		QString	GetCacheFolder(uint32_t hash) const;
+		QImage	GetImagePreview(const QString & path, int width, int height);
+		QImage	GetMoviePreview(const QString & path, int width, int height);
 
 		//! true if we should cache the thumbnails, false otherwise
 		bool m_UseCache;
@@ -51,6 +53,43 @@ namespace MediaViewer
 		QString m_CachePath;
 
 	};
+
+
+	//!
+	//! Utility class used with a QMediaPlayer to capture a frame of a movie.
+	//!
+	class VideoCapture
+		: public QAbstractVideoSurface
+	{
+
+	public:
+
+		// Constructor
+		VideoCapture(QEventLoop & loop);
+
+		// API
+		void			Capture(void);
+		const QImage &	GetFrame(void) const;
+
+	protected:
+
+		// Reimplemented from QAbstractVideoSurface
+		bool								present(const QVideoFrame & source) override;
+		QList< QVideoFrame::PixelFormat >	supportedPixelFormats(QAbstractVideoBuffer::HandleType type) const override;
+
+	private:
+
+		//! Reference to the event loop used to wait until the capture's done
+		QEventLoop & m_Loop;
+
+		//! When true, the next presented frame will be captured
+		bool m_Capture;
+
+		//! The captured frame
+		QImage m_Frame;
+
+	};
+
 
 } // namespace MediaViewer
 

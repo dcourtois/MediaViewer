@@ -10,7 +10,7 @@
 		<file>WindowState.qml</file>
 		<file>ShortcutMenuItem.qml</file>
 
-		<!-- Globa states -->
+		<!-- Global states -->
 		<file>Selection.qml</file>
 		<file>StateManager.qml</file>
 
@@ -23,11 +23,6 @@
 		<file>Viewers/AnimatedImage.qml</file>
 		<file>Viewers/Image.qml</file>
 		<file>Viewers/Movie.qml</file>
-
-		<!-- Media thumbnails in the browser -->
-		<file>Previews/AnimatedImage.qml</file>
-		<file>Previews/Image.qml</file>
-		<file>Previews/Movie.qml</file>
 
 		<!-- Tools -->
 		<file>Preferences.qml</file>
