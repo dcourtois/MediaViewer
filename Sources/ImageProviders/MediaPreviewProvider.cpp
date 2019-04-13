@@ -1,5 +1,6 @@
 #include "MediaViewerPCH.h"
 #include "MediaPreviewProvider.h"
+#include "ImageResponse.h"
 #include "CppUtils/Hash.h"
 #include "Utils/Job.h"
 
@@ -52,7 +53,7 @@ namespace MediaViewer
 		}
 
 		// create the image response
-		auto * response = MT_NEW MediaViewer::ImageResponse([=] (void) -> QImage {
+		return MT_NEW MediaViewer::ImageResponse([=] (void) -> QImage {
 
 			// ensure the image exists
 			if (QFile::exists(path) == false)
@@ -141,10 +142,6 @@ namespace MediaViewer
 			return image;
 
 		});
-
-		// launch and return
-		QThreadPool::globalInstance()->start(response);
-		return response;
 	}
 
 	//!
@@ -500,32 +497,5 @@ namespace MediaViewer
 			QVideoFrame::Format_Jpeg
 		};
 	}
-
-	//!
-	//! Constructor
-	//!
-	ImageResponse::ImageResponse(std::function< QImage (void) > && callback)
-		: m_Callback(callback)
-	{
-		setAutoDelete(false);
-	}
-
-	//!
-	//! Create the response object
-	//!
-	QQuickTextureFactory * ImageResponse::textureFactory(void) const
-	{
-		return QQuickTextureFactory::textureFactoryForImage(m_Image);
-	}
-
-	//!
-	//! Run the job
-	//!
-	void ImageResponse::run(void)
-	{
-		m_Image = m_Callback();
-		emit finished();
-	}
-
 
 }

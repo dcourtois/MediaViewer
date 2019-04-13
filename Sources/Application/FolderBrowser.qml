@@ -88,13 +88,15 @@ Controls.TreeView {
 
 		// draw a row delegate
 		delegate: Item {
+			// shortcut to the folder
+			property var folder: styleData.value
 
 			// folder icon
 			Image {
 				id: delegateIcon
 				anchors.verticalCenter: parent.verticalCenter
 				asynchronous: true
-				source: styleData.value ? "image://FolderIcon/" + styleData.value.path : "qrc:/Images/Empty"
+				source: folder ? "image://FolderIcon/" + folder.path : "qrc:/Images/Empty"
 			}
 
 			// folder name
@@ -105,14 +107,14 @@ Controls.TreeView {
 				anchors.right: delegateMediaCount.visible ? delegateMediaCount.left : parent.right
 				anchors.rightMargin: 5
 				elide: Text.ElideRight
-				text: styleData.value ? styleData.value.name : ""
+				text: folder ? folder.name : ""
 			}
 
 			// media count
 			Rectangle {
 				id: delegateMediaCount
 
-				visible: styleData.value ? styleData.value.mediaCount !== 0 : false
+				visible: folder? folder.mediaCount !== 0 : false
 
 				anchors.right: parent.right
 				anchors.rightMargin: 5
@@ -129,7 +131,7 @@ Controls.TreeView {
 				Label {
 					id: delegateMediaCountText
 					anchors.centerIn: parent
-					text: styleData.value ? styleData.value.mediaCount : ""
+					text: folder? folder.mediaCount : ""
 					font.pixelSize: 12
 				}
 			}

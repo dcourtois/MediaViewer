@@ -96,36 +96,6 @@ namespace MediaViewer
 
 	};
 
-	//!
-	//! Implementation of QQuickImageResponse used by MediaPreviewProvider
-	//!
-	class ImageResponse
-		: public QQuickImageResponse
-		, public QRunnable
-	{
-
-	public:
-
-		// constructor
-		ImageResponse() {}
-		ImageResponse(std::function< QImage (void) > && callback);
-
-		// reimplemented from QQuickImageResponse
-		QQuickTextureFactory * textureFactory(void) const final;
-
-		// reimplemented from QRunnable
-		void run(void) final;
-
-	private:
-
-		//! The callback to run to get the image
-		std::function< QImage (void) > m_Callback;
-
-		//! The image
-		QImage m_Image;
-
-	};
-
 
 } // namespace MediaViewer
 
