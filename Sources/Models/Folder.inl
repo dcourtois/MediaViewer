@@ -1,5 +1,5 @@
-#ifndef __FOLDER_INL__
-#define __FOLDER_INL__
+#ifndef MODELS_FOLDER_INL
+#define MODELS_FOLDER_INL
 
 
 namespace MediaViewer
@@ -8,7 +8,7 @@ namespace MediaViewer
 	//!
 	//! Get the folder's path
 	//!
-	const QString & Folder::GetPath(void) const
+	inline const QString & Folder::GetPath(void) const
 	{
 		return m_Path;
 	}
@@ -16,7 +16,7 @@ namespace MediaViewer
 	//!
 	//! Get the folder's name
 	//!
-	const QString & Folder::GetName(void) const
+	inline const QString & Folder::GetName(void) const
 	{
 		return m_Name;
 	}
@@ -24,7 +24,7 @@ namespace MediaViewer
 	//!
 	//! Get the number of medias in this folder
 	//!
-	int Folder::GetMediaCount(void) const
+	inline int Folder::GetMediaCount(void) const
 	{
 		return m_MediaCount;
 	}
@@ -32,7 +32,7 @@ namespace MediaViewer
 	//!
 	//! Get the folder's parent
 	//!
-	const Folder * Folder::GetParent(void) const
+	inline const Folder * Folder::GetParent(void) const
 	{
 		return m_Parent;
 	}
@@ -40,13 +40,13 @@ namespace MediaViewer
 	//!
 	//! Get the children
 	//!
-	const QVector< Folder * > & Folder::GetChildren(void) const
+	inline const QVector< Folder * > & Folder::GetChildren(void) const
 	{
 		this->UpdateChildren();
 		return m_Children;
 	}
 
-} // namespace MediaViewer
+}
 
 
-#endif // __FOLDER_INL__
+#endif

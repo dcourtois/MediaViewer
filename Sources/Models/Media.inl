@@ -1,5 +1,5 @@
-#ifndef __MEDIA_INL__
-#define __MEDIA_INL__
+#ifndef MODELS_MEDIA_INL
+#define MODELS_MEDIA_INL
 
 
 namespace MediaViewer
@@ -8,7 +8,7 @@ namespace MediaViewer
 	//!
 	//! Get the media's path
 	//!
-	const QString & Media::GetPath(void) const
+	inline const QString & Media::GetPath(void) const
 	{
 		return m_Path;
 	}
@@ -16,7 +16,7 @@ namespace MediaViewer
 	//!
 	//! Get the media's name
 	//!
-	const QString & Media::GetName(void) const
+	inline const QString & Media::GetName(void) const
 	{
 		return m_Name;
 	}
@@ -24,7 +24,7 @@ namespace MediaViewer
 	//!
 	//! Get the media's last modification date
 	//!
-	const QDateTime & Media::GetDate(void) const
+	inline const QDateTime & Media::GetDate(void) const
 	{
 		return m_Date;
 	}
@@ -32,7 +32,7 @@ namespace MediaViewer
 	//!
 	//! Get the media's name
 	//!
-	uint64_t Media::GetSize(void) const
+	inline uint64_t Media::GetSize(void) const
 	{
 		return m_Size;
 	}
@@ -40,7 +40,7 @@ namespace MediaViewer
 	//!
 	//! Get the media's type
 	//!
-	Media::Type Media::GetType(void) const
+	inline Media::Type Media::GetType(void) const
 	{
 		return m_Type;
 	}
@@ -48,12 +48,12 @@ namespace MediaViewer
 	//!
 	//! Checks if a file is a supported media
 	//!
-	bool Media::IsMedia(const QString & filename)
+	inline bool Media::IsMedia(const QString & filename)
 	{
 		return GetType(filename) != Type::NotSupported;
 	}
 
-} // namespace MediaViewer
+}
 
 
-#endif // __MEDIA_INL__
+#endif

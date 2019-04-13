@@ -1,5 +1,5 @@
-#ifndef __FOLDER_MODEL_H__
-#define __FOLDER_MODEL_H__
+#ifndef MODELS_FOLDER_MODEL_H
+#define MODELS_FOLDER_MODEL_H
 
 
 namespace MediaViewer
@@ -55,10 +55,10 @@ namespace MediaViewer
 
 	};
 
-} // namespace MediaViewer
+}
 
 
 #include "FolderModel.inl"
 
 
-#endif // __FOLDER_MODEL_H__
+#endif

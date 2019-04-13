@@ -1,5 +1,5 @@
-#ifndef __MEDIA_H__
-#define __MEDIA_H__
+#ifndef MODELS_MEDIA_H
+#define MODELS_MEDIA_H
 
 
 namespace MediaViewer
@@ -85,10 +85,10 @@ namespace MediaViewer
 
 	};
 
-} // namespace MediaViewer
+}
 
 
 #include "Media.inl"
 
 
-#endif // __MEDIA_H__
+#endif

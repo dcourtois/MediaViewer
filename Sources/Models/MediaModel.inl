@@ -1,5 +1,5 @@
-#ifndef __MEDIA_MODEL_INL__
-#define __MEDIA_MODEL_INL__
+#ifndef MODELS_MEDIA_MODEL_INL
+#define MODELS_MEDIA_MODEL_INL
 
 
 namespace MediaViewer
@@ -8,7 +8,7 @@ namespace MediaViewer
 	//!
 	//! Get the current root's path.
 	//!
-	const QString & MediaModel::GetRoot(void) const
+	inline const QString & MediaModel::GetRoot(void) const
 	{
 		return m_Root;
 	}
@@ -16,7 +16,7 @@ namespace MediaViewer
 	//!
 	//! Get the sort type
 	//!
-	MediaModel::SortBy MediaModel::GetSortBy(void) const
+	inline MediaModel::SortBy MediaModel::GetSortBy(void) const
 	{
 		return m_SortBy;
 	}
@@ -24,12 +24,12 @@ namespace MediaViewer
 	//!
 	//! Get the sort direction
 	//!
-	MediaModel::SortOrder MediaModel::GetSortOrder(void) const
+	inline MediaModel::SortOrder MediaModel::GetSortOrder(void) const
 	{
 		return m_SortOrder;
 	}
 
-} // namespace MediaViewer
+}
 
 
-#endif // __MEDIA_MODEL_INL__
+#endif
