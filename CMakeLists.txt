@@ -16,7 +16,7 @@ include (CMakeUtils.cmake)
 #
 # Define options for this project
 #
-cu_option (QT_DIR "D:/Development/Libs/Qt/5.12.2/msvc2017_64/lib/cmake")
+cu_option (QT_DIR "C:/Development/Libs/Qt/5.12.2/msvc2017_64/lib/cmake")
 
 #
 # Configure Qt
@@ -129,6 +129,9 @@ target_link_libraries(MediaViewer
 #
 target_compile_definitions (MediaViewer
 	PUBLIC
+		# Enable memory tracking
+		MEMORY_CHECK=1
+
 		# Platforms
 		$<$<PLATFORM_ID:Windows>:WINDOWS>
 

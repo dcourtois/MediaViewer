@@ -10,7 +10,7 @@ namespace MediaViewer
 	//!
 	class MediaPreviewProvider
 		: public QObject
-		, public QQuickImageProvider
+		, public QQuickAsyncImageProvider
 	{
 
 		Q_OBJECT
@@ -27,8 +27,8 @@ namespace MediaViewer
 
 		MediaPreviewProvider(void);
 
-		// reimplemented from QQuickImageProvider
-		QImage requestImage(const QString & id, QSize * size, const QSize & requestedSize) final;
+		// reimplemented from QQuickAsyncImageProvider
+		QQuickImageResponse *requestImageResponse(const QString &id, const QSize &requestedSize) final;
 
 		// public C++ API
 		bool				GetUseCache(void) const;
@@ -65,10 +65,10 @@ namespace MediaViewer
 	public:
 
 		// Constructor
-		VideoCapture(QEventLoop & loop);
+		VideoCapture(const QString & path, QEventLoop & loop);
 
 		// API
-		void			Capture(void);
+		void			Capture(int retries);
 		const QImage &	GetFrame(void) const;
 
 	protected:
@@ -79,6 +79,9 @@ namespace MediaViewer
 
 	private:
 
+		//! The movie path (for debugging only)
+		QString m_Path;
+
 		//! Reference to the event loop used to wait until the capture's done
 		QEventLoop & m_Loop;
 
@@ -87,6 +90,39 @@ namespace MediaViewer
 
 		//! The captured frame
 		QImage m_Frame;
+
+		//! Number of times to retry capturing
+		int m_Retries;
+
+	};
+
+	//!
+	//! Implementation of QQuickImageResponse used by MediaPreviewProvider
+	//!
+	class ImageResponse
+		: public QQuickImageResponse
+		, public QRunnable
+	{
+
+	public:
+
+		// constructor
+		ImageResponse() {}
+		ImageResponse(std::function< QImage (void) > && callback);
+
+		// reimplemented from QQuickImageResponse
+		QQuickTextureFactory * textureFactory(void) const final;
+
+		// reimplemented from QRunnable
+		void run(void) final;
+
+	private:
+
+		//! The callback to run to get the image
+		std::function< QImage (void) > m_Callback;
+
+		//! The image
+		QImage m_Image;
 
 	};
 

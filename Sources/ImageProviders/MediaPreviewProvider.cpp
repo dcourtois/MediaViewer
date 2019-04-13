@@ -1,15 +1,11 @@
 #include "MediaViewerPCH.h"
 #include "MediaPreviewProvider.h"
 #include "CppUtils/Hash.h"
+#include "Utils/Job.h"
 
 
 namespace MediaViewer
 {
-
-	//! Supported movie extensions
-	static const QVector< QString > movieExtensions = {
-		".mp4"
-	};
 
 	//! Default cache folder
 	inline QString GetDefaultCachePath(void)
@@ -21,8 +17,7 @@ namespace MediaViewer
 	//! Constructor
 	//!
 	MediaPreviewProvider::MediaPreviewProvider(void)
-		: QQuickImageProvider(QQuickImageProvider::Image)
-		, m_UseCache(g_Settings.value("imageProvider.useCache", true).toBool())
+		: m_UseCache(g_Settings.value("imageProvider.useCache", true).toBool())
 		, m_CachePath(g_Settings.value("imageProvider.cachePath", GetDefaultCachePath()).toString())
 	{
 		QDir().mkpath(m_CachePath);
@@ -31,7 +26,7 @@ namespace MediaViewer
 	//!
 	//! Get an image for the given id
 	//!
-	QImage MediaPreviewProvider::requestImage(const QString & id, QSize * size, const QSize & requestedSize)
+	QQuickImageResponse * MediaPreviewProvider::requestImageResponse(const QString & id, const QSize & requestedSize)
 	{
 		// get the requested size
 		int width = requestedSize.width() > 0 ? requestedSize.width() : -1;
@@ -56,93 +51,100 @@ namespace MediaViewer
 			}
 		}
 
-		// ensure the image exists
-		if (QFile::exists(path) == false)
-		{
-			return QImage();
-		}
+		// create the image response
+		auto * response = MT_NEW MediaViewer::ImageResponse([=] (void) -> QImage {
 
-		// get the hash corresponding to this thumbnail
-		uint32_t hash = Hash::Combine(
-			Hash::Jenkins(path.toLocal8Bit().data(), size_t(path.size())),
-			static_cast< unsigned int >(width),
-			static_cast< unsigned int >(height)
-		);
-
-		// get the source file info and a few information
-		const QFileInfo source(path);
-		const QString extension(source.suffix());
-		const QString cacheFolder	= this->GetCacheFolder(hash);
-		const QString cacheName		= cacheFolder + QString("%1").arg(hash);
-		const QString descName		= cacheFolder + ".json";
-
-		// the image
-		QImage image;
-
-		// check if we have a thumbnail already
-		QFile descFile(descName);
-		if (m_UseCache == true && descFile.open(QIODevice::ReadOnly) == true)
-		{
-			const QJsonDocument desc(QJsonDocument::fromJson(descFile.readAll()));
-			const QJsonObject root = desc.object();
-			if (source.size() == root["size"].toInt() &&
-				source.lastModified().toString() == root["date"].toString() &&
-				QFile::exists(root["thumbnail"].toString()))
+			// ensure the image exists
+			if (QFile::exists(path) == false)
 			{
-				image = QImage(root["thumbnail"].toString());
+				return QImage();
 			}
-		}
 
-		// didn't load the image, create it
-		QString thumbnail = cacheName + '.' + extension;
-		if (image.isNull() == true)
-		{
-			image = this->GetImagePreview(path, width, height);
-		}
-		if (image.isNull() == true)
-		{
-			image = this->GetMoviePreview(path, width, height);
-			thumbnail += ".jpg";
-		}
-		if (image.isNull() == true)
-		{
-			return image;
-		}
+			// get the hash corresponding to this thumbnail
+			uint32_t hash = Hash::Combine(
+				Hash::Jenkins(path.toLocal8Bit().data(), size_t(path.size())),
+				static_cast< unsigned int >(width),
+				static_cast< unsigned int >(height)
+			);
 
-		// update the size
-		if (size != nullptr)
-		{
-			*size = image.size();
-		}
+			// get the source file info and a few information
+			const QFileInfo source(path);
+			const QString extension(source.suffix());
+			const QString cacheFolder	= this->GetCacheFolder(hash);
+			const QString cacheName		= cacheFolder + QString("%1").arg(hash);
+			const QString descName		= cacheFolder + ".json";
 
-		// update cache if needed
-		if (m_UseCache == true)
-		{
-			// ensure the folder exists
-			QDir().mkpath(cacheFolder);
-
-			// save the image
-			if (image.save(thumbnail) == true)
+			// check if we have a thumbnail already
+			QFile descFile(descName);
+			if (m_UseCache == true && descFile.open(QIODevice::ReadOnly) == true)
 			{
-				// write description
-				QJsonObject root;
-				root["size"] = source.size();
-				root["date"] = source.lastModified().toString();
-				root["thumbnail"] = thumbnail;
-				QFile desc(descName);
-				if (desc.open(QIODevice::WriteOnly) == true)
+				const QJsonDocument desc(QJsonDocument::fromJson(descFile.readAll()));
+				const QJsonObject root = desc.object();
+				if (source.size() == root["size"].toInt() &&
+					source.lastModified().toString() == root["date"].toString() &&
+					QFile::exists(root["thumbnail"].toString()))
 				{
-					desc.write(QJsonDocument(root).toJson());
+					return QImage(root["thumbnail"].toString());
 				}
 			}
-			else
-			{
-				qDebug("failed writing image preview %s to disk", qPrintable(thumbnail));
-			}
-		}
 
-		// return the image
-		return image;
+			// the image is no in the cache, load it
+			QImage image;
+			QString thumbnail = cacheName + '.' + extension;
+			if (image.isNull() == true)
+			{
+				image = this->GetImagePreview(path, width, height);
+			}
+			if (image.isNull() == true)
+			{
+				image = this->GetMoviePreview(path, width, height);
+				thumbnail += ".jpg";
+			}
+
+			// couldn't load it, stop here
+			if (image.isNull() == true)
+			{
+				return image;
+			}
+
+			// update cache if needed
+			if (m_UseCache == true)
+			{
+				// ensure the folder exists
+				QDir().mkpath(cacheFolder);
+
+				// save the image
+				if (image.save(thumbnail) == true)
+				{
+					// write description
+					QJsonObject root;
+					root["size"] = source.size();
+					root["date"] = source.lastModified().toString();
+					root["thumbnail"] = thumbnail;
+					QFile desc(descName);
+					if (desc.open(QIODevice::WriteOnly) == true)
+					{
+						desc.write(QJsonDocument(root).toJson());
+					}
+					else
+					{
+						qDebug() << "failed writing preview metadata " << descName << " to disk";
+					}
+				}
+				else
+				{
+					qDebug() << "failed writing image preview " << thumbnail << " to disk";
+				}
+			}
+
+			// return the image
+			return image;
+
+		});
+
+		// launch and return
+		QThreadPool::globalInstance()->start(response);
+		return response;
 	}
 
 	//!
@@ -217,38 +219,34 @@ namespace MediaViewer
 	//!
 	QImage MediaPreviewProvider::GetMoviePreview(const QString & path, int width, int height)
 	{
-		Q_UNUSED(path);
-		Q_UNUSED(width);
-		Q_UNUSED(height);
-
-		// create data needed for the video capture
+		// create stuff needed for the video capture
 		QEventLoop loop;
 		QMediaPlayer player;
-		VideoCapture output(loop);
-		bool capture = false;
+		VideoCapture output(path, loop);
 
-		// when metadata is available, set the position to a third of the movie length
-		QObject::connect(&player, &QMediaObject::metaDataAvailableChanged, [&] (bool available) {
-			if (available == true)
+		QObject::connect(&player, &QMediaPlayer::mediaStatusChanged, [&] (QMediaPlayer::MediaStatus status) {
+			if (status == QMediaPlayer::InvalidMedia)
 			{
-				capture = true;
-				player.setPosition(player.metaData("Duration").toInt() / 3);
+				qDebug("%s invalid media", qPrintable(path));
+				loop.quit();
 			}
 		});
 
 		// on error, just stop the loop
 		QObject::connect(&player, static_cast< void (QMediaPlayer::*)(QMediaPlayer::Error) >(&QMediaPlayer::error), [&] (QMediaPlayer::Error error) {
-			qDebug("failed generating preview for %s with error %d", qPrintable(path), error);
+			qDebug() << "failed generating preview for " << path << " with error " <<  error;
 			loop.quit();
 		});
 
 		// when the position changes, enabled capture and start playing
+		bool first = true;
 		QObject::connect(&player, &QMediaPlayer::positionChanged, [&] (qint64 position) {
 			Q_UNUSED(position);
-			if (capture == true)
+			if (first == true)
 			{
-				output.Capture();
+				output.Capture(10);
 				player.play();
+				first = false;
 			}
 		});
 
@@ -265,7 +263,9 @@ namespace MediaViewer
 		player.setVideoOutput(static_cast< QAbstractVideoSurface * >(nullptr));
 
 		// return the captured frame
-		return output.GetFrame().scaled({ width, height }, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
+		return output.GetFrame().isNull() == false ?
+			output.GetFrame().scaled({ width, height }, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation) :
+			output.GetFrame();
 	}
 
 	//!
@@ -355,18 +355,21 @@ namespace MediaViewer
 	//!
 	//! Constructor
 	//!
-	VideoCapture::VideoCapture(QEventLoop & loop)
-		: m_Loop(loop)
+	VideoCapture::VideoCapture(const QString & path, QEventLoop & loop)
+		: m_Path(path)
+		, m_Loop(loop)
 		, m_Capture(false)
+		, m_Retries(0)
 	{
 	}
 
 	//!
 	//! Enable capture for the next presented frame
 	//!
-	void VideoCapture::Capture(void)
+	void VideoCapture::Capture(int retries)
 	{
 		m_Capture = true;
+		m_Retries = retries;
 	}
 
 	//!
@@ -382,26 +385,94 @@ namespace MediaViewer
 	//!
 	bool VideoCapture::present(const QVideoFrame & source)
 	{
-		if (m_Capture == true)
+		if (m_Capture == false)
 		{
-			// map our frame (we need to make a local copy since we receive the frame as an immutable reference)
-			QVideoFrame frame(source);
-			if (frame.map(QAbstractVideoBuffer::MapMode::ReadOnly) == false)
-			{
-				return false;
-			}
-
-			// create the image and copy the pixels
-			m_Frame = QImage(frame.width(), frame.height(), QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat()));
-			memcpy(m_Frame.bits(), frame.bits(), frame.mappedBytes());
-
-			// release the frame
-			frame.unmap();
-
-			// stop the loop
-			m_Loop.quit();
+			return true;
 		}
 
+		// avoid re-capturing
+		--m_Retries;
+		if (m_Retries <= 0)
+		{
+			m_Capture = false;
+		}
+
+		// check the frame
+		if (source.isValid() == false)
+		{
+			qDebug() << m_Path << " - invalid frame - " << this->error();
+			if (m_Capture == false)
+			{
+				m_Loop.quit();
+			}
+			return false;
+		}
+
+		// map our frame (we need to make a local copy since we receive the frame as an immutable reference)
+		QVideoFrame frame(source);
+		if (frame.map(QAbstractVideoBuffer::MapMode::ReadOnly) == false)
+		{
+			qDebug() << m_Path << " - failed mapping frame - " << this->error();
+			if (m_Capture == false)
+			{
+				m_Loop.quit();
+			}
+			return false;
+		}
+
+		if (source.pixelFormat() != QVideoFrame::Format_Invalid)
+		{
+			// setup the image
+			m_Frame = QImage(frame.width(), frame.height(), QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat()));
+
+			// check the size of the source frame and destination capture
+			const int srcBytes = frame.mappedBytes();
+			const int dstBytes = m_Frame.byteCount();
+
+			// depending on those sizes, extracting the frame is done differently
+			if (dstBytes == srcBytes)
+			{
+				// simple case, the image can be copied in one go
+				memcpy(m_Frame.bits(), frame.bits(), srcBytes);
+			}
+			else if (dstBytes < srcBytes)
+			{
+				// more complex case, it seems in some cases there is some padding at the end of each
+				// lines, so we need to copy them one at a time
+				uchar * src = frame.bits();
+				uchar * dst = m_Frame.bits();
+				const int srcBytesPerLine = frame.bytesPerLine();
+				const int dstBytesPerLine = dstBytes / m_Frame.height();
+				for (int i = 0, iend = frame.height(); i < iend; ++i)
+				{
+					memcpy(dst, src, dstBytesPerLine);
+					src += srcBytesPerLine;
+					dst += dstBytesPerLine;
+				}
+			}
+			else
+			{
+				// ok here I don't know what the hell's going on
+				Q_ASSERT(false && "incompatible sizes");
+			}
+		}
+		else
+		{
+			qDebug() << m_Path << " - invalid format - " << source.pixelFormat();
+			if (m_Capture == false)
+			{
+				m_Loop.quit();
+			}
+			return false;
+		}
+
+		// release the frame
+		frame.unmap();
+
+		// stop the loop
+		m_Loop.quit();
+
+		// and done !
 		return true;
 	}
 
@@ -413,8 +484,48 @@ namespace MediaViewer
 		Q_UNUSED(type);
 		return {
 			QVideoFrame::Format_RGB24,
-			QVideoFrame::Format_ARGB32
+			QVideoFrame::Format_RGB32,
+			QVideoFrame::Format_RGB555,
+			QVideoFrame::Format_RGB565,
+			QVideoFrame::Format_BGR24,
+			QVideoFrame::Format_BGR32,
+			QVideoFrame::Format_BGR555,
+			QVideoFrame::Format_BGR565,
+			QVideoFrame::Format_BGRA32,
+			QVideoFrame::Format_BGRA32_Premultiplied,
+			QVideoFrame::Format_BGRA5658_Premultiplied,
+			QVideoFrame::Format_ARGB32,
+			QVideoFrame::Format_ARGB32_Premultiplied,
+			QVideoFrame::Format_ARGB8565_Premultiplied,
+			QVideoFrame::Format_Jpeg
 		};
 	}
 
-} // namespace MediaViewer
+	//!
+	//! Constructor
+	//!
+	ImageResponse::ImageResponse(std::function< QImage (void) > && callback)
+		: m_Callback(callback)
+	{
+		setAutoDelete(false);
+	}
+
+	//!
+	//! Create the response object
+	//!
+	QQuickTextureFactory * ImageResponse::textureFactory(void) const
+	{
+		return QQuickTextureFactory::textureFactoryForImage(m_Image);
+	}
+
+	//!
+	//! Run the job
+	//!
+	void ImageResponse::run(void)
+	{
+		m_Image = m_Callback();
+		emit finished();
+	}
+
+
+}
