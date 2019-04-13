@@ -97,7 +97,7 @@ namespace MediaViewer
 	};
 
 
-} // namespace MediaViewer
+}
 
 
-#endif // IMAGE_PROVIDERS_MEDIA_PREVIEW_PROVIDER_H
+#endif

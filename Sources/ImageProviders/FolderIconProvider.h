@@ -1,5 +1,5 @@
-#ifndef __FOLDER_ICON_PROVIDER_H__
-#define __FOLDER_ICON_PROVIDER_H__
+#ifndef IMAGE_PROVIDERS_FOLDER_ICON_PROVIDER_H
+#define IMAGE_PROVIDERS_FOLDER_ICON_PROVIDER_H
 
 
 namespace MediaViewer
@@ -29,7 +29,7 @@ namespace MediaViewer
 
 	};
 
-} // namespace MediaViewer
+}
 
 
-#endif // __FOLDER_ICON_PROVIDER_H__
+#endif
