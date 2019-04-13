@@ -1,3 +1,6 @@
 [submodule "Libs/CppUtils"]
 	path = Libs/CppUtils
 	url = https://github.com/dcourtois/CppUtils.git
+[submodule "Libs/QtUtils"]
+	path = Libs/QtUtils
+	url = https://github.com/dcourtois/QtUtils.git
