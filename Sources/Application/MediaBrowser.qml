@@ -93,6 +93,23 @@ Rectangle {
 						source: "image://MediaPreview/" + path + "?" + width + "&" + height
 						asynchronous: true
 						fillMode: Image.PreserveAspectFit
+
+						// animation overlay if the media can be played
+						Loader {
+							active: image.status === Image.Ready && type !== Media.Image
+
+							anchors.centerIn: parent
+							width: grid.cellWidth / 2
+							height: grid.cellHeight / 2
+
+							sourceComponent: Image {
+								source: "qrc:/Icons/Play"
+								sourceSize.width: grid.cellWidth / 2
+								sourceSize.height: grid.cellHeight / 2
+								fillMode: Image.PreserveAspectFit
+								opacity: 0.5
+							}
+						}
 					}
 
 					// the label
