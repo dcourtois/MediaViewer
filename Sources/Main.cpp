@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 	MT_DELETE settings;
 	MT_DELETE cursor;
 	MT_DELETE fileSystem;
-	MT_SHUTDOWN(printf);
+	MT_SHUTDOWN(qDebug);
 
 	return code;
 }
