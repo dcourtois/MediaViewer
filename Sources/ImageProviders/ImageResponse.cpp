@@ -1,5 +1,6 @@
 #include "MediaViewerPCH.h"
 #include "ImageResponse.h"
+#include "MediaPreviewProvider.h"
 
 
 namespace MediaViewer
@@ -8,25 +9,17 @@ namespace MediaViewer
 	//!
 	//! Constructor
 	//!
-	ImageResponse::ImageResponse(void)
+	ImageResponse::ImageResponse(RunCallbackType && run,  QThreadPool * pool)
+		: m_Run(run)
+		, m_Cancel(false)
 	{
-	}
-
-	//!
-	//! Constructor
-	//!
-	ImageResponse::ImageResponse(std::function< QImage (void) > && callback, bool start)
-		: m_Callback(callback)
-	{
-		// image responses are deleted once the image has been used. And since thread pools
-		// auto-delete runnables by default, we need to disable this.
+		// thread pool automatically delete jobs when done, but this is also an image response which
+		// is deleted when the image has been generated, so we need to disable the automatic deletion
+		// by the thread pool to avoid deleting this twice
 		setAutoDelete(false);
 
-		// start if required
-		if (start == true)
-		{
-			QThreadPool::globalInstance()->start(this);
-		}
+		// auto-start
+		pool->start(this);
 	}
 
 	//!
@@ -38,11 +31,19 @@ namespace MediaViewer
 	}
 
 	//!
+	//! Cancel is required
+	//!
+	void ImageResponse::cancel(void)
+	{
+		m_Cancel = true;
+	}
+
+	//!
 	//! Run the job
 	//!
 	void ImageResponse::run(void)
 	{
-		m_Image = m_Callback();
+		m_Image = m_Run(m_Cancel);
 		emit finished();
 	}
 

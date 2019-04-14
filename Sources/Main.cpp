@@ -15,9 +15,9 @@
 
 // those are exposed to QML through QQmlContext::setContextProperty, which
 // does not take ownership, so we'll need to delete them we leaving the app.
-static Settings *	settings	= nullptr;
-static Cursor *		cursor		= nullptr;
-static FileSystem *	fileSystem	= nullptr;
+static Settings *		settings		= nullptr;
+static Cursor *			cursor			= nullptr;
+static FileSystem *		fileSystem		= nullptr;
 
 //!
 //! Set the application engine with our main QML file
@@ -132,30 +132,31 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 //!
 int main(int argc, char *argv[])
 {
-	int code = -1;
-	{
-		// create the application
-		QApplication app(argc, argv);
-		app.setOrganizationName(ORGANIZATION_NAME);
-		app.setOrganizationDomain(ORGANIZATION_DOMAIN);
-		app.setApplicationName(APPLICATION_NAME);
-		app.setApplicationVersion(APPLICATION_VERSION);
+	// create the application
+	QApplication *app = MT_NEW QApplication(argc, argv);
+	app->setOrganizationName(ORGANIZATION_NAME);
+	app->setOrganizationDomain(ORGANIZATION_DOMAIN);
+	app->setApplicationName(APPLICATION_NAME);
+	app->setApplicationVersion(APPLICATION_VERSION);
 
-		// set style
-		QQuickStyle::setStyle("Material");
+	// set style
+	QQuickStyle::setStyle("Material");
 
-		// create and setup application engine
-		QQmlApplicationEngine engine;
-		Setup(app, engine);
+	// create and setup application engine
+	QQmlApplicationEngine * engine = MT_NEW QQmlApplicationEngine();
+	Setup(*app, *engine);
 
-		// run the application
-		code = app.exec();
-	}
+	// run the application
+	int code = app->exec();
 
-	// cleanup
+	// cleanup (order is important)
 	MT_DELETE settings;
 	MT_DELETE cursor;
 	MT_DELETE fileSystem;
+	MT_DELETE engine;
+	MT_DELETE app;
+
+	// log memory leaks
 	MT_SHUTDOWN(qDebug);
 
 	return code;

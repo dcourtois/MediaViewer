@@ -63,6 +63,7 @@
 // STL
 
 #include <algorithm>
+#include <atomic>
 #include <cctype>
 #include <functional>
 

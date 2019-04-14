@@ -18,14 +18,21 @@ namespace MediaViewer
 	//!
 	QQuickImageResponse * FolderIconProvider::requestImageResponse(const QString & id, const QSize & requestedSize)
 	{
-		return MT_NEW MediaViewer::ImageResponse([=] (void) -> QImage {
+		return MT_NEW MediaViewer::ImageResponse([=] (std::atomic_bool & cancel) -> QImage {
 			// set the size
 			int width = requestedSize.width() > 0 ? requestedSize.width() : 16;
 			int height = requestedSize.height() > 0 ? requestedSize.height() : 16;
 
 			// return the pixmap
-			QMutexLocker lock(&m_Mutex);
-			return m_IconProvider.icon(QFileInfo(id)).pixmap(width, height).toImage();
+			if (cancel == false)
+			{
+				QMutexLocker lock(&m_Mutex);
+				return m_IconProvider.icon(QFileInfo(id)).pixmap(width, height).toImage();
+			}
+			else
+			{
+				return QImage();
+			}
 		});
 	}
 

@@ -39,6 +39,7 @@ Rectangle {
 					break;
 
 				case "Media.ThumbnailSize":
+					mediaProvider.cancelPending();
 					root._thumbnailSize = value;
 					break;
 

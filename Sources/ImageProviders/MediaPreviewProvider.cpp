@@ -14,8 +14,20 @@ namespace MediaViewer
 	MediaPreviewProvider::MediaPreviewProvider(void)
 		: m_UseCache(Settings::Get< bool >("MediaPreviewProvider.UseCache"))
 		, m_CachePath(Settings::Get< QString >("MediaPreviewProvider.CachePath"))
+		, m_CancelTime(QTime::currentTime())
 	{
 		QDir().mkpath(m_CachePath);
+	}
+
+	//!
+	//! Destructor
+	//!
+	MediaPreviewProvider::~MediaPreviewProvider(void)
+	{
+		// ensure all tasks are correctly closed before continuing
+		this->cancelPending();
+		m_Pool.clear();
+		m_Pool.waitForDone();
 	}
 
 	//!
@@ -55,7 +67,13 @@ namespace MediaViewer
 		}
 
 		// create the image response
-		return MT_NEW MediaViewer::ImageResponse([=] (void) -> QImage {
+		return MT_NEW MediaViewer::ImageResponse([=] (std::atomic_bool & cancel) -> QImage {
+
+			// avoid wasting time
+			if (QTime::currentTime() < m_CancelTime)
+			{
+				return QImage();
+			}
 
 			// ensure the image exists
 			if (QFile::exists(path) == false)
@@ -94,13 +112,13 @@ namespace MediaViewer
 			// the image is no in the cache, load it
 			QImage image;
 			QString thumbnail = cacheName + '.' + extension;
-			if (image.isNull() == true)
+			if (cancel == false && image.isNull() == true)
 			{
-				image = this->GetImagePreview(path, width, height);
+				image = this->GetImagePreview(path, width, height, cancel);
 			}
-			if (image.isNull() == true)
+			if (cancel == false && image.isNull() == true)
 			{
-				image = this->GetMoviePreview(path, width, height);
+				image = this->GetMoviePreview(path, width, height, cancel);
 				thumbnail += ".jpg";
 			}
 
@@ -111,7 +129,7 @@ namespace MediaViewer
 			}
 
 			// update cache if needed
-			if (m_UseCache == true)
+			if (cancel == false && m_UseCache == true)
 			{
 				// ensure the folder exists
 				QDir().mkpath(cacheFolder);
@@ -143,7 +161,7 @@ namespace MediaViewer
 			// return the image
 			return image;
 
-		});
+		}, &m_Pool);
 	}
 
 	//!
@@ -171,14 +189,14 @@ namespace MediaViewer
 	//!
 	//! Try to get a preview for a static image
 	//!
-	QImage MediaPreviewProvider::GetImagePreview(const QString & path, int width, int height)
+	QImage MediaPreviewProvider::GetImagePreview(const QString & path, int width, int height, std::atomic_bool & cancel)
 	{
 		// check if we can read the image
 		QImageReader imageReader;
 		imageReader.setAutoDetectImageFormat(true);
 		imageReader.setAutoTransform(true);
 		imageReader.setFileName(path);
-		if (imageReader.canRead() == false)
+		if (cancel == true || imageReader.canRead() == false)
 		{
 			return QImage();
 		}
@@ -210,18 +228,18 @@ namespace MediaViewer
 		}
 
 		// return the preview
-		return imageReader.read();
+		return cancel == false ? imageReader.read() : QImage();
 	}
 
 	//!
 	//! Try to get a preview for a movie
 	//!
-	QImage MediaPreviewProvider::GetMoviePreview(const QString & path, int width, int height)
+	QImage MediaPreviewProvider::GetMoviePreview(const QString & path, int width, int height, std::atomic_bool & cancel)
 	{
 		// create stuff needed for the video capture
 		QEventLoop loop;
 		QMediaPlayer * player = MT_NEW QMediaPlayer();
-		VideoCapture * output = MT_NEW VideoCapture(path, loop);
+		VideoCapture * output = MT_NEW VideoCapture(path, loop, cancel);
 
 		// check for invalid media errors
 		QObject::connect(player, &QMediaPlayer::mediaStatusChanged, [&] (QMediaPlayer::MediaStatus status) {
@@ -242,6 +260,10 @@ namespace MediaViewer
 		bool first = true;
 		QObject::connect(player, &QMediaPlayer::positionChanged, [&] (qint64 position) {
 			Q_UNUSED(position);
+			if (cancel == true)
+			{
+				loop.quit();
+			}
 			if (first == true)
 			{
 				output->Capture(10);
@@ -251,9 +273,12 @@ namespace MediaViewer
 		});
 
 		// setup the player
-		player->setVideoOutput(output);
-		player->setMuted(true);
-		player->setMedia(QUrl::fromLocalFile(path));
+		if (cancel == false)
+		{
+			player->setVideoOutput(output);
+			player->setMuted(true);
+			player->setMedia(QUrl::fromLocalFile(path));
+		}
 
 		// wait for the capture
 		loop.exec();
@@ -262,7 +287,7 @@ namespace MediaViewer
 		player->stop();
 
 		// get the captured frame
-		QImage result = output->GetFrame().isNull() == false ?
+		QImage result = cancel == false && output->GetFrame().isNull() == false ?
 			output->GetFrame().scaled({ width, height }, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation) :
 			output->GetFrame();
 
@@ -357,13 +382,22 @@ namespace MediaViewer
 		}
 	}
 
+	//!
+	//! Call this when you know all the preview are going to be re-created (typically when changing the thumbnail size)
+	//!
+	void MediaPreviewProvider::cancelPending(void)
+	{
+		m_CancelTime = QTime::currentTime();
+	}
+
 
 	//!
 	//! Constructor
 	//!
-	VideoCapture::VideoCapture(const QString & path, QEventLoop & loop)
+	VideoCapture::VideoCapture(const QString & path, QEventLoop & loop, std::atomic_bool & cancel)
 		: m_Path(path)
 		, m_Loop(loop)
+		, m_Cancel(cancel)
 		, m_Capture(false)
 		, m_Retries(0)
 	{
@@ -397,8 +431,7 @@ namespace MediaViewer
 		}
 
 		// avoid re-capturing
-		--m_Retries;
-		if (m_Retries <= 0)
+		if (m_Retries.fetch_sub(1) <= 0)
 		{
 			m_Capture = false;
 		}
@@ -414,6 +447,13 @@ namespace MediaViewer
 			return false;
 		}
 
+		// check cancellation
+		if (m_Cancel == true)
+		{
+			m_Loop.quit();
+			return false;
+		}
+
 		// map our frame (we need to make a local copy since we receive the frame as an immutable reference)
 		QVideoFrame frame(source);
 		if (frame.map(QAbstractVideoBuffer::MapMode::ReadOnly) == false)
@@ -426,31 +466,56 @@ namespace MediaViewer
 			return false;
 		}
 
+		// check cancellation
+		if (m_Cancel == true)
+		{
+			frame.unmap();
+			m_Loop.quit();
+			return false;
+		}
+
 		if (source.pixelFormat() != QVideoFrame::Format_Invalid)
 		{
 			// setup the image
-			m_Frame = QImage(frame.width(), frame.height(), QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat()));
+			QImage capturedFrame(frame.width(), frame.height(), QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat()));
 
 			// check the size of the source frame and destination capture
 			const int srcBytes = frame.mappedBytes();
-			const int dstBytes = m_Frame.byteCount();
+			const int dstBytes = capturedFrame.byteCount();
+
+			// check cancellation
+			if (m_Cancel == true)
+			{
+				frame.unmap();
+				m_Loop.quit();
+				return false;
+			}
 
 			// depending on those sizes, extracting the frame is done differently
 			if (dstBytes == srcBytes)
 			{
 				// simple case, the image can be copied in one go
-				memcpy(m_Frame.bits(), frame.bits(), srcBytes);
+				memcpy(capturedFrame.bits(), frame.bits(), srcBytes);
 			}
 			else if (dstBytes < srcBytes)
 			{
 				// more complex case, it seems in some cases there is some padding at the end of each
 				// lines, so we need to copy them one at a time
 				uchar * src = frame.bits();
-				uchar * dst = m_Frame.bits();
+				uchar * dst = capturedFrame.bits();
 				const int srcBytesPerLine = frame.bytesPerLine();
-				const int dstBytesPerLine = dstBytes / m_Frame.height();
+				const int dstBytesPerLine = dstBytes / capturedFrame.height();
 				for (int i = 0, iend = frame.height(); i < iend; ++i)
 				{
+
+					// check cancellation
+					if (m_Cancel == true)
+					{
+						frame.unmap();
+						m_Loop.quit();
+						return false;
+					}
+
 					memcpy(dst, src, dstBytesPerLine);
 					src += srcBytesPerLine;
 					dst += dstBytesPerLine;
@@ -461,6 +526,9 @@ namespace MediaViewer
 				// ok here I don't know what the hell's going on
 				Q_ASSERT(false && "incompatible sizes");
 			}
+
+			// store the captured frame
+			m_Frame = capturedFrame;
 		}
 		else
 		{

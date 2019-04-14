@@ -26,6 +26,7 @@ namespace MediaViewer
 	public:
 
 		MediaPreviewProvider(void);
+		~MediaPreviewProvider(void);
 
 		// reimplemented from QQuickAsyncImageProvider
 		QQuickImageResponse *requestImageResponse(const QString &id, const QSize &requestedSize) final;
@@ -39,19 +40,27 @@ namespace MediaViewer
 
 		// public QML API
 		Q_INVOKABLE void	clearCache(void) const;
+		Q_INVOKABLE void	cancelPending(void);
 
 	private:
 
 		// private API
 		QString	GetCacheFolder(uint32_t hash) const;
-		QImage	GetImagePreview(const QString & path, int width, int height);
-		QImage	GetMoviePreview(const QString & path, int width, int height);
+		QImage	GetImagePreview(const QString & path, int width, int height, std::atomic_bool & cancel);
+		QImage	GetMoviePreview(const QString & path, int width, int height, std::atomic_bool & cancel);
 
 		//! true if we should cache the thumbnails, false otherwise
 		bool m_UseCache;
 
 		//! path to the thumbnail cache
 		QString m_CachePath;
+
+		//! pool used to handle the image responses
+		QThreadPool m_Pool;
+
+		//! time of the last call to cancelPending
+		QTime m_CancelTime;
+
 
 	};
 
@@ -66,7 +75,7 @@ namespace MediaViewer
 	public:
 
 		// Constructor
-		VideoCapture(const QString & path, QEventLoop & loop);
+		VideoCapture(const QString & path, QEventLoop & loop, std::atomic_bool & cancel);
 
 		// API
 		void			Capture(int retries);
@@ -83,17 +92,20 @@ namespace MediaViewer
 		//! The movie path (for debugging only)
 		QString m_Path;
 
-		//! Reference to the event loop used to wait until the capture's done
+		//! Used to stop the capture in case of errors
 		QEventLoop & m_Loop;
 
+		//! Used to cancel the capture
+		std::atomic_bool & m_Cancel;
+
 		//! When true, the next presented frame will be captured
-		bool m_Capture;
+		std::atomic_bool m_Capture;
+
+		//! Number of times to retry capturing
+		std::atomic_int m_Retries;
 
 		//! The captured frame
 		QImage m_Frame;
-
-		//! Number of times to retry capturing
-		int m_Retries;
 
 	};
 
