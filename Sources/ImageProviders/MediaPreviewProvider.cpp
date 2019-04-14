@@ -267,9 +267,8 @@ namespace MediaViewer
 			output->GetFrame();
 
 		// cleanup
-		player->setVideoOutput(static_cast< QAbstractVideoSurface * >(nullptr));
-		MT_DELETE output;
 		MT_DELETE player;
+		MT_DELETE output;
 
 		// done
 		return result;
