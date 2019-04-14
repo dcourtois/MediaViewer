@@ -88,6 +88,9 @@ add_executable (MediaViewer WIN32
 
 	# QtUtils that need moc
 	Libs/QtUtils/Settings.h
+
+	# RC file on Windows
+	$<$<PLATFORM_ID:Windows>:Resources/MediaViewer.rc>
 )
 
 #
