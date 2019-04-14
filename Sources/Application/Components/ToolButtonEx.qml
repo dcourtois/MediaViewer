@@ -10,7 +10,7 @@ ToolButton {
 
 	// automatically size the icon
 	icon.height: root.height / 2
-	icon.width: icon.height
+	icon.width: root.height / 2
 
 	// source points to the icon's source
 	property alias source: root.icon.source
