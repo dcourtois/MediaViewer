@@ -84,7 +84,7 @@ Rectangle {
 		RowLayout {
 			spacing: 10
 
-			// to center
+			// spacer
 			Item {
 				Layout.fillWidth: true
 			}
@@ -116,7 +116,6 @@ Rectangle {
 
 			// loop
 			Image {
-				id: loop
 				sourceSize { width: 40; height: 40 }
 				source: "qrc:/Icons/Loop"
 				opacity: player.loops === 1 ? 0.2 : 1
@@ -127,9 +126,20 @@ Rectangle {
 				}
 			}
 
-			// to center
+			// spacer
 			Item {
 				Layout.fillWidth: true
+			}
+
+			// sound
+			Image {
+				sourceSize { width: 40; height: 40 }
+				source: player.muted ? "qrc:/Icons/Mute" :  "qrc:/Icons/Sound"
+				MouseArea {
+					anchors.fill: parent
+					acceptedButtons: Qt.LeftButton
+					onClicked: player.muted = !player.muted
+				}
 			}
 
 		}
@@ -153,10 +163,6 @@ Rectangle {
 				ProgressBar {
 					id: seekBar
 					anchors.fill: parent
-
-					background.height: 10
-					contentItem.height: 10
-
 					from: 0
 					value: player.position
 					to: player.duration
