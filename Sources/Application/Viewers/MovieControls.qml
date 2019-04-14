@@ -49,6 +49,13 @@ Rectangle {
 	opacity: enabled ? 1 : 0
 	Behavior on opacity { NumberAnimation { duration: 150 } }
 
+	// handle the cursor
+	onEnabledChanged: {
+		if (stateManager.state === "fullscreen") {
+			cursor.hidden = enabled === false;
+		}
+	}
+
 	// set the movie at the given position
 	function setPosition(position) {
 		player.seek(position);

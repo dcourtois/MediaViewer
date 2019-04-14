@@ -31,6 +31,9 @@ Item {
 
 			// restore focus
 			mediaBrowser.forceFocus();
+
+			// force cursor
+			cursor.hidden = false;
 		} else {
 			// toggle fullscreen
 			mainWindow.setFullScreen(mediaViewer);
