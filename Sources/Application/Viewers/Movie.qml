@@ -1,7 +1,7 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3
-import QtMultimedia 5.8
+import QtMultimedia 5.12
 
 
 //
@@ -10,11 +10,15 @@ import QtMultimedia 5.8
 Item {
 	id: root
 
-	// expose the source (like ImageViewer and AnimatedImageViewer)
+	// expose the source
 	property alias source: player.source
 
 	// acquire focus for movie specific shortcuts
 	focus: true
+
+	// show the controls when needed
+	Connections { target: stateManager; onStateChanged: controls.show() }
+	Connections { target: selection; onCurrentChanged: controls.show() }
 
 	// the media player
 	VideoOutput {
@@ -26,14 +30,16 @@ Item {
 		function resize() {
 			if (player.metaData && player.metaData.resolution) {
 				const size = player.metaData.resolution;
-				if (size.width >= root.width || size.height >= root.height) {
+				if (size.width >= root.width || size.height >= root.height && anchors.centerIn !== undefined) {
 					anchors.centerIn = undefined;
 					anchors.fill = root;
 				} else {
-					anchors.fill = undefined;
+					if (anchors.fill !== undefined) {
+						anchors.centerIn = root;
+						anchors.fill = undefined;
+					}
 					width = size.width;
 					height = size.height;
-					anchors.centerIn = root;
 				}
 			}
 		}
@@ -44,6 +50,7 @@ Item {
 		id: player
 		autoPlay: false
 		muted: true
+		notifyInterval: 2
 
 		// update the sizing when ready to play
 		onStatusChanged: {
@@ -69,6 +76,7 @@ Item {
 		target: root
 		onWidthChanged: { output.resize(); controls.setPosition(player.position); }
 		onHeightChanged: { output.resize(); controls.setPosition(player.position); }
+
 	}
 
 	// movie controls

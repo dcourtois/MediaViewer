@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
+import QtQuick.Controls.Material 2.12
 import QtMultimedia 5.8
 
 
@@ -24,8 +25,8 @@ Rectangle {
 
 	// show the controls
 	function show() {
-		timer.restart();
 		shouldHide = false;
+		timer.restart();
 	}
 
 	// hide the controls
@@ -132,14 +133,60 @@ Rectangle {
 			}
 
 			// sound
-			Image {
-				sourceSize { width: 40; height: 40 }
-				source: player.muted ? "qrc:/Icons/Mute" :  "qrc:/Icons/Sound"
-				MouseArea {
-					anchors.fill: parent
-					acceptedButtons: Qt.LeftButton
-					onClicked: player.muted = !player.muted
+			Item {
+				width: 40
+				height: 40
+
+//				MouseArea {
+//					anchors.fill: parent
+//					hoverEnabled: true
+//					propagateComposedEvents: true
+//					acceptedButtons: Qt.LeftButton
+//					onEntered: if (player.muted === false) { volume.enabled = true }
+//					onClicked: { mouse.accepted = true; player.muted = !player.muted; }
+//				}
+
+//				Rectangle {
+//					id: volume
+//					anchors.bottom: parent.bottom
+//					anchors.left: parent.left
+//					anchors.right: parent.right
+//					height: 150
+//
+//					color: Qt.rgba(0, 0, 0, 0.6)
+//					border.width: 1
+//					border.color: Qt.rgba(1, 1, 1, 0.6)
+//
+//					enabled: true
+//					visible: enabled
+//
+//					Slider {
+//						anchors.fill: parent
+//						anchors.bottomMargin: 40
+//
+//						orientation: Qt.Vertical
+//						focusPolicy: Qt.NoFocus
+//						to: 0
+//						value: player.volume
+//						onValueChanged: player.volume = value
+//						from: 1
+//					}
+//				}
+
+	//					MouseArea {
+	//						anchors.fill: parent
+	//						hoverEnabled: true
+	//						propagateComposedEvents: true
+	//						onExited: volume.enabled = false
+	//					}
+
+
+				Image {
+					sourceSize { width: 40; height: 40 }
+					//opacity: player.muted ? 0.2 : 1
+					source: player.muted ? "qrc:/Icons/Mute" :  "qrc:/Icons/Sound"
 				}
+
 			}
 
 		}
@@ -160,18 +207,31 @@ Rectangle {
 				Layout.fillWidth: true
 				height: 30
 
-				ProgressBar {
-					id: seekBar
+				Rectangle {
 					anchors.fill: parent
-					from: 0
-					value: player.position
-					to: player.duration
+					anchors.margins: 12
+					color: Qt.rgba(Material.accent.r, Material.accent.g, Material.accent.b, 0.4);
+				}
+
+				Rectangle {
+					anchors.top: parent.top
+					anchors.left: parent.left
+					anchors.bottom: parent.bottom
+					anchors.margins: 10
+					color: Material.accent
+					width: parent.width * (player.position / player.duration)
 				}
 
 				MouseArea {
 					anchors.fill: parent
-					onClicked: root.setPosition(player.duration * Math.min(player.duration, Math.max(0, (mouse.x / width))))
-					onPositionChanged: root.setPosition(player.duration * Math.min(player.duration, Math.max(0, (mouse.x / width))))
+					acceptedButtons: Qt.LeftButton
+					propagateComposedEvents: true
+					function update(mouse) {
+						mouse.accepted = true;
+						root.setPosition(player.duration * Math.min(player.duration, Math.max(0, (mouse.x / width))));
+					}
+					onClicked: update(mouse)
+					onPositionChanged: update(mouse)
 				}
 			}
 
