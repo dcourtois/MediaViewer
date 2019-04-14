@@ -220,10 +220,11 @@ namespace MediaViewer
 	{
 		// create stuff needed for the video capture
 		QEventLoop loop;
-		QMediaPlayer player;
-		VideoCapture output(path, loop);
+		QMediaPlayer * player = MT_NEW QMediaPlayer();
+		VideoCapture * output = MT_NEW VideoCapture(path, loop);
 
-		QObject::connect(&player, &QMediaPlayer::mediaStatusChanged, [&] (QMediaPlayer::MediaStatus status) {
+		// check for invalid media errors
+		QObject::connect(player, &QMediaPlayer::mediaStatusChanged, [&] (QMediaPlayer::MediaStatus status) {
 			if (status == QMediaPlayer::InvalidMedia)
 			{
 				qDebug("%s invalid media", qPrintable(path));
@@ -232,39 +233,46 @@ namespace MediaViewer
 		});
 
 		// on error, just stop the loop
-		QObject::connect(&player, static_cast< void (QMediaPlayer::*)(QMediaPlayer::Error) >(&QMediaPlayer::error), [&] (QMediaPlayer::Error error) {
+		QObject::connect(player, static_cast< void (QMediaPlayer::*)(QMediaPlayer::Error) >(&QMediaPlayer::error), [&] (QMediaPlayer::Error error) {
 			qDebug() << "failed generating preview for " << path << " with error " <<  error;
 			loop.quit();
 		});
 
 		// when the position changes, enabled capture and start playing
 		bool first = true;
-		QObject::connect(&player, &QMediaPlayer::positionChanged, [&] (qint64 position) {
+		QObject::connect(player, &QMediaPlayer::positionChanged, [&] (qint64 position) {
 			Q_UNUSED(position);
 			if (first == true)
 			{
-				output.Capture(10);
-				player.play();
+				output->Capture(10);
+				player->play();
 				first = false;
 			}
 		});
 
 		// setup the player
-		player.setVideoOutput(&output);
-		player.setMuted(true);
-		player.setMedia(QUrl::fromLocalFile(path));
+		player->setVideoOutput(output);
+		player->setMuted(true);
+		player->setMedia(QUrl::fromLocalFile(path));
 
 		// wait for the capture
 		loop.exec();
 
 		// cleanup
-		player.stop();
-		player.setVideoOutput(static_cast< QAbstractVideoSurface * >(nullptr));
+		player->stop();
 
-		// return the captured frame
-		return output.GetFrame().isNull() == false ?
-			output.GetFrame().scaled({ width, height }, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation) :
-			output.GetFrame();
+		// get the captured frame
+		QImage result = output->GetFrame().isNull() == false ?
+			output->GetFrame().scaled({ width, height }, Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation) :
+			output->GetFrame();
+
+		// cleanup
+		player->setVideoOutput(static_cast< QAbstractVideoSurface * >(nullptr));
+		MT_DELETE output;
+		MT_DELETE player;
+
+		// done
+		return result;
 	}
 
 	//!
