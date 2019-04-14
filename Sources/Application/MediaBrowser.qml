@@ -23,6 +23,7 @@ Rectangle {
 	property color _highlight: Material.color(Material.LightBlue, Material.Shade300)
 	property color _background: root.color
 	property int _thumbnailSize: settings.get("Media.ThumbnailSize")
+	property bool _showLabel: settings.get("Media.ShowLabel")
 
 	// bind settings
 	Connections {
@@ -39,6 +40,10 @@ Rectangle {
 
 				case "Media.ThumbnailSize":
 					root._thumbnailSize = value;
+					break;
+
+				case "Media.ShowLabel":
+					root._showLabel = value;
 					break;
 			}
 		}
@@ -127,7 +132,7 @@ Rectangle {
 					// the label
 					Loader {
 						id: label
-						active: settings.get("Media.ShowLabel", true)
+						active: root._showLabel
 
 						// position in the thumbnail
 						width: parent.width - 20
