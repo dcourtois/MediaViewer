@@ -30,6 +30,7 @@
 		<file>Viewers/AnimatedImage.qml</file>
 		<file>Viewers/Image.qml</file>
 		<file>Viewers/Movie.qml</file>
+		<file>Viewers/MovieControls.qml</file>
 
 		<!-- Tools -->
 		<file>Preferences.qml</file>
