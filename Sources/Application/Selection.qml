@@ -49,6 +49,7 @@ Item {
 	// add to the selection
 	function select(index) {
 		current = convertIndex(index);
+		currentChanged(current);
 		selection.push(current);
 		selectionChanged(selection);
 	}
@@ -66,7 +67,7 @@ Item {
 	function unselect(index) {
 		// compute the index in the current selection
 		index = convertIndex(index);
-		var i = indexOf(index);
+		const i = indexOf(index);
 		if (i !== -1) {
 			// update the current
 			if (i > 0) {
@@ -76,6 +77,7 @@ Item {
 			} else {
 				current = { valid: false };
 			}
+			currentChanged(current);
 
 			// remove from the selection
 			selection.splice(i, 1);
@@ -87,7 +89,9 @@ Item {
 	function setCurrent(index) {
 		index = convertIndex(index);
 		selection = [ index ];
+		selectionChanged(selection);
 		current = index;
+		currentChanged(current);
 	}
 
 	// check if we have a selection
@@ -98,7 +102,7 @@ Item {
 	// select everything
 	function selectAll() {
 		selection.length = 0;
-		var index = { valid: false },
+		let index = { valid: false },
 			newIndex = convertIndex(0);
 		while (newIndex.valid === true && index !== newIndex) {
 			selection.push(newIndex);
@@ -106,14 +110,15 @@ Item {
 			newIndex = model.getNextModelIndex(index);
 		}
 		current = selection.length !== 0 ? selection[0] : { valid: false };
-		selectionChanged();
+		currentChanged(current);
+		selectionChanged(selection);
 	}
 
 	// inverse selection
 	function selectInverse() {
-		var index = { valid: false },
-			newIndex = convertIndex(0),
-			newSelection = [];
+		let index = { valid: false },
+			newIndex = convertIndex(0);
+		const newSelection = [];
 		while (newIndex.valid === true && index !== newIndex) {
 			if (indexOf(newIndex) === -1) {
 				newSelection.push(newIndex);
@@ -122,7 +127,9 @@ Item {
 			newIndex = model.getNextModelIndex(index);
 		}
 		current = newSelection.length !== 0 ? newSelection[0] : { valid: false };
+		currentChanged(current);
 		selection = newSelection;
+		selectionChanged(selection);
 	}
 
 	// extend the selection
@@ -132,7 +139,7 @@ Item {
 
 		// get the start and end indices
 		index = convertIndex(index);
-		var start = current.valid ? current.row : 0,
+		let start = current.valid ? current.row : 0,
 			end = index.row;
 		if (start > end) {
 			end = start;
@@ -140,7 +147,7 @@ Item {
 		}
 
 		// add items
-		for (var i = start; i <= end; ++i) {
+		for (let i = start; i <= end; ++i) {
 			selection.push(convertIndex(i));
 		}
 
@@ -151,7 +158,9 @@ Item {
 	// clear the selection
 	function clear() {
 		selection = [];
+		selectionChanged(selection);
 		current = { valid: false };
+		currentChanged(current);
 	}
 
 	// convert a numerical index (row) into a model index
@@ -161,7 +170,7 @@ Item {
 
 	// get the index of an index in the selection
 	function indexOf(index) {
-		for (var i = 0; i < selection.length; ++i) {
+		for (let i = 0; i < selection.length; ++i) {
 			if (index.row === selection[i].row) {
 				return i;
 			}
@@ -171,8 +180,8 @@ Item {
 
 	// return a list of selected paths
 	function getSelectedPaths() {
-		var paths = [];
-		for (var i = 0; i < selection.length; ++i) {
+		const paths = [];
+		for (let i = 0; i < selection.length; ++i) {
 			paths.push(model.getMedia(selection[i]).path);
 		}
 		return paths;
