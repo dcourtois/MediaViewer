@@ -162,15 +162,13 @@ Dialog {
 				Slider {
 					id: thumbnailSize
 					Layout.minimumWidth: 150
-					from: 10
+					from: 100
 					to: 300
 					value: settings.get("Media.ThumbnailSize")
 					onValueChanged: settings.set("Media.ThumbnailSize", Math.round(value))
 					ToolTip.delay: _tooltipDelay
 					ToolTip.visible: hovered
-					ToolTip.text: {
-						return	"Control the size of the thumbnails in the media browser view.";
-					}
+					ToolTip.text: `Control the size of the thumbnails in the media browser view.\nCurrent Value is ${Math.round(value)}`;
 				}
 
 				// Show image names in the browser

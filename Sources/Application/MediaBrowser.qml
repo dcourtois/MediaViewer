@@ -22,18 +22,23 @@ Rectangle {
 	property bool _shiftDown: false
 	property color _highlight: Material.color(Material.LightBlue, Material.Shade300)
 	property color _background: root.color
+	property int _thumbnailSize: settings.get("Media.ThumbnailSize")
 
 	// bind settings
 	Connections {
 		target: settings
 		onSettingChanged: {
 			switch (key) {
-				case "media.sortBy":
+				case "Media.SortBy":
 					selection.model.sortBy = value;
 					break;
-
-				case "media.sortOrder":
+					
+				case "Media.SortOrder":
 					selection.model.sortOrder = value;
+					break;
+
+				case "Media.ThumbnailSize":
+					root._thumbnailSize = value;
 					break;
 			}
 		}
@@ -55,8 +60,8 @@ Rectangle {
 			id: grid
 
 			// size of the cells
-			cellWidth: Math.round(settings.get("Media.ThumbnailSize"))
-			cellHeight: cellWidth
+			cellWidth: root._thumbnailSize
+			cellHeight: root._thumbnailSize
 
 			// delegates
 			delegate: itemDelegate
