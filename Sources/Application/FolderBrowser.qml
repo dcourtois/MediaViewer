@@ -4,7 +4,6 @@ import QtQuick.Controls.Material 2.2
 import QtQuick.Controls 1.4 as Controls
 import QtQuick.Layouts 1.2
 import QtQml.Models 2.2
-import Qt.labs.settings 1.0
 
 
 //
@@ -12,9 +11,6 @@ import Qt.labs.settings 1.0
 //
 Controls.TreeView {
 	id: root
-
-	// externally set
-	property var settings
 
 	// The currently selected path
 	property string currentFolderPath: ""
@@ -39,13 +35,13 @@ Controls.TreeView {
 
 	// Initialization
 	Component.onCompleted: {
-		if (settings.restoreLastVisitedFolder === true) {
-			setCurrentFolderPath(settings.lastVisitedFolder);
+		if (settings.get("General.RestoreLastVisitedFolder") === true) {
+			setCurrentFolderPath(settings.get("General.LastVisitedFolder"));
 		}
 	}
 
 	// Bindings
-	onCurrentFolderPathChanged: settings.lastVisitedFolder = currentFolderPath
+	onCurrentFolderPathChanged: settings.set("General.LastVisitedFolder", currentFolderPath)
 
 	//-------------------------------------------------------------------------
 	// Privates

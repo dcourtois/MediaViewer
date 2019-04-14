@@ -5,17 +5,17 @@
 #include "Utils/Cursor.h"
 #include "Utils/FileSystem.h"
 
+
 // application information
 #define ORGANIZATION_NAME	"Citron"
 #define ORGANIZATION_DOMAIN	"pcitron.fr"
 #define APPLICATION_NAME	"MediaViewer"
 #define APPLICATION_VERSION	"0.1"
 
-// the settings
-QSettings g_Settings(QSettings::IniFormat, QSettings::UserScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
 // those are exposed to QML through QQmlContext::setContextProperty, which
 // does not take ownership, so we'll need to delete them we leaving the app.
+static Settings *	settings	= nullptr;
 static Cursor *		cursor		= nullptr;
 static FileSystem *	fileSystem	= nullptr;
 
@@ -27,6 +27,22 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 	// register QML types
 	MediaViewer::RegisterQMLTypes();
 
+	// the settings. These need to be created first since some other parts of the
+	// code will check them to initialize correctly
+	settings = MT_NEW Settings;
+	settings->Init("FileSystem.DeletePermanently",			false);
+	settings->Init("General.RestoreLastVisitedFolder",		true);
+	settings->Init("General.LastVisitedFolder",				QString(""));
+	settings->Init("Media.SortBy",							0);
+	settings->Init("Media.SortOrder",						0);
+	settings->Init("Media.ThumbnailSize",					100);
+	settings->Init("Media.ShowLabel",						true);
+	settings->Init("Slideshow.Loop",						true);
+	settings->Init("Slideshow.Selection",					true);
+	settings->Init("Slideshow.Delay",						2000);
+	settings->Init("MediaPreviewProvider.UseCache",			true);
+	settings->Init("MediaPreviewProvider.CachePath",		MediaViewer::MediaPreviewProvider::DefaultCachePath());
+
 	// create data that's shared with QML
 	auto * mediaProvider	= MT_NEW MediaViewer::MediaPreviewProvider;
 	cursor					= MT_NEW Cursor;
@@ -37,6 +53,7 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 	engine.addImageProvider("MediaPreview", mediaProvider);
 
 	// set a few global QML helpers
+	engine.rootContext()->setContextProperty("settings", settings);
 	engine.rootContext()->setContextProperty("cursor", cursor);
 	engine.rootContext()->setContextProperty("fileSystem", fileSystem);
 	engine.rootContext()->setContextProperty("mediaProvider", mediaProvider);
@@ -136,6 +153,7 @@ int main(int argc, char *argv[])
 	}
 
 	// cleanup
+	MT_DELETE settings;
 	MT_DELETE cursor;
 	MT_DELETE fileSystem;
 	MT_SHUTDOWN(printf);

@@ -85,6 +85,9 @@ add_executable (MediaViewer WIN32
 	Sources/MediaViewerPCH.h
 	Sources/RegisterQMLTypes.cpp
 	Sources/RegisterQMLTypes.h
+
+	# QtUtils that need moc
+	Libs/QtUtils/Settings.h
 )
 
 #

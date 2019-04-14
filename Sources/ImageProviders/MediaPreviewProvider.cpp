@@ -8,20 +8,22 @@
 namespace MediaViewer
 {
 
-	//! Default cache folder
-	inline QString GetDefaultCachePath(void)
-	{
-		return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Cache";
-	}
-
 	//!
 	//! Constructor
 	//!
 	MediaPreviewProvider::MediaPreviewProvider(void)
-		: m_UseCache(g_Settings.value("imageProvider.useCache", true).toBool())
-		, m_CachePath(g_Settings.value("imageProvider.cachePath", GetDefaultCachePath()).toString())
+		: m_UseCache(Settings::Get< bool >("MediaPreviewProvider.UseCache"))
+		, m_CachePath(Settings::Get< QString >("MediaPreviewProvider.CachePath"))
 	{
 		QDir().mkpath(m_CachePath);
+	}
+
+	//!
+	//! Default cache folder
+	//!
+	QString MediaPreviewProvider::DefaultCachePath(void)
+	{
+		return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Cache";
 	}
 
 	//!
@@ -281,7 +283,7 @@ namespace MediaViewer
 		if (m_UseCache != value)
 		{
 			m_UseCache = value;
-			g_Settings.setValue("imageProvider.useCache", m_UseCache);
+			Settings::Set("MediaPreviewProvider.UseCache", m_UseCache);
 			emit useCacheChanged(value);
 		}
 	}
@@ -303,7 +305,7 @@ namespace MediaViewer
 	void MediaPreviewProvider::SetCachePath(const QString & path)
 	{
 		// get the path
-		QString newPath = path.size() != 0 ? path : GetDefaultCachePath();
+		QString newPath = path.size() != 0 ? path : DefaultCachePath();
 		newPath.replace('\\', '/');
 		if (newPath.section('/', -1, -1) != "Cache")
 		{
@@ -332,7 +334,7 @@ namespace MediaViewer
 
 			// update the path and notify
 			m_CachePath = newPath;
-			g_Settings.setValue("imageProvider.cachePath", m_CachePath);
+			Settings::Set("MediaPreviewProvider.CachePath", m_CachePath);
 			emit cachePathChanged(m_CachePath);
 		}
 	}

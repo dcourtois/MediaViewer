@@ -7,7 +7,6 @@ import MediaViewer 0.1
 //
 Item {
 	// externally set
-	property var settings
 	property var stateManager
 	property var selection
 	property var _mediaViewer
@@ -48,7 +47,7 @@ Item {
 		_backupSelection = selection.selection.slice();
 
 		// check settings to know which medias to show
-		if (settings.slideShowSelection === true && selection.selection.length > 0) {
+		if (settings.get("Slideshow.Selection") === true && selection.selection.length > 0) {
 			for (i in selection.selection) {
 				index = selection.selection[i];
 				media = selection.model.getMedia(index);
@@ -84,7 +83,7 @@ Item {
 	// the timer used to control the selection
 	Timer {
 		id: timer
-		interval: settings.slideShowDelay
+		interval: settings.get("Slideshow.Delay")
 		repeat: true
 		triggeredOnStart: false
 		onTriggered: {
@@ -93,7 +92,7 @@ Item {
 
 			// loop or stop, depending on settings
 			if (_current >= _medias.length) {
-				if (settings.slideShowLoop === true) {
+				if (settings.get("Slideshow.Loop") === true) {
 					_current = 0;
 				} else {
 					stop();

@@ -1,7 +1,6 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.0
-import Qt.labs.settings 1.0
 import MediaViewer 0.1
 
 
@@ -21,15 +20,6 @@ MainWindow {
 			selection.selectByPath(initMedia);
 			stateManager.state = "fullscreen";
 		}
-	}
-
-	// default settings
-	Settings {
-		id: settings
-
-		// size of the viewer part
-		property alias mediaViewerWidth: mediaViewerContainer.width
-		property alias mediaViewerHeight: mediaViewerContainer.height
 	}
 
 	// the folder model. Allow access to the physical folders.
@@ -68,7 +58,6 @@ MainWindow {
 	// the slide show
 	SlideShow {
 		id: slideShow
-		settings: preferences.settings
 		stateManager: stateManager
 		selection: selection
 		_mediaViewer: mediaViewer
@@ -80,19 +69,6 @@ MainWindow {
 		mediaBrowser: mediaBrowser
 		x: (mainWindow.width - width) / 2
 		y: (mainWindow.height - height) / 2
-		settings: Settings {
-			category: "Preferences"
-			property int sortBy: 4
-			property int sortOrder: 0
-			property double thumbnailSize: 0.5
-			property string lastVisitedFolder: ""
-			property bool restoreLastVisitedFolder: false
-			property bool deletePermanently: false
-			property bool showLabel: false
-			property int slideShowDelay: 2500
-			property bool slideShowLoop: true
-			property bool slideShowSelection: false
-		}
 	}
 
 	// Menu
@@ -117,14 +93,16 @@ MainWindow {
 				id: folderBrowser
 				Layout.fillHeight: true
 				model: folderModel
-				settings: preferences.settings
 			}
 
 			// media preview
 			Item {
 				id: mediaViewerContainer
-				width: 300
-				height: 300
+				width: settings.get("MediaView.Preview.Width", 300)
+				height: settings.get("MediaView.Preview.Height", 300)
+
+				onWidthChanged: settings.set("MediaView.Preview.Width", width)
+				onHeightChanged: settings.set("MediaView.Preview.Height", height)
 
 				MediaViewer {
 					id: mediaViewer
@@ -141,7 +119,6 @@ MainWindow {
 			Layout.fillWidth: true
 			selection: selection
 			stateManager: stateManager
-			settings: preferences.settings
 		}
 	}
 }

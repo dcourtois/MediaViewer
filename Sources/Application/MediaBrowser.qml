@@ -4,7 +4,6 @@ import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.2
 import QtQuick.Layouts 1.2
 import QtMultimedia 5.8
-import Qt.labs.settings 1.0
 import MediaViewer 0.1
 
 
@@ -17,7 +16,6 @@ Rectangle {
 	// externally set
 	property var selection
 	property var stateManager
-	property var settings
 
 	// privates
 	property bool _controlDown: false
@@ -28,8 +26,17 @@ Rectangle {
 	// bind settings
 	Connections {
 		target: settings
-		onSortByChanged: selection.model.sortBy = settings.sortBy
-		onSortOrderChanged: selection.model.sortOrder = settings.sortOrder
+		onSettingChanged: {
+			switch (key) {
+				case "media.sortBy":
+					selection.model.sortBy = value;
+					break;
+
+				case "media.sortOrder":
+					selection.model.sortOrder = value;
+					break;
+			}
+		}
 	}
 
 	// handle focus
@@ -48,8 +55,8 @@ Rectangle {
 			id: grid
 
 			// size of the cells
-			cellWidth: Math.round(settings.thumbnailSize * 350 + 50)
-			cellHeight: Math.round(settings.thumbnailSize * 350 + 50)
+			cellWidth: Math.round(settings.get("Media.ThumbnailSize") * 350 + 50)
+			cellHeight: cellWidth
 
 			// delegates
 			delegate: itemDelegate
@@ -115,7 +122,7 @@ Rectangle {
 					// the label
 					Loader {
 						id: label
-						active: settings.showLabel
+						active: settings.get("Media.ShowLabel", true)
 
 						// position in the thumbnail
 						width: parent.width - 20

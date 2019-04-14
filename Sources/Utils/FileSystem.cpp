@@ -67,7 +67,7 @@ void FileSystem::paste(QString destination)
 void FileSystem::remove(QStringList files)
 {
 	// check if we need to permanently delete
-	bool permanent = QSettings().value("Preferences/deletePermanently", false).toBool() && this->CanTrash() == true;
+	bool permanent = Settings::Get< bool >("FileSystem.DeletePermanently") && this->CanTrash() == true;
 	for (const QString & file : files)
 	{
 		if (permanent == true)

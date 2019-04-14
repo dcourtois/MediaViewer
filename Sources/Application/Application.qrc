@@ -16,7 +16,6 @@
 		<file>MainWindow.qml</file>
 		<file>MainMenu.qml</file>
 		<file>WindowSettings.qml</file>
-		<file>WindowState.qml</file>
 
 		<!-- Global states -->
 		<file>Selection.qml</file>

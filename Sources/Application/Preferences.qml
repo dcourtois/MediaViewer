@@ -1,7 +1,6 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
-import Qt.labs.settings 1.0
 import Qt.labs.platform 1.0 as PlatformDialog
 import MediaViewer 0.1
 
@@ -16,31 +15,10 @@ Dialog {
 
 	// externally set
 	property var mediaBrowser
-	property var settings
 
 	// private properties
 	property int _tooltipDelay: 750
 	property int _labelWidth: Math.max(root.width / 3, 200)
-
-	// setup when the dialog is shown (to avoid binding loops)
-	onVisibleChanged: {
-		if (visible === true) {
-			sortBy.currentIndex					= settings.sortBy;
-			sortOrder.currentIndex				= settings.sortOrder;
-			thumbnailSize.value					= settings.thumbnailSize;
-			restoreLastVisitedFolder.checked	= settings.restoreLastVisitedFolder;
-			deletePermanently.checked			= fileSystem.canTrash === true ? settings.deletePermanently : true;
-			showLabel.checked					= settings.showLabel;
-			slideShowDelay.text					= settings.slideShowDelay;
-			slideShowLoop.checked				= settings.slideShowLoop;
-			slideShowSelection.checked			= settings.slideShowSelection;
-			useCache.checked					= mediaProvider.useCache;
-			cachePath.text						= mediaProvider.cachePath;
-		} else {
-			// restore the previous focus item
-			mediaBrowser.forceFocus();
-		}
-	}
 
 	ColumnLayout {
 		id: column
@@ -91,11 +69,8 @@ Dialog {
 					}
 					CheckBox {
 						id: restoreLastVisitedFolder
-						onCheckedChanged: {
-							if (root.visible === true) {
-								settings.restoreLastVisitedFolder = checked
-							}
-						}
+						checked: settings.get("General.RestoreLastVisitedFolder", true)
+						onCheckedChanged: settings.set("General.RestoreLastVisitedFolder", checked)
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
@@ -116,11 +91,8 @@ Dialog {
 					}
 					CheckBox {
 						id: deletePermanently
-						onCheckedChanged: {
-							if (root.visible === true) {
-								settings.deletePermanently = checked
-							}
-						}
+						checked: fileSystem.canTrash ? settings.get("FileSystem.DeletePermanently") : true
+						onCheckedChanged: settings.set("FileSystem.DeletePermanently", checked)
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
@@ -160,11 +132,8 @@ Dialog {
 							"Type",
 							"None"
 						]
-						onCurrentIndexChanged: {
-							if (root.visible === true) {
-								settings.sortBy = currentIndex
-							}
-						}
+						currentIndex: settings.get("Media.SortBy")
+						onCurrentIndexChanged: settings.set("Media.SortBy", currentIndex)
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
@@ -189,11 +158,8 @@ Dialog {
 							"Ascending",
 							"Descending"
 						]
-						onCurrentIndexChanged: {
-							if (root.visible === true) {
-								settings.sortOrder = currentIndex
-							}
-						}
+						currentIndex: settings.get("Media.SortOrder")
+						onCurrentIndexChanged: settings.set("Media.SortOrder", currentIndex)
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
@@ -213,7 +179,10 @@ Dialog {
 					Slider {
 						id: thumbnailSize
 						Layout.fillWidth: true
-						onValueChanged: settings.thumbnailSize = value
+						from: 10
+						to: 300
+						value: settings.get("Media.ThumbnailSize")
+						onValueChanged: settings.set("Media.ThumbnailSize", Math.round(value))
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
@@ -232,11 +201,8 @@ Dialog {
 					}
 					CheckBox {
 						id: showLabel
-						onCheckedChanged: {
-							if (root.visible === true) {
-								settings.showLabel = checked
-							}
-						}
+						checked: settings.get("Media.ShowLabel", true)
+						onCheckedChanged: settings.set("Media.ShowLabel", checked)
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
@@ -269,11 +235,8 @@ Dialog {
 						id: slideShowDelay
 						verticalAlignment: Text.BottomLeft
 						placeholderText: "Milliseconds"
-						onTextChanged: {
-							if (root.visible === true) {
-								settings.slideShowDelay = parseInt(text);
-							}
-						}
+						text: settings.get("Slideshow.Delay")
+						onTextChanged: settings.set("Slideshow.Delay", parseInt(text))
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
@@ -292,11 +255,8 @@ Dialog {
 					}
 					CheckBox {
 						id: slideShowLoop
-						onCheckedChanged: {
-							if (root.visible === true) {
-								settings.slideShowLoop = checked
-							}
-						}
+						checked: settings.get("Slideshow.Loop")
+						onCheckedChanged: settings.set("Slideshow.Loop", slideShowLoop.checked)
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: {
@@ -316,11 +276,8 @@ Dialog {
 					}
 					CheckBox {
 						id: slideShowSelection
-						onCheckedChanged: {
-							if (root.visible === true) {
-								settings.slideShowSelection = checked
-							}
-						}
+						checked: settings.get("Slideshow.Selection", true)
+						onCheckedChanged: settings.set("Slideshow.Selection", checked)
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: "If checked, the slide show will use only the current selection."
@@ -348,11 +305,8 @@ Dialog {
 					}
 					CheckBox {
 						id: useCache
-						onCheckedChanged: {
-							if (root.visible === true) {
-								mediaProvider.useCache = checked
-							}
-						}
+						checked: settings.get("MediaPreviewProvider.UseCache", true)
+						onCheckedChanged: mediaProvider.useCache = checked
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: "When checked, thumbnails will be stored in a cache."
@@ -373,11 +327,8 @@ Dialog {
 						Layout.fillWidth: true
 						enabled: false
 						placeholderText: "Folder"
-						onTextChanged: {
-							if (root.visible === true) {
-								mediaProvider.cachePath = text;
-							}
-						}
+						text: settings.get("MediaPreviewProvider.CachePath")
+						onTextChanged: mediaProvider.cachePath = text
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered
 						ToolTip.text: "Where the cached thumbnails are stored."
@@ -406,11 +357,7 @@ Dialog {
 					ToolTip.delay: _tooltipDelay
 					ToolTip.visible: hovered
 					ToolTip.text: "Empty the whole cache folder."
-					onClicked: {
-						if (root.visible === true) {
-							mediaProvider.clearCache();
-						}
-					}
+					onClicked: mediaProvider.clearCache()
 				}
 
 

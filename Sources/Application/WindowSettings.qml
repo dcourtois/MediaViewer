@@ -1,11 +1,9 @@
 import QtQuick 2.3
 import QtQuick.Window 2.2
-import Qt.labs.settings 1.0
 
 
 //
-// This component will save and restore the states
-// of a Window
+// This component will save and restore the states of a Window
 //
 Item {
 	id: root
@@ -22,10 +20,19 @@ Item {
 	//-------------------------------------------------------------------------
 	// The following is private, do not modify externally
 
-	// the settings
-	Settings {
-		id: settings
-		category: root.category
+	// current and previous states. These are needed because the
+	// visibility state changes after the position and size of the window
+	// changes, so we need to keep track of the previous states
+	QtObject {
+		id: previous
+		property int x
+		property int y
+		property int width
+		property int height
+		property bool maximized
+	}
+	QtObject {
+		id: current
 		property int x
 		property int y
 		property int width
@@ -33,37 +40,21 @@ Item {
 		property bool maximized
 	}
 
-	// current and previous states. These are needed because the
-	// visibility state changes after the position and size of the window
-	// changes, so we need to keep track of the previous states
-	WindowState { id: previous }
-	WindowState { id: current }
-
 	// post-constructor. Initialize the window states
 	Component.onCompleted: {
-		if (!settings.width || !settings.height) {
-			// First run, or width/height are screwed up.
-			current.x = window.x;
-			current.y = window.y;
-			current.width = window.width;
-			current.height = window.height;
-			current.maximized = false;
-		} else {
-			current.x = settings.x;
-			current.y = settings.y;
-			current.width = settings.width;
-			current.height = settings.height;
-			current.maximized = settings.maximized
-		}
+		// init settings
+		settings.init("MainWindow.X", window.x);
+		settings.init("MainWindow.Y", window.x);
+		settings.init("MainWindow.Width", window.width);
+		settings.init("MainWindow.Height", window.height);
+		settings.init("MainWindow.Maximized", window.visibility === Window.Maximized);
 
-		window.x = previous.x = current.x;
-		window.y = previous.y = current.y;
-		window.width = previous.width = current.width;
-		window.height = previous.height = current.height;
-
-		if (current.maximized) {
-			window.visibility = Window.Maximized;
-		}
+		// restore settings
+		previous.x = current.x = settings.get("MainWindow.X")
+		previous.y = current.y = settings.get("MainWindow.Y")
+		previous.width = current.width = settings.get("MainWindow.Width");
+		previous.height = current.height = settings.get("MainWindow.Height");
+		previous.maximized = current.maximized = settings.get("MainWindow.Maximized");
 	}
 
 	// watch for states modifications
@@ -85,14 +76,13 @@ Item {
 				current.y = previous.y = window.y;
 				current.width = previous.width = window.width;
 				current.height = previous.height = window.height;
-			}
-			else if (window.visibility === Window.Hidden) {
+			} else if (window.visibility === Window.Hidden) {
 				// Save settings.
-				settings.x = current.maximized ? previous.x : current.x;
-				settings.y = current.maximized ? previous.y : current.y;
-				settings.width = current.maximized ? previous.width : current.width;
-				settings.height = current.maximized ? previous.height : current.height;
-				settings.maximized = current.maximized;
+				settings.set("MainWindow.X", current.maximized ? previous.x : current.x);
+				settings.set("MainWindow.Y", current.maximized ? previous.y : current.y);
+				settings.set("MainWindow.Width", current.maximized ? previous.width : current.width);
+				settings.set("MainWindow.Height", current.maximized ? previous.height : current.height);
+				settings.set("MainWindow.Maximized", current.maximized);
 			}
 		}
 

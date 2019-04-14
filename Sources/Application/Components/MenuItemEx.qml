@@ -9,11 +9,12 @@ MenuItem {
 	// the API
 	property alias sequence: shortcut.sequence
 	property alias sequences: shortcut.sequences
+	property int space: 10
 
 	// replace the content to be able to display the shortcut sequence
 	contentItem: RowLayout {
 		Label { text: root.text }
-		Item { Layout.fillWidth: true; Layout.minimumWidth: 20 }
+		Item { Layout.fillWidth: true; Layout.minimumWidth: root.space }
 		Label { text: shortcut.nativeText; enabled: false }
 	}
 

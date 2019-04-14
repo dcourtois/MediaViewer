@@ -31,6 +31,7 @@ namespace MediaViewer
 		QQuickImageResponse *requestImageResponse(const QString &id, const QSize &requestedSize) final;
 
 		// public C++ API
+		static QString		DefaultCachePath(void);
 		bool				GetUseCache(void) const;
 		void				SetUseCache(bool value);
 		const QString &		GetCachePath(void) const;

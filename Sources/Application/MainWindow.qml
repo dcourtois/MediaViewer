@@ -13,9 +13,12 @@ ApplicationWindow {
 	id: mainWindow
 	visible: true
 
-	// default size
-	width: 1000
-	height: 750
+	// init
+	x: settings.get("MainWindow.X", undefined)
+	y: settings.get("MainWindow.Y", undefined)
+	width: settings.get("MainWindow.Width", 1000)
+	height: settings.get("MainWindow.Height", 750)
+	visibility: settings.get("MainWindow.Maximized", false) ? Window.Maximized : Window.Windowed
 
 	// privates
 	property int _lastVisibility

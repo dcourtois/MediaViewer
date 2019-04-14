@@ -63,19 +63,17 @@
 // STL
 
 #include <algorithm>
+#include <cctype>
 #include <functional>
 
 
 //------------------------------------------------------------------------------
-// memory leak detection
+// Utils
+
 
 #include "CppUtils/MemoryTracker.h"
 #include "CppUtils/STLUtils.h"
+#include "QtUtils/Settings.h"
 
-
-//------------------------------------------------------------------------------
-// global stuff
-
-extern QSettings g_Settings;
 
 #endif // MEDIA_VIEWER_PCH_H
