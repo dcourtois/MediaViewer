@@ -25,7 +25,7 @@ Item {
 		// resize
 		function resize() {
 			if (player.metaData && player.metaData.resolution) {
-				var size = player.metaData.resolution;
+				const size = player.metaData.resolution;
 				if (size.width >= root.width || size.height >= root.height) {
 					anchors.centerIn = undefined;
 					anchors.fill = root;
@@ -54,6 +54,16 @@ Item {
 		}
 	}
 
+	// mouse area to detect movement to display / hide the controls
+	MouseArea {
+		anchors.fill: parent
+		hoverEnabled: true
+		propagateComposedEvents: true
+		onPositionChanged: controls.show()
+		onEntered: controls.show()
+		onExited: controls.hide()
+	}
+
 	// detect size changes
 	Connections {
 		target: root
@@ -67,6 +77,7 @@ Item {
 		player: player
 		anchors.horizontalCenter: parent.horizontalCenter
 		anchors.bottom: parent.bottom
+		anchors.bottomMargin: 10
 	}
 
 	// Movie specific keyboard handling

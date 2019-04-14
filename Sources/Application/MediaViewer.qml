@@ -38,7 +38,6 @@ Rectangle {
 
 		// mouse wheel, image navigation
 		onWheel: {
-			wheel.accepted = true;
 			if (wheel.angleDelta.y > 0) {
 				selection.selectPrevious();
 			} else {
