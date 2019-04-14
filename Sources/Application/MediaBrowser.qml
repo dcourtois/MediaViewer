@@ -55,7 +55,7 @@ Rectangle {
 			id: grid
 
 			// size of the cells
-			cellWidth: Math.round(settings.get("Media.ThumbnailSize") + 50)
+			cellWidth: Math.round(settings.get("Media.ThumbnailSize"))
 			cellHeight: cellWidth
 
 			// delegates
