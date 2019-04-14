@@ -107,6 +107,20 @@ Item {
 					onClicked: player.playbackState === MediaPlayer.PlayingState ? player.pause() : player.play()
 				}
 			}
+			Item {
+				width: 100
+			}
+			Image {
+				id: loop
+				sourceSize { width: 40; height: 40 }
+				source: "qrc:/Icons/Loop"
+				opacity: player.loops === 1 ? 0.4 : 1
+				MouseArea {
+					anchors.fill: parent
+					acceptedButtons: Qt.LeftButton
+					onClicked: player.loops = player.loops === 1 ? MediaPlayer.Infinite : 1
+				}
+			}
 		}
 
 		// seek bar background

@@ -18,6 +18,7 @@
 		<file alias="Stop">Icons/round-stop-24px.svg</file>
 		<file alias="Close">Icons/round-exit_to_app-24px.svg</file>
 		<file alias="Settings">Icons/round-settings-24px.svg</file>
+		<file alias="Loop">Icons/round-loop-24px.svg</file>
 	</qresource>
 
 </RCC>
