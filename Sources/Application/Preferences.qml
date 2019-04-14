@@ -30,22 +30,22 @@ Dialog {
 			width: parent.width
 
 			TabButton {
-				width: column.width / 4
+				width: column.width / bar.contentChildren.length
 				text: "General"
 			}
 
 			TabButton {
-				width: column.width / 4
+				width: column.width / bar.contentChildren.length
 				text: "Interface"
 			}
 
 			TabButton {
-				width: column.width / 4
+				width: column.width / bar.contentChildren.length
 				text: "Slide Show"
 			}
 
 			TabButton {
-				width: column.width / 4
+				width: column.width / bar.contentChildren.length
 				text: "Cache"
 			}
 		}
