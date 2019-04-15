@@ -5,7 +5,10 @@
 
 # totally remove warnings. This lets us set the warning level we want per target
 # without command lines complaining when we override the warning levels.
-string(REGEX REPLACE "(/W[^ ]+)|(-W[123])" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+string (REGEX REPLACE "(/W[^ ]+)|(-W[123])" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
+# disable banner of the resource compiler on Windows
+set (CMAKE_RC_FLAGS "/nologo")
 
 #
 # Custom option with a default value. This is meant to be used in the root

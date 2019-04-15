@@ -137,21 +137,25 @@ target_link_libraries(MediaViewer
 #
 target_compile_definitions (MediaViewer
 	PUBLIC
-		# Enable memory tracking
-		MEMORY_CHECK=1
+		# Debug stuff
+		$<$<NOT:$<CONFIG:Release>>:MEMORY_CHECK=1>
+		$<$<NOT:$<CONFIG:Release>>:QT_QML_DEBUG>
+		$<$<CONFIG:Release>:QT_NO_DEBUG>
+		$<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
+		$<$<CONFIG:Release>:QT_NO_INFO_OUTPUT>
+		$<$<CONFIG:Release>:QT_NO_WARNING_OUTPUT>
 
 		# Platforms
 		$<$<PLATFORM_ID:Windows>:WINDOWS>
+		$<$<PLATFORM_ID:Linux>:LINUX>
+		$<$<PLATFORM_ID:Darwin>:MACOS>
 
 		# Compilers
 		$<$<CXX_COMPILER_ID:MSVC>:MSVC>
 		$<$<CXX_COMPILER_ID:Clang>:CLANG>
 
-		# MSVC
+		# Disable annoying stuff from MSVC
 		$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
-
-		# QML debug
-		$<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>
 )
 
 #
@@ -159,9 +163,7 @@ target_compile_definitions (MediaViewer
 #
 target_compile_options (MediaViewer
 	PUBLIC
-		# MSVC
-		$<$<CXX_COMPILER_ID:MSVC>:/W4>
-
-		# Clang
-		$<$<CXX_COMPILER_ID:Clang>:-Wall>
+		# Warning levels
+		$<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+		$<$<CXX_COMPILER_ID:Clang>:-Wall -Werror>
 )
