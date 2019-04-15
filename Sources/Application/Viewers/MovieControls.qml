@@ -4,6 +4,8 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls.Material 2.12
 import QtMultimedia 5.8
 
+import "../Components" as Components
+
 
 //
 // Movie controls. This control displays a rectangle with playback controls and
@@ -16,7 +18,8 @@ Rectangle {
 	property var player
 
 	// control the look & feel. Can be overriden
-	height: 100
+	property int iconSize: 32
+	height: 80
 	width: 500
 	radius: 20
 	color: Qt.rgba(0, 0, 0, 0.6)
@@ -87,111 +90,84 @@ Rectangle {
 	ColumnLayout {
 		anchors.fill: parent
 		anchors.margins: 10
+		spacing: 0
 
 		// the controls
-		RowLayout {
-			spacing: 10
+		Item {
+			Layout.fillWidth: true
+			height: root.iconSize
 
-			// spacer
-			Item {
-				Layout.fillWidth: true
-			}
+			RowLayout {
+				anchors.centerIn: parent
+				spacing: 10
 
-			// stop
-			Image {
-				sourceSize { width: 40; height: 40 }
-				source: "qrc:/Icons/Stop"
-				MouseArea {
-					anchors.fill: parent
-					acceptedButtons: Qt.LeftButton
-					onClicked: {
-						player.stop();
-						root.setPosition(0);
+				// stop
+				Image {
+					sourceSize { width: root.iconSize; height: root.iconSize }
+					source: "qrc:/Icons/Stop"
+					MouseArea {
+						anchors.fill: parent
+						acceptedButtons: Qt.LeftButton
+						onClicked: {
+							player.stop();
+							root.setPosition(0);
+						}
 					}
 				}
-			}
 
-			// play / pause
-			Image {
-				sourceSize { width: 40; height: 40 }
-				source: player.playbackState === MediaPlayer.PlayingState ? "qrc:/Icons/Pause" : "qrc:/Icons/Play"
-				MouseArea {
-					anchors.fill: parent
-					acceptedButtons: Qt.LeftButton
-					onClicked: player.playbackState === MediaPlayer.PlayingState ? player.pause() : player.play()
-				}
-			}
-
-			// loop
-			Image {
-				sourceSize { width: 40; height: 40 }
-				source: "qrc:/Icons/Loop"
-				opacity: player.loops === 1 ? 0.2 : 1
-				MouseArea {
-					anchors.fill: parent
-					acceptedButtons: Qt.LeftButton
-					onClicked: player.loops = player.loops === 1 ? MediaPlayer.Infinite : 1
-				}
-			}
-
-			// spacer
-			Item {
-				Layout.fillWidth: true
-			}
-
-			// sound
-			Item {
-				width: 40
-				height: 40
-
-//				MouseArea {
-//					anchors.fill: parent
-//					hoverEnabled: true
-//					propagateComposedEvents: true
-//					acceptedButtons: Qt.LeftButton
-//					onEntered: if (player.muted === false) { volume.enabled = true }
-//					onClicked: { mouse.accepted = true; player.muted = !player.muted; }
-//				}
-
-//				Rectangle {
-//					id: volume
-//					anchors.bottom: parent.bottom
-//					anchors.left: parent.left
-//					anchors.right: parent.right
-//					height: 150
-//
-//					color: Qt.rgba(0, 0, 0, 0.6)
-//					border.width: 1
-//					border.color: Qt.rgba(1, 1, 1, 0.6)
-//
-//					enabled: true
-//					visible: enabled
-//
-//					Slider {
-//						anchors.fill: parent
-//						anchors.bottomMargin: 40
-//
-//						orientation: Qt.Vertical
-//						focusPolicy: Qt.NoFocus
-//						to: 0
-//						value: player.volume
-//						onValueChanged: player.volume = value
-//						from: 1
-//					}
-//				}
-
-	//					MouseArea {
-	//						anchors.fill: parent
-	//						hoverEnabled: true
-	//						propagateComposedEvents: true
-	//						onExited: volume.enabled = false
-	//					}
-
-
+				// play / pause
 				Image {
-					sourceSize { width: 40; height: 40 }
-					//opacity: player.muted ? 0.2 : 1
+					sourceSize { width: root.iconSize; height: root.iconSize }
+					source: player.playbackState === MediaPlayer.PlayingState ? "qrc:/Icons/Pause" : "qrc:/Icons/Play"
+					MouseArea {
+						anchors.fill: parent
+						acceptedButtons: Qt.LeftButton
+						onClicked: player.playbackState === MediaPlayer.PlayingState ? player.pause() : player.play()
+					}
+				}
+
+				// loop
+				Image {
+					sourceSize { width: root.iconSize; height: root.iconSize }
+					source: "qrc:/Icons/Loop"
+					opacity: player.loops === 1 ? 0.2 : 1
+					MouseArea {
+						anchors.fill: parent
+						acceptedButtons: Qt.LeftButton
+						onClicked: player.loops = player.loops === 1 ? MediaPlayer.Infinite : 1
+					}
+				}
+
+			}
+
+			RowLayout {
+				anchors.right: parent.right
+				spacing: 10
+
+				// volume icon
+				Image {
+					id: volumeIcon
+					sourceSize { width: root.iconSize; height: root.iconSize }
+					opacity: player.muted ? 0.2 : 1
 					source: player.muted ? "qrc:/Icons/Mute" :  "qrc:/Icons/Sound"
+					MouseArea {
+						anchors.fill: parent
+						acceptedButtons: Qt.LeftButton
+						onClicked: player.muted = !player.muted
+					}
+				}
+
+				// volume
+				Components.ProgressBarEx {
+					Layout.fillWidth: true
+					Layout.preferredWidth: player.muted ? 0 : 80
+					Layout.preferredHeight: root.iconSize
+					Behavior on Layout.preferredWidth { NumberAnimation { duration: 100 } }
+					enabled: player.muted === false
+					visible: enabled
+					interactive: enabled
+					position: player.volume
+					onPositionChanged: { player.volume = position; }
 				}
 
 			}
@@ -200,8 +176,7 @@ Rectangle {
 
 		// seek bar
 		RowLayout {
-			Layout.leftMargin: 10
-			Layout.rightMargin: 10
+			spacing: 8
 
 			// current time
 			Text {
@@ -210,36 +185,12 @@ Rectangle {
 			}
 
 			// seek bar
-			Item {
+			Components.ProgressBarEx {
 				Layout.fillWidth: true
-				height: 30
-
-				Rectangle {
-					anchors.fill: parent
-					anchors.margins: 12
-					color: Qt.rgba(Material.accent.r, Material.accent.g, Material.accent.b, 0.4);
-				}
-
-				Rectangle {
-					anchors.top: parent.top
-					anchors.left: parent.left
-					anchors.bottom: parent.bottom
-					anchors.margins: 10
-					color: Material.accent
-					width: parent.width * (player.position / player.duration)
-				}
-
-				MouseArea {
-					anchors.fill: parent
-					acceptedButtons: Qt.LeftButton
-					propagateComposedEvents: true
-					function update(mouse) {
-						mouse.accepted = true;
-						root.setPosition(player.duration * Math.min(player.duration, Math.max(0, (mouse.x / width))));
-					}
-					onClicked: update(mouse)
-					onPositionChanged: update(mouse)
-				}
+				Layout.preferredHeight: root.iconSize
+				interactive: true
+				position: player.position / player.duration
+				onPositionChanged: root.setPosition(position * player.duration)
 			}
 
 			// total time

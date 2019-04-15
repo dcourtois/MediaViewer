@@ -20,6 +20,25 @@ static Cursor *			cursor			= nullptr;
 static FileSystem *		fileSystem		= nullptr;
 
 //!
+//! Message handler. Since Qt 5.12.xx there is a fucking flood of warnings whenever you use a
+//! TreeView from QtQuick.Controls 1. And since there's not replacement in Controls 2, I'm
+//! stuck with this. So at least I can filter those.
+//!
+void MessageHandler(QtMsgType, const QMessageLogContext & context, const QString & message)
+{
+	if (QString(context.file).contains("jsruntime") == false)
+	{
+		// customize our message, while we're at it...
+		const QString output = QString("MediaViewer: %1:%2 - %3\n").arg(context.file).arg(context.line).arg(message);
+#if defined(OutputDebugString)
+		OutputDebugStringA(qPrintable(output));
+#else
+		printf("MediaViewer: %s\n", qPrintable(output));
+#endif
+	}
+}
+
+//!
 //! Set the application engine with our main QML file
 //!
 void Setup(QApplication & app, QQmlApplicationEngine & engine)
@@ -138,6 +157,9 @@ int main(int argc, char *argv[])
 	app->setOrganizationDomain(ORGANIZATION_DOMAIN);
 	app->setApplicationName(APPLICATION_NAME);
 	app->setApplicationVersion(APPLICATION_VERSION);
+
+	// install our message handler
+	qInstallMessageHandler(MessageHandler);
 
 	// set style
 	QQuickStyle::setStyle("Material");

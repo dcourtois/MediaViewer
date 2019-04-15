@@ -4,6 +4,7 @@
 	<!-- Reusable components -->
 	<qresource prefix="Components">
 		<file alias="MenuItemEx.qml">Components/MenuItemEx.qml</file>
+		<file alias="ProgressBarEx.qml">Components/ProgressBarEx.qml</file>
 		<file alias="ToolButtonEx.qml">Components/ToolButtonEx.qml</file>
 	</qresource>
 

@@ -52,6 +52,16 @@
 
 
 //------------------------------------------------------------------------------
+// on Windows, to be able to output to the Visual Studio debuggers
+
+#if defined(WINDOWS)
+#	define WIN32_LEAN_AND_MEAN
+#	include <Windows.h>
+#endif
+
+
+
+//------------------------------------------------------------------------------
 // restore warnings
 
 #if defined(_MSC_VER)

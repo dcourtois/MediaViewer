@@ -4,7 +4,7 @@ import QtQuick.Controls.Material 2.1
 import QtQuick.Layouts 1.0
 import MediaViewer 0.1
 
-import "./Components" as Components
+import "Components" as Components
 
 
 //

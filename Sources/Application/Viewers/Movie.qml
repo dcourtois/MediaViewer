@@ -49,6 +49,7 @@ Item {
 	MediaPlayer {
 		id: player
 		autoPlay: false
+		volume: 0.5
 		muted: true
 		notifyInterval: 2
 
@@ -76,7 +77,6 @@ Item {
 		target: root
 		onWidthChanged: { output.resize(); controls.setPosition(player.position); }
 		onHeightChanged: { output.resize(); controls.setPosition(player.position); }
-
 	}
 
 	// movie controls
@@ -86,6 +86,7 @@ Item {
 		anchors.horizontalCenter: parent.horizontalCenter
 		anchors.bottom: parent.bottom
 		anchors.bottomMargin: 10
+		width: Math.min(700, parent.width - 50)
 	}
 
 	// Movie specific keyboard handling
