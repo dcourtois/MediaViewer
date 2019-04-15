@@ -16,7 +16,7 @@ include (CMakeUtils.cmake)
 #
 # Define options for this project
 #
-cu_option (QT_DIR "C:/Development/Libs/Qt/5.12.2/msvc2017_64/lib/cmake")
+cu_option (QT_DIR "D:/Development/Libs/Qt/5.12.2/msvc2017_64/lib/cmake")
 
 #
 # Configure Qt
@@ -105,7 +105,7 @@ target_pch (MediaViewer
 # compiler's requirements
 #
 target_compile_features (MediaViewer
-	PUBLIC
+	PRIVATE
 		cxx_std_17
 )
 
@@ -113,7 +113,7 @@ target_compile_features (MediaViewer
 # includes
 #
 target_include_directories (MediaViewer
-	PUBLIC
+	PRIVATE
 		Sources
 		Libs
 )
@@ -122,7 +122,7 @@ target_include_directories (MediaViewer
 # libs
 #
 target_link_libraries(MediaViewer
-	PUBLIC
+	PRIVATE
 		Qt5::Core
 		Qt5::Multimedia
 		Qt5::Qml
@@ -136,7 +136,7 @@ target_link_libraries(MediaViewer
 # Compile definitions
 #
 target_compile_definitions (MediaViewer
-	PUBLIC
+	PRIVATE
 		# Debug stuff
 		$<$<NOT:$<CONFIG:Release>>:MEMORY_CHECK=1>
 		$<$<NOT:$<CONFIG:Release>>:QT_QML_DEBUG>
@@ -153,8 +153,9 @@ target_compile_definitions (MediaViewer
 		# Compilers
 		$<$<CXX_COMPILER_ID:MSVC>:MSVC>
 		$<$<CXX_COMPILER_ID:Clang>:CLANG>
+		$<$<CXX_COMPILER_ID:GNU>:GCC>
 
-		# Disable annoying stuff from MSVC
+		# Disable some annoying warnings
 		$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
 )
 
@@ -162,8 +163,9 @@ target_compile_definitions (MediaViewer
 # Compile options
 #
 target_compile_options (MediaViewer
-	PUBLIC
+	PRIVATE
 		# Warning levels
 		$<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
 		$<$<CXX_COMPILER_ID:Clang>:-Wall -Werror>
+		$<$<CXX_COMPILER_ID:GNU>:-Wall -Werror>
 )
