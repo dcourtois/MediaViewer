@@ -186,11 +186,9 @@ Rectangle {
 
 			// seek bar
 			Components.ProgressBarEx {
-				id: seekBar
 				Layout.fillWidth: true
 				Layout.preferredHeight: root.iconSize
 				interactive: true
-				property bool sendEvent: true
 				position: player.position / player.duration
 				onPositionChanged: Math.round(position * player.duration)
 			}

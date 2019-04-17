@@ -1,7 +1,10 @@
 import QtQuick 2.5
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
+
 import MediaViewer 0.1
+
+import "Viewers" as Viewers
 
 
 //
@@ -83,37 +86,6 @@ Rectangle {
 		}
 	}
 
-	// detect media changes
-	Connections {
-		target: selection
-		onCurrentMediaChanged: {
-			if (selection.currentMedia) {
-				switch (selection.currentMedia.type) {
-					case Media.Image:
-						viewer.source = "qrc:///Viewers/Image.qml";
-						viewer.item.source = "file:///" + selection.currentMedia.path;
-						break;
-
-					case Media.AnimatedImage:
-						viewer.source = "qrc:///Viewers/AnimatedImage.qml";
-						viewer.item.source = "file:///" + selection.currentMedia.path;
-						break;
-
-					case Media.Movie:
-						viewer.source = "qrc:///Viewers/Movie.qml";
-						viewer.item.source = "file:///" + selection.currentMedia.path;
-						break;
-
-					case Media.NotSupported:
-						viewer.source = undefined;
-						break;
-				}
-			} else {
-				viewer.source = "";
-			}
-		}
-	}
-
 	// update focus
 	function updateFocus() {
 		if (selection.currentMedia) {
@@ -123,9 +95,57 @@ Rectangle {
 		}
 	}
 
+	// the animated image viewer
+	Component {
+		id: animated
+		Viewers.Animated {
+			readonly property var mediaType: Media.Animated
+			source: "file:///" + selection.currentMedia.path
+		}
+	}
+
+	// the image viewer
+	Component {
+		id: image
+		Viewers.Image {
+			readonly property var mediaType: Media.Image
+			source: "file:///" + selection.currentMedia.path
+		}
+	}
+
+	// the movie viewer
+	Component {
+		id: movie
+		Viewers.Movie {
+			readonly property var mediaType: Media.Movie
+			source: "file:///" + selection.currentMedia.path
+		}
+	}
+
 	// handle focus for the movie viewer
 	Connections { target: stateManager; onStateChanged: updateFocus() }
 	Connections { target: selection; onCurrentMediaChanged: updateFocus() }
+
+	// on selection change, update the viewer if needed
+	Connections {
+		target: selection
+		onCurrentMediaTypeChanged: {
+			const type = selection.currentMedia ? selection.currentMedia.type : Media.NotSupported;
+			if (viewer.item === null || type !== viewer.item.mediaType) {
+				switch (type) {
+					case Media.Animated:
+						viewer.sourceComponent = animated;
+						break;
+					case Media.Image:
+						viewer.sourceComponent = image;
+						break;
+					case Media.Movie:
+						viewer.sourceComponent = movie;
+						break;
+				}
+			}
+		}
+	}
 
 	// the content
 	Loader {

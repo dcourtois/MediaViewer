@@ -1,14 +1,28 @@
 <!DOCTYPE RCC>
 <RCC>
 
-	<!-- Reusable components -->
+	<!--
+		Reusable components
+	-->
 	<qresource prefix="Components">
 		<file alias="MenuItemEx.qml">Components/MenuItemEx.qml</file>
 		<file alias="ProgressBarEx.qml">Components/ProgressBarEx.qml</file>
 		<file alias="ToolButtonEx.qml">Components/ToolButtonEx.qml</file>
 	</qresource>
 
+	<!--
+		Viewers
+	-->
+	<qresource prefix="Viewers">
+		<file alias="Animated.qml">Viewers/Animated.qml</file>
+		<file alias="Image.qml">Viewers/Image.qml</file>
+		<file alias="Movie.qml">Viewers/Movie.qml</file>
+		<file alias="MovieControls.qml">Viewers/MovieControls.qml</file>
+	</qresource>
 
+	<!--
+		The Application
+	-->
 	<qresource prefix="/">
 		<!-- Main entry point -->
 		<file>Main.qml</file>
@@ -26,12 +40,6 @@
 		<file>FolderBrowser.qml</file>
 		<file>MediaBrowser.qml</file>
 		<file>MediaViewer.qml</file>
-
-		<!-- Medias viewers (handle both preview and fullscreen) -->
-		<file>Viewers/AnimatedImage.qml</file>
-		<file>Viewers/Image.qml</file>
-		<file>Viewers/Movie.qml</file>
-		<file>Viewers/MovieControls.qml</file>
 
 		<!-- Tools -->
 		<file>Preferences.qml</file>

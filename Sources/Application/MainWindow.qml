@@ -14,8 +14,8 @@ ApplicationWindow {
 	visible: true
 
 	// init
-	x: settings.get("MainWindow.X", undefined)
-	y: settings.get("MainWindow.Y", undefined)
+	x: settings.get("MainWindow.X", 100)
+	y: settings.get("MainWindow.Y", 100)
 	width: settings.get("MainWindow.Width", 1000)
 	height: settings.get("MainWindow.Height", 750)
 	visibility: settings.get("MainWindow.Maximized", false) ? Window.Maximized : Window.Windowed
