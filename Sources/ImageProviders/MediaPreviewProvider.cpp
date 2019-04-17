@@ -92,8 +92,9 @@ namespace MediaViewer
 			const QFileInfo source(path);
 			const QString extension(source.suffix());
 			const QString cacheFolder	= this->GetCacheFolder(hash);
-			const QString cacheName		= cacheFolder + QString("%1").arg(hash);
-			const QString descName		= cacheFolder + ".json";
+			const QString cacheName		= QString("%1/%2").arg(cacheFolder).arg(static_cast< qulonglong >(hash));
+			const QString descName		= QString("%1.json").arg(cacheName);
+			const QString thumbnail		= QString("%1.jpg").arg(cacheName);
 
 			// check if we have a thumbnail already
 			QFile descFile(descName);
@@ -111,15 +112,13 @@ namespace MediaViewer
 
 			// the image is no in the cache, load it
 			QImage image;
-			QString thumbnail = cacheName + '.' + extension;
 			if (cancel == false && image.isNull() == true)
 			{
 				image = this->GetImagePreview(path, width, height, cancel);
 			}
-			if (cancel == false && image.isNull() == true)
+			else if (cancel == false && image.isNull() == true)
 			{
 				image = this->GetMoviePreview(path, width, height, cancel);
-				thumbnail += ".jpg";
 			}
 
 			// couldn't load it, stop here
@@ -169,21 +168,11 @@ namespace MediaViewer
 	//!
 	QString MediaPreviewProvider::GetCacheFolder(uint32_t hash) const
 	{
-		QString hashName = QString("%2").arg(hash);
-		QString folder = m_CachePath + '/';
-		for (int i = 0; i < hashName.size(); i += 4)
-		{
-			if (hashName.size() - i < 4)
-			{
-				break;
-			}
-			folder += hashName[i];
-			folder += hashName[i + 2];
-			folder += hashName[i + 3];
-			folder += hashName[i + 4];
-			folder += '/';
-		}
-		return folder;
+		QString hashName = QString("%1").arg(static_cast< uint >(hash), 8, 10, static_cast< QChar >('0'));
+		Q_ASSERT(hashName.size() >= 8);
+		return QString("%1/%2%3%4%5/%6%7%8%9").arg(m_CachePath)
+			.arg(hashName[0]).arg(hashName[1]).arg(hashName[2]).arg(hashName[3])
+			.arg(hashName[4]).arg(hashName[5]).arg(hashName[6]).arg(hashName[7]);
 	}
 	
 	//!
