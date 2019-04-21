@@ -46,6 +46,24 @@ namespace MediaViewer
 		return m_Children;
 	}
 
+	//!
+	//! Normalize a path so that it's easier to test things
+	//!
+	inline QString Folder::Normalize(const QString & path)
+	{
+		QString result(path);
+		result = result.replace('\\', '/');
+		if (result.back() == '/')
+		{
+			result.remove(result.size() - 1, 1);
+			if (result.back() == ':')
+			{
+				return result + '/';
+			}
+		}
+		return result;
+	}
+
 }
 
 

@@ -30,40 +30,58 @@ namespace MediaViewer
 	//!
 	QModelIndex FolderModel::getIndexByPath(const QString & path) const
 	{
-		Folder * folder = nullptr;
-		int row = 0;
-		QStringList tokens = QString(path).replace('\\', '/').split('/');
+		// normalized
+		QString normalized = Folder::Normalize(path);
 
-		// remove trailing slash
-		if (tokens.last().isEmpty() == true)
+		// find the root
+		QString current;
+		Folder * folder = nullptr;
+		for (const auto & root : m_Roots)
 		{
-			tokens.pop_back();
+			if (normalized.startsWith(root->GetPath()) == true &&
+				root->GetPath().size() > current.size())
+			{
+				folder = root;
+				current = root->GetPath();
+			}
 		}
 
-		// reconstruct the path from the beginning
-		QString current;
+		// nothing found, return
+		if (folder == nullptr)
+		{
+			return QModelIndex();
+		}
+
+		// tokenize to find the child item corresponding to the path
+		int row = 0;
+		QStringList tokens = normalized.remove(0, current.size() + 1).split('/');
 		for (const auto & token : tokens)
 		{
 			// update the current path
-			current = (current.isEmpty() == true ? token : current + token) + "/";
+			current += "/" + token;
 
 			// try to find the next folder
-			const QVector< Folder * > & folders = folder == nullptr ? m_Roots : folder->GetChildren();
+			const QVector< Folder * > & folders = folder->GetChildren();
 			folder = nullptr;
 			for (int i = 0; i < folders.size(); ++i)
 			{
-				if (QDir(folders.at(i)->GetPath()) == QDir(current))
+				if (folders.at(i)->GetPath() == current)
 				{
 					row = i;
 					folder = folders.at(i);
 					break;
 				}
 			}
+
+			// error check
+			if (folder == nullptr)
+			{
+				return QModelIndex();
+			}
 		}
 
 		// return the result
-		return folder == nullptr ? QModelIndex() : this->createIndex(row, 0, folder);
-
+		return this->createIndex(row, 0, folder);
 	}
 
 	//!

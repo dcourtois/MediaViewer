@@ -54,7 +54,8 @@ namespace MediaViewer
 	//!
 	void Folder::SetPath(const QString & path)
 	{
-		if (m_Path != path)
+		QString normalized = Folder::Normalize(path);
+		if (m_Path != normalized)
 		{
 			// remove old path
 			if (m_Path.isEmpty() == false)
@@ -63,17 +64,17 @@ namespace MediaViewer
 			}
 
 			// update
-			m_Path = path;
+			m_Path = normalized;
 			m_Dirty = true;
 
 			// add new path
-			if (path.isEmpty() == false)
+			if (normalized.isEmpty() == false)
 			{
-				m_FileWatcher.addPath(path);
+				m_FileWatcher.addPath(normalized);
 			}
 
 			// get the name
-			QDir dir = QDir(path);
+			QDir dir = QDir(normalized);
 			m_Name = dir.dirName();
 
 			// drive letters

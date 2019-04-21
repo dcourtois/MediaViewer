@@ -36,13 +36,14 @@ namespace MediaViewer
 		inline int								GetMediaCount(void) const;
 		inline const Folder *					GetParent(void) const;
 		inline const QVector< Folder * > &		GetChildren(void) const;
+		inline static QString					Normalize(const QString & path);
 
 	private:
 
 		// private API
-		void	UpdateChildren(void) const;
-		void	UpdateMedias(void) const;
-		void	SetPath(const QString & path);
+		void					UpdateChildren(void) const;
+		void					UpdateMedias(void) const;
+		void					SetPath(const QString & path);
 
 		//! The parent
 		const Folder * m_Parent;
