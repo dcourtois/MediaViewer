@@ -4,6 +4,7 @@
 #include "ImageProviders/MediaPreviewProvider.h"
 #include "Utils/Cursor.h"
 #include "Utils/FileSystem.h"
+#include "QtUtils/QuickView.h"
 
 
 // application information
@@ -26,23 +27,31 @@ static FileSystem *		fileSystem		= nullptr;
 //!
 void MessageHandler(QtMsgType, const QMessageLogContext & context, const QString & message)
 {
+#if defined(QT_NO_DEBUG)
+	Q_UNUSED(context);
+	Q_UNUSED(message);
+#else
 	if (QString(context.file).contains("jsruntime") == false)
 	{
 		// customize our message, while we're at it...
 		const QString output = QString("MediaViewer: %1:%2 - %3\n").arg(context.file).arg(context.line).arg(message);
-#if defined(OutputDebugString)
+#	if defined(OutputDebugString)
 		OutputDebugStringA(qPrintable(output));
-#else
+#	else
 		printf("MediaViewer: %s\n", qPrintable(output));
-#endif
+#	endif
 	}
+#endif
 }
 
 //!
 //! Set the application engine with our main QML file
 //!
-void Setup(QApplication & app, QQmlApplicationEngine & engine)
+void Setup(QApplication & app, QuickView & view)
 {
+	// set default size
+	view.resize(1000, 750);
+
 	// register QML types
 	MediaViewer::RegisterQMLTypes();
 
@@ -54,7 +63,7 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 	settings->Init("General.LastVisitedFolder",				QString(""));
 	settings->Init("Media.SortBy",							0);
 	settings->Init("Media.SortOrder",						0);
-	settings->Init("Media.ThumbnailSize",					100);
+	settings->Init("Media.ThumbnailSize",					170);
 	settings->Init("Media.ShowLabel",						true);
 	settings->Init("Slideshow.Loop",						true);
 	settings->Init("Slideshow.Selection",					true);
@@ -68,14 +77,17 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 	fileSystem				= MT_NEW FileSystem;
 
 	// set the image provider for the folders
+	QQmlEngine & engine = *view.engine();
 	engine.addImageProvider("FolderIcon", MT_NEW MediaViewer::FolderIconProvider);
 	engine.addImageProvider("MediaPreview", mediaProvider);
 
 	// set a few global QML helpers
-	engine.rootContext()->setContextProperty("settings", settings);
-	engine.rootContext()->setContextProperty("cursor", cursor);
-	engine.rootContext()->setContextProperty("fileSystem", fileSystem);
-	engine.rootContext()->setContextProperty("mediaProvider", mediaProvider);
+	engine.rootContext()->setContextProperties({
+		{ "settings",		QVariant::fromValue(settings) },
+		{ "cursor",			QVariant::fromValue(cursor) },
+		{ "fileSystem",		QVariant::fromValue(fileSystem) },
+		{ "mediaProvider",	QVariant::fromValue(mediaProvider) }
+	});
 
 	// expose the list of drives to QML
 	QVariantList drives;
@@ -143,7 +155,7 @@ void Setup(QApplication & app, QQmlApplicationEngine & engine)
 	}
 
 	// set the source
-	engine.load(QUrl("qrc:/Main.qml"));
+	view.setSource(QUrl("qrc:/Main.qml"));
 }
 
 //!
@@ -164,19 +176,19 @@ int main(int argc, char *argv[])
 	// set style
 	QQuickStyle::setStyle("Material");
 
-	// create and setup application engine
-	QQmlApplicationEngine * engine = MT_NEW QQmlApplicationEngine();
-	Setup(*app, *engine);
+	// create and setup our view
+	QuickView * view = MT_NEW QuickView();
+	Setup(*app, *view);
 
 	// run the application
 	int code = app->exec();
 
 	// cleanup (order is important)
-	MT_DELETE settings;
 	MT_DELETE cursor;
 	MT_DELETE fileSystem;
-	MT_DELETE engine;
+	MT_DELETE view;
 	MT_DELETE app;
+	MT_DELETE settings;
 
 	// log memory leaks
 	MT_SHUTDOWN(qDebug);

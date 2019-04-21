@@ -17,7 +17,6 @@ ToolBar {
 	// externally set
 	property var selection
 	property var preferences
-	property var slideShow
 
 	RowLayout {
 		anchors.fill: parent
@@ -27,11 +26,11 @@ ToolBar {
 		//
 
 		Components.ToolButtonEx {
-			text: "File"
-			onClicked: fileMenu.open()
+			text: "Application"
+			onClicked: appMenu.open()
 
 			Menu {
-				id: fileMenu
+				id: appMenu
 				y: parent.y + parent.height
 
 				Components.MenuItemEx {
@@ -39,7 +38,18 @@ ToolBar {
 					sequence: StandardKey.Close
 					onTriggered: Qt.quit();
 				}
+
+				MenuSeparator {
+				}
+
+				Components.MenuItemEx {
+					text: "Preferences"
+					sequence: "Ctrl+Shift+P"
+					onTriggered: preferences.open()
+				}
+
 			}
+
 		}
 		
 		//
@@ -146,36 +156,6 @@ ToolBar {
 				}
 
 			}
-		}
-
-		//
-		// Options
-		//
-
-		Components.ToolButtonEx {
-			text: "Options"
-			onClicked: optionMenu.open()
-
-			Menu {
-				id: optionMenu
-				y: parent.y + parent.height
-
-				Components.MenuItemEx {
-					text: "Slide Show"
-					sequence: "S"
-					onTriggered: slideShow.start()
-				}
-
-				MenuSeparator {
-				}
-
-				Components.MenuItemEx {
-					text: "Preferences"
-					sequence: "Ctrl+Shift+P"
-					onTriggered: preferences.open()
-				}
-			}
-
 		}
 
 		Item {

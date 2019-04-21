@@ -48,10 +48,13 @@ Item {
 
 	// add to the selection
 	function select(index) {
-		current = convertIndex(index);
-		currentChanged(current);
-		selection.push(current);
-		selectionChanged(selection);
+		index = convertIndex(index);
+		if (index !== current) {
+			current = convertIndex(index);
+			currentChanged(current);
+			selection.push(current);
+			selectionChanged(selection);
+		}
 	}
 
 	// toggle selection
@@ -88,10 +91,12 @@ Item {
 	// overwrite the selection
 	function setCurrent(index) {
 		index = convertIndex(index);
-		selection = [ index ];
-		selectionChanged(selection);
-		current = index;
-		currentChanged(current);
+		if (index !== current) {
+			selection = [ index ];
+			selectionChanged(selection);
+			current = index;
+			currentChanged(current);
+		}
 	}
 
 	// check if we have a selection

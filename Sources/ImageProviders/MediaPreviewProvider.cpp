@@ -116,7 +116,7 @@ namespace MediaViewer
 			{
 				image = this->GetImagePreview(path, width, height, cancel);
 			}
-			else if (cancel == false && image.isNull() == true)
+			if (cancel == false && image.isNull() == true)
 			{
 				image = this->GetMoviePreview(path, width, height, cancel);
 			}

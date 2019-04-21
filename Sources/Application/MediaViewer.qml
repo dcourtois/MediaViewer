@@ -18,26 +18,22 @@ Rectangle {
 
 	// externally set
 	property var selection
-	property var stateManager
 
 	// default mouse handling
 	MouseArea {
 		anchors.fill: parent
+		enabled: rootView.fullscreen
 		acceptedButtons: Qt.LeftButton | Qt.MiddleButton
 
 		// middle button click, toggle fullscreen
 		onClicked: {
-			if (selection.currentMedia && mouse.button === Qt.MiddleButton) {
-				stateManager.toggleFullScreen();
+			if (mouse.button === Qt.MiddleButton) {
+				rootView.fullscreen = !rootView.fullscreen;
 			}
 		}
 
-		// double click: toggle fullscreen state
-		onDoubleClicked: {
-			if (selection.currentMedia) {
-				stateManager.toggleFullScreen();
-			}
-		}
+		// double click: exit fullscreen
+		onDoubleClicked: rootView.fullscreen = false
 
 		// mouse wheel, image navigation
 		onWheel: {
@@ -51,6 +47,11 @@ Rectangle {
 
 	// default key handling
 	Keys.onPressed: {
+		// this should not happen
+		if (rootView.fullscreen === false) {
+			return;
+		}
+
 		switch (event.key) {
 			// previous media
 			case Qt.Key_Left:
@@ -71,27 +72,21 @@ Rectangle {
 			case Qt.Key_Enter:
 				event.accepted = true;
 				if (selection.currentMedia) {
-					stateManager.toggleFullScreen();
+					rootView.fullscreen = !rootView.fullscreen;
 				}
 				break;
 
 			// escape goes back to preview
 			case Qt.Key_Escape:
 				event.accepted = true;
-				stateManager.state = "preview";
+				rootView.fullscreen = false;
 				break;
 
+			// default, froward to the viewer
 			default:
-				event.accepted = false;
-		}
-	}
-
-	// update focus
-	function updateFocus() {
-		if (selection.currentMedia) {
-			var isFullScreen = stateManager.state === "fullscreen";
-			root.focus = isFullScreen;
-			viewer.focus = isFullScreen;
+				if (viewer.item !== null) {
+					viewer.item.Keys.pressed(event);
+				}
 		}
 	}
 
@@ -122,25 +117,31 @@ Rectangle {
 		}
 	}
 
-	// handle focus for the movie viewer
-	Connections { target: stateManager; onStateChanged: updateFocus() }
-	Connections { target: selection; onCurrentMediaChanged: updateFocus() }
-
 	// on selection change, update the viewer if needed
 	Connections {
 		target: selection
-		onCurrentMediaTypeChanged: {
+		onCurrentMediaChanged: {
 			const type = selection.currentMedia ? selection.currentMedia.type : Media.NotSupported;
-			if (viewer.item === null || type !== viewer.item.mediaType) {
+			if (viewer.item === null || viewer.item.mediaType !== type) {
 				switch (type) {
-					case Media.Animated:
-						viewer.sourceComponent = animated;
-						break;
-					case Media.Image:
+					// Media.Image
+					case 0:
 						viewer.sourceComponent = image;
 						break;
-					case Media.Movie:
+
+					// Media.Animated
+					case 1:
+						viewer.sourceComponent = animated;
+						break;
+
+					// Media.Movie
+					case 2:
 						viewer.sourceComponent = movie;
+						break;
+
+					// Media.NotSupported
+					default:
+						viewer.sourceComponent = undefined;
 						break;
 				}
 			}
@@ -153,8 +154,7 @@ Rectangle {
 		asynchronous: false
 		anchors.fill: parent
 
-		// make selection and state manager available
+		// make selection available
 		property var selection: root.selection
-		property var stateManager: root.stateManager
 	}
 }

@@ -28,21 +28,15 @@
 		<file>Main.qml</file>
 
 		<!-- Main Window + Menu -->
-		<file>MainWindow.qml</file>
 		<file>MainMenu.qml</file>
-		<file>WindowSettings.qml</file>
 
 		<!-- Global states -->
 		<file>Selection.qml</file>
-		<file>StateManager.qml</file>
 
 		<!-- Main parts of the application -->
 		<file>FolderBrowser.qml</file>
 		<file>MediaBrowser.qml</file>
 		<file>MediaViewer.qml</file>
-
-		<!-- Tools -->
 		<file>Preferences.qml</file>
-		<file>SlideShow.qml</file>
 	</qresource>
 </RCC>

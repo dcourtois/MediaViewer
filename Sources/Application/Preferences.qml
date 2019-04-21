@@ -40,11 +40,6 @@ Dialog {
 
 			TabButton {
 				width: column.width / bar.contentChildren.length
-				text: "Slide Show"
-			}
-
-			TabButton {
-				width: column.width / bar.contentChildren.length
 				text: "Cache"
 			}
 		}
@@ -195,69 +190,6 @@ Dialog {
 							return	"If checked, will display the name of the medias under\n" +
 									"the thumbnails in the media browser view.";
 						}
-					}
-
-				}
-			}
-
-			// slideshow options
-			Item {
-				Layout.fillWidth: true
-				Layout.fillHeight: true
-
-				GridLayout {
-					anchors.centerIn: parent
-					columns: 2
-					columnSpacing: 10
-					rowSpacing: 10
-
-					// Delay between 2 images
-					Label {
-						text: "Delay"
-						Layout.alignment: Qt.AlignRight
-					}
-					TextField {
-						id: slideShowDelay
-						verticalAlignment: Text.BottomLeft
-						placeholderText: "Milliseconds"
-						text: settings.get("Slideshow.Delay")
-						onTextChanged: settings.set("Slideshow.Delay", parseInt(text))
-						ToolTip.delay: _tooltipDelay
-						ToolTip.visible: hovered
-						ToolTip.text: {
-							return	"Delay in milliseconds between 2 images.";
-						}
-					}
-
-					// Loop
-					Label {
-						text: "Loop"
-						Layout.alignment: Qt.AlignRight
-					}
-					CheckBox {
-						id: slideShowLoop
-						checked: settings.get("Slideshow.Loop")
-						onCheckedChanged: settings.set("Slideshow.Loop", slideShowLoop.checked)
-						ToolTip.delay: _tooltipDelay
-						ToolTip.visible: hovered
-						ToolTip.text: {
-							return	"If checked, the slide show will start again when\n" +
-									"reaching the last image. Otherwise, it stops.";
-						}
-					}
-
-					// Use selection
-					Label {
-						text: "Use Selection"
-						Layout.alignment: Qt.AlignRight
-					}
-					CheckBox {
-						id: slideShowSelection
-						checked: settings.get("Slideshow.Selection", true)
-						onCheckedChanged: settings.set("Slideshow.Selection", checked)
-						ToolTip.delay: _tooltipDelay
-						ToolTip.visible: hovered
-						ToolTip.text: "If checked, the slide show will use only the current selection."
 					}
 
 				}

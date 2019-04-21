@@ -17,7 +17,7 @@ Item {
 	focus: true
 
 	// show the controls when needed
-	Connections { target: stateManager; onStateChanged: controls.show() }
+	Connections { target: rootView; onFullscreenChanged: controls.show() }
 	Connections { target: selection; onCurrentChanged: controls.show() }
 
 	// the media player

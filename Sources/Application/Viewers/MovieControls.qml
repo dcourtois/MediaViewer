@@ -54,7 +54,7 @@ Rectangle {
 
 	// handle the cursor
 	onEnabledChanged: {
-		if (stateManager.state === "fullscreen") {
+		if (rootView.fullscreen === true) {
 			cursor.hidden = enabled === false;
 		}
 	}

@@ -16,7 +16,7 @@ include (CMakeUtils.cmake)
 #
 # Define options for this project
 #
-cu_option (QT_DIR "D:/Development/Libs/Qt/5.12.2/msvc2017_64/lib/cmake")
+cu_option (QT_DIR "C:/Development/Libs/Qt/5.12.3/msvc2017_64/lib/cmake")
 
 #
 # Configure Qt
@@ -30,7 +30,6 @@ find_package (Qt5 5.12
 		QuickControls2
 		Sql
 		Svg
-		Test
 	REQUIRED
 )
 
@@ -40,6 +39,11 @@ find_package (Qt5 5.12
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_AUTORCC ON)
 set (CMAKE_AUTOMOC_MOC_OPTIONS "-bMediaViewerPCH.h")
+
+#
+# Add QtUtils
+#
+add_subdirectory (Libs/QtUtils)
 
 #
 # The library
@@ -86,9 +90,6 @@ add_executable (MediaViewer WIN32
 	Sources/RegisterQMLTypes.cpp
 	Sources/RegisterQMLTypes.h
 
-	# QtUtils that need moc
-	Libs/QtUtils/Settings.h
-
 	# RC file on Windows
 	$<$<PLATFORM_ID:Windows>:Resources/MediaViewer.rc>
 )
@@ -99,14 +100,6 @@ add_executable (MediaViewer WIN32
 target_pch (MediaViewer
 	MediaViewerPCH.h
 	Sources/MediaViewerPCH.cpp
-)
-
-#
-# compiler's requirements
-#
-target_compile_features (MediaViewer
-	PRIVATE
-		cxx_std_17
 )
 
 #
@@ -126,10 +119,10 @@ target_link_libraries(MediaViewer
 		Qt5::Core
 		Qt5::Multimedia
 		Qt5::Qml
-		Qt5::Quick
 		Qt5::QuickControls2
 		Qt5::Sql
 		Qt5::Svg
+		QtUtils
 )
 
 #

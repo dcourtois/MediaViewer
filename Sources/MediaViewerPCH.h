@@ -85,6 +85,7 @@
 #include "CppUtils/MemoryTracker.h"
 #include "CppUtils/STLUtils.h"
 #include "QtUtils/Settings.h"
+#include "QtUtils/Utils.h"
 
 
 #endif // MEDIA_VIEWER_PCH_H

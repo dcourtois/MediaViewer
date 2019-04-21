@@ -1,4 +1,4 @@
-import QtQuick 2.5
+import QtQuick 2.12
 import QtQuick.Controls 1.4 as Controls
 import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.2
@@ -15,7 +15,6 @@ Rectangle {
 
 	// externally set
 	property var selection
-	property var stateManager
 
 	// privates
 	property bool _controlDown: false
@@ -25,7 +24,12 @@ Rectangle {
 	property int _thumbnailSize: settings.get("Media.ThumbnailSize")
 	property bool _showLabel: settings.get("Media.ShowLabel")
 
-	// bind settings
+	// helper to get back the focus when switching back from fullscreen
+	function forceFocus() {
+		scrollView.forceActiveFocus();
+	}
+
+	// watch for setting changes
 	Connections {
 		target: settings
 		onSettingChanged: {
@@ -48,11 +52,6 @@ Rectangle {
 					break;
 			}
 		}
-	}
-
-	// handle focus
-	function forceFocus() {
-		scrollView.forceActiveFocus();
 	}
 
 	// use a scroll view to show a scroll bar (GridView is a flickable, so
@@ -81,7 +80,6 @@ Rectangle {
 
 				Rectangle {
 					id: thumbnailBackground
-					property string currentPath: path
 					width: grid.cellWidth
 					height: grid.cellHeight
 					color: _background
@@ -90,9 +88,9 @@ Rectangle {
 					Connections {
 						target: selection
 						onSelectionChanged: {
-							var selected = selection.isSelected(index);
-							thumbnailBackground.color = selected ? palette.highlight : _background;
-							label.item.color = selected ? palette.highlightedText : palette.windowText;
+							const selected = selection.isSelected(index);
+							thumbnailBackground.color = selected ? _highlight : _background;
+							label.item.color = selected ? _background : "black";
 						}
 					}
 
@@ -130,7 +128,7 @@ Rectangle {
 						}
 					}
 
-					// the label
+					// the optional label
 					Loader {
 						id: label
 						active: root._showLabel
@@ -151,9 +149,10 @@ Rectangle {
 				}
 			}
 
-			// notify the selection manager that the index changed
+			// notify the selection manager that the index changed. In fullscreen, do nothing since it's
+			// the media viewer which controls things
 			onCurrentIndexChanged: {
-				if (stateManager.state === "preview") {
+				if (rootView.fullscreen === false) {
 					if (_controlDown === true) {
 						selection.toggleSelection(grid.currentIndex);
 					} else if (_shiftDown === true) {
@@ -167,11 +166,8 @@ Rectangle {
 			// update the view's current item when the selection manager's current index changed
 			Connections {
 				target: selection
-				onCurrentChanged: {
-					if (stateManager.state === "fullscreen") {
-						grid.currentIndex = selection.current.row;
-					}
-				}
+				enabled: rootView.fullscreen
+				onCurrentChanged: grid.currentIndex = selection.current.row
 			}
 
 			// Mouse handling
@@ -202,14 +198,14 @@ Rectangle {
 
 					// middle click, toggle fullscreen
 					if (selection.currentMedia && mouse.button === Qt.MiddleButton) {
-						stateManager.state = "fullscreen";
+						rootView.fullscreen = true;
 					}
 				}
 
 				// toggle fullscreen
 				onDoubleClicked: {
 					if (selection.currentMedia) {
-						stateManager.state = "fullscreen";
+						rootView.fullscreen = true;
 					}
 				}
 			}
@@ -244,7 +240,7 @@ Rectangle {
 					break;
 				case Qt.Key_Enter:
 				case Qt.Key_Return:
-					stateManager.state = "fullscreen";
+					rootView.fullscreen = true;
 					break;
 			}
 		}
