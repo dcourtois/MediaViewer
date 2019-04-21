@@ -34,18 +34,18 @@ ToolBar {
 				y: parent.y + parent.height
 
 				Components.MenuItemEx {
-					text: "Close"
-					sequence: StandardKey.Close
-					onTriggered: Qt.quit();
+					text: "Preferences"
+					sequence: "Ctrl+Shift+P"
+					onTriggered: preferences.open()
 				}
 
 				MenuSeparator {
 				}
 
 				Components.MenuItemEx {
-					text: "Preferences"
-					sequence: "Ctrl+Shift+P"
-					onTriggered: preferences.open()
+					text: "Close"
+					sequence: StandardKey.Close
+					onTriggered: Qt.quit();
 				}
 
 			}
@@ -58,7 +58,7 @@ ToolBar {
 
 		Components.ToolButtonEx {
 			id: editButton
-			text: "Edit"
+			text: "Media"
 			onClicked: editMenu.open()
 
 			Menu {
