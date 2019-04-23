@@ -110,6 +110,19 @@ Rectangle {
 						asynchronous: true
 						fillMode: Image.PreserveAspectFit
 
+						// the loading animation
+						Loader {
+							active: image.status !== Image.Ready
+
+							anchors.centerIn: parent
+							width: grid.cellWidth / 2
+							height: grid.cellHeight / 2
+
+							sourceComponent: BusyIndicator {
+								running: image.status !== Image.Ready
+							}
+						}
+
 						// animation overlay if the media can be played
 						Loader {
 							active: image.status === Image.Ready && type !== Media.Image
