@@ -1,6 +1,10 @@
 #include "MediaViewerPCH.h"
 #include "FileSystem.h"
 
+#if defined(WINDOWS)
+#	include <shellapi.h>
+#endif
+
 
 //!
 //! Constructor
@@ -99,9 +103,15 @@ bool FileSystem::CanPaste(void) const
 bool FileSystem::CanTrash(void) const
 {
 #if defined(LINUX)
+
+	// only supported if we found the trash location (see InitTrashFolder)
 	return m_TrashFolder.isEmpty() == false;
+
 #elif defined(WINDOWS)
-	return false;
+
+	// always supported
+	return true;
+
 #else
 	static_assert(false, "implement FileSystem::CanTrash for your platform");
 #endif
@@ -113,6 +123,7 @@ bool FileSystem::CanTrash(void) const
 void FileSystem::InitTrashFolder(void)
 {
 #if defined(LINUX)
+
 	// note: following https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
 	QVector< QString > trashes = {
 		QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.local/share/Trash",
@@ -129,7 +140,11 @@ void FileSystem::InitTrashFolder(void)
 			break;
 		}
 	}
+
 #elif defined(WINDOWS)
+
+	// nothing to do
+
 #else
 	static_assert(false, "implement FileSystem::InitTrash for your platform");
 #endif
@@ -141,6 +156,7 @@ void FileSystem::InitTrashFolder(void)
 void FileSystem::MoveToTrash(const QString & path)
 {
 #if defined(LINUX)
+
 	// note: following https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
 	// check that we can trash
 	if (m_TrashFolder.isEmpty() == true)
@@ -173,8 +189,27 @@ void FileSystem::MoveToTrash(const QString & path)
 	QFile info(m_TrashFolder + "/info/" + trashName + ".trashinfo");
 	info.open(QIODevice::WriteOnly);
 	info.write(trashInfo.toUtf8());
+
 #elif defined(WINDOWS)
-	Q_UNUSED(path);
+
+	// convert the path
+	char * pStr = MT_NEW char [path.size() + 2];
+	memcpy(pStr, qPrintable(QString(path).replace('/', '\\')), path.size());
+	memset(pStr + path.size(), 0, 2);
+
+	// init the options
+	SHFILEOPSTRUCT fileOpt;
+	memset(&fileOpt, 0, sizeof(SHFILEOPSTRUCT));
+	fileOpt.wFunc	= FO_DELETE;
+	fileOpt.fFlags	= FOF_SILENT | FOF_NOERRORUI | FOF_NOCONFIRMATION | FOF_ALLOWUNDO;
+	fileOpt.pFrom	= pStr;
+
+	// recycle
+	SHFileOperation(&fileOpt);
+
+	// cleanup
+	MT_DELETE [] pStr;
+
 #else
 	static_assert(false, "implement FileSystem::MoveToTrash for your platform");
 #endif
