@@ -28,8 +28,6 @@ find_package (Qt5 5.12
 		Qml
 		Quick
 		QuickControls2
-		Sql
-		Svg
 	REQUIRED
 )
 
@@ -120,8 +118,6 @@ target_link_libraries(MediaViewer
 		Qt5::Multimedia
 		Qt5::Qml
 		Qt5::QuickControls2
-		Qt5::Sql
-		Qt5::Svg
 		QtUtils
 )
 
@@ -162,3 +158,8 @@ target_compile_options (MediaViewer
 		$<$<CXX_COMPILER_ID:Clang>:-Wall -Werror>
 		$<$<CXX_COMPILER_ID:GNU>:-Wall -Werror>
 )
+
+#
+# Install mediaviewer
+#
+qt_install (MediaViewer "${CMAKE_CURRENT_SOURCE_DIR}/Sources")

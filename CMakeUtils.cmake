@@ -106,3 +106,36 @@ function (target_pch PCH_TARGET_NAME PCH_HEADER PCH_SOURCE)
 	endif ()
 
 endfunction ()
+
+#
+# Install an executable using deployqt tool
+#
+function (qt_install target_name qmldir)
+
+	install (TARGETS ${target_name}
+		RUNTIME DESTINATION .
+		LIBRARY DESTINATION .
+		ARCHIVE DESTINATION .
+	)
+
+	find_program (QT_DEPLOY_TOOL
+		NAMES
+			windeployqt
+		HINTS
+			${QT_DIR}/../../bin
+	)
+
+	install (CODE "
+		execute_process(
+			COMMAND ${QT_DEPLOY_TOOL} --qmldir \"${qmldir}\" \"${CMAKE_INSTALL_PREFIX}/${target_name}${CMAKE_EXECUTABLE_SUFFIX}\"
+				--no-compiler-runtime
+				--no-opengl-sw
+				--no-webkit2
+				--no-system-d3d-compiler
+				--no-translations
+				--no-qmltooling
+			WORKING_DIRECTORY ${QT_DIR}/bin
+		)
+	")
+
+endfunction ()
