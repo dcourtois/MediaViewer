@@ -64,19 +64,23 @@ void FileSystem::paste(QString destination)
 //!
 //! Erase the files
 //!
-void FileSystem::remove(QStringList files)
+void FileSystem::remove(QStringList paths)
 {
 	// check if we need to permanently delete
-	bool permanent = Settings::Get< bool >("FileSystem.DeletePermanently") && this->CanTrash() == true;
-	for (const QString & file : files)
+	bool permanent = Settings::Get< bool >("FileSystem.DeletePermanently") || this->CanTrash() == false;
+	for (const QString & path : paths)
 	{
 		if (permanent == true)
 		{
-			QFile::remove(file);
+			QFile file(path);
+			if (file.remove() == false)
+			{
+				qDebug() << "failed removing file " << file << " with error " << file.errorString();
+			}
 		}
 		else
 		{
-			this->MoveToTrash(file);
+			this->MoveToTrash(path);
 		}
 	}
 }

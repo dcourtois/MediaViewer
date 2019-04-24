@@ -25,10 +25,10 @@ public:
 	FileSystem(void);
 
 	// QML API
-	Q_INVOKABLE void	copy(QStringList files);
-	Q_INVOKABLE void	cut(QStringList files);
+	Q_INVOKABLE void	copy(QStringList paths);
+	Q_INVOKABLE void	cut(QStringList paths);
 	Q_INVOKABLE void	paste(QString destination);
-	Q_INVOKABLE void	remove(QStringList files);
+	Q_INVOKABLE void	remove(QStringList paths);
 
 private:
 
