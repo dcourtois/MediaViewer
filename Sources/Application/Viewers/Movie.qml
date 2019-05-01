@@ -46,25 +46,13 @@ Item {
 			settings.set("Movie.Fullscreen", fullscreen);
 		}
 
-		// resize
+		// resize, to make sure we don't grow bigger than our parent when not in fullscreen
 		function resize() {
-
-			// if fullscreen, do nothing (anchors.fill is set to parent, so sizing
-			// is automatically handled)
-			if (fullscreen === true) {
-				return;
+			if (fullscreen === false) {
+				const size = Qt.size(sourceRect.width, sourceRect.height);
+				width = Math.min(size.width, root.width);
+				height = Math.min(size.height, root.height);
 			}
-
-			// if not, we'll need to get the size of the media to decide on how we should size the output
-			const size = player.metaData && player.metaData.resolution ? player.metaData.resolution : null;
-			if (size === null) {
-				console.warning("Movie.resize called while player's metadata is not ready or does not contain the resolution.");
-				return;
-			}
-
-			// make sure we don't grow bigger than our parent
-			width = Math.min(size.width, root.width);
-			height = Math.min(size.height, root.height);
 		}
 
 		// when the root is resized, we need to make sure the media is correctly resized
@@ -83,7 +71,9 @@ Item {
 		loops: settings.get("Movie.Loop")
 		muted: settings.get("Movie.Muted")
 		volume: settings.get("Movie.Volume")
-		notifyInterval: 2
+
+		// we want a smooth seeking bar
+		notifyInterval: 10
 
 		// on changes, update the settings
 		onLoopsChanged: settings.set("Movie.Loop", loops)
@@ -127,6 +117,28 @@ Item {
 			case Qt.Key_Space:
 				event.accepted = true;
 				player.playbackState === MediaPlayer.PlayingState ? player.pause() : player.play();
+				controls.show();
+				break;
+
+			// fullscreen / original size
+			case Qt.Key_F:
+				event.accepted = true;
+				output.fullscreen = !output.fullscreen;
+				controls.show();
+				break;
+
+			// loop
+			case Qt.Key_L:
+				event.accepted = true;
+				player.loops = player.loops === MediaPlayer.Infinite ? 0 : MediaPlayer.Infinite;
+				controls.show();
+				break;
+
+			// mute
+			case Qt.Key_M:
+				event.accepted = true;
+				player.muted = !player.muted;
+				controls.show();
 				break;
 
 			// let the rest be handled by the parent

@@ -142,11 +142,11 @@ Rectangle {
 				Image {
 					sourceSize { width: root.iconSize; height: root.iconSize }
 					source: "qrc:/Icons/Loop"
-					opacity: player.loops === 0 ? 0.2 : 1
+					opacity: player.loops === MediaPlayer.Infinite ? 1 : 0.2
 					MouseArea {
 						anchors.fill: parent
 						acceptedButtons: Qt.LeftButton
-						onClicked: player.loops = player.loops === 0 ? MediaPlayer.Infinite : 0
+						onClicked: player.loops = player.loops === MediaPlayer.Infinite ? 0 : MediaPlayer.Infinite
 					}
 				}
 
