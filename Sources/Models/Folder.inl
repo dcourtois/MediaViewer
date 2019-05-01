@@ -51,6 +51,10 @@ namespace MediaViewer
 	//!
 	inline QString Folder::Normalize(const QString & path)
 	{
+		if (path.size() == 0)
+		{
+			return path;
+		}
 		QString result(path);
 		result = result.replace('\\', '/');
 		if (result.back() == '/')
