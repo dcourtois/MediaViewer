@@ -93,6 +93,19 @@ namespace MediaViewer
 	}
 
 	//!
+	//! Clear the children's list
+	//!
+	void Folder::Clear(void)
+	{
+		m_Dirty = true;
+		for (Folder * folder : m_Children)
+		{
+			MT_DELETE folder;
+		}
+		m_Children.clear();
+	}
+
+	//!
 	//! Update the children list
 	//!
 	void Folder::UpdateChildren(void) const
@@ -140,5 +153,18 @@ namespace MediaViewer
 			emit mediaCountChanged(m_MediaCount);
 		});
 	}
+
+	//!
+	//! This should be called when this folder is collapsed. It will empty all its
+	//! children to minimize the number of open file watchers, etc.
+	//!
+	void Folder::collapse(void) const
+	{
+		for (Folder * folder : m_Children)
+		{
+			folder->Clear();
+		}
+	}
+
 
 } // namespace MediaViewer

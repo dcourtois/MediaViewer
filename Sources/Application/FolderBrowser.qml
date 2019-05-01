@@ -68,6 +68,14 @@ Controls.TreeView {
 		color: styleData.selected ? selectedColor : (styleData.alternate ? evenColor : oddColor)
 	}
 
+	// On collapse, notify the folders
+	onCollapsed: {
+		const folder = model.data(index, 258);
+		if (folder) {
+			folder.collapse();
+		}
+	}
+
 	// disable the item delegate
 	// note: we're using a TableViewColumn to access the folders, and custom draw each
 	// rows. When doing this, the itemDelegate of TreeView is no longer used (try replacing

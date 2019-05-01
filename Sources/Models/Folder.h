@@ -38,12 +38,16 @@ namespace MediaViewer
 		inline const QVector< Folder * > &		GetChildren(void) const;
 		inline static QString					Normalize(const QString & path);
 
+		// QML API
+		Q_INVOKABLE void	collapse(void) const;
+
 	private:
 
 		// private API
-		void					UpdateChildren(void) const;
-		void					UpdateMedias(void) const;
-		void					SetPath(const QString & path);
+		void	Clear(void);
+		void	UpdateChildren(void) const;
+		void	UpdateMedias(void) const;
+		void	SetPath(const QString & path);
 
 		//! The parent
 		const Folder * m_Parent;
