@@ -26,32 +26,69 @@ Item {
 		source: player
 		autoOrientation: true
 
+		// init anchors
+		anchors.fill: fullscreen === true ? root : undefined
+		anchors.centerIn: fullscreen === false ? root : undefined
+
+		// if this is true, the video fills the parent area
+		property bool fullscreen: settings.get("Movie.Fullscreen")
+
+		// update the anchor on fullscreen change
+		onFullscreenChanged: {
+			if (fullscreen === true) {
+				anchors.fill = root;
+				anchors.centerIn = undefined;
+			} else {
+				anchors.fill = undefined;
+				anchors.centerIn = root;
+				resize();
+			}
+			settings.set("Movie.Fullscreen", fullscreen);
+		}
+
 		// resize
 		function resize() {
-			if (player.metaData && player.metaData.resolution) {
-				const size = player.metaData.resolution;
-				if (size.width >= root.width || size.height >= root.height && anchors.centerIn !== undefined) {
-					anchors.centerIn = undefined;
-					anchors.fill = root;
-				} else {
-					if (anchors.fill !== undefined) {
-						anchors.centerIn = root;
-						anchors.fill = undefined;
-					}
-					width = size.width;
-					height = size.height;
-				}
+
+			// if fullscreen, do nothing (anchors.fill is set to parent, so sizing
+			// is automatically handled)
+			if (fullscreen === true) {
+				return;
 			}
+
+			// if not, we'll need to get the size of the media to decide on how we should size the output
+			const size = player.metaData && player.metaData.resolution ? player.metaData.resolution : null;
+			if (size === null) {
+				console.warning("Movie.resize called while player's metadata is not ready or does not contain the resolution.");
+				return;
+			}
+
+			// make sure we don't grow bigger than our parent
+			width = Math.min(size.width, root.width);
+			height = Math.min(size.height, root.height);
 		}
+
+		// when the root is resized, we need to make sure the media is correctly resized
+		Connections {
+			target: root
+			onWidthChanged: output.resize()
+			onHeightChanged: output.resize()
+		}
+
 	}
 
 	// the player
 	MediaPlayer {
 		id: player
 		autoPlay: false
-		volume: 0.5
-		muted: true
+		loops: settings.get("Movie.Loop")
+		muted: settings.get("Movie.Muted")
+		volume: settings.get("Movie.Volume")
 		notifyInterval: 2
+
+		// on changes, update the settings
+		onLoopsChanged: settings.set("Movie.Loop", loops)
+		onMutedChanged: settings.set("Movie.Muted", muted)
+		onVolumeChanged: settings.set("Movie.Volume", volume)
 
 		// update the sizing when ready to play
 		onStatusChanged: {
@@ -72,17 +109,11 @@ Item {
 		onExited: controls.hide()
 	}
 
-	// detect size changes
-	Connections {
-		target: root
-		onWidthChanged: output.resize()
-		onHeightChanged: output.resize()
-	}
-
 	// movie controls
 	MovieControls {
 		id: controls
 		player: player
+		output: output
 		anchors.horizontalCenter: parent.horizontalCenter
 		anchors.bottom: parent.bottom
 		anchors.bottomMargin: 10

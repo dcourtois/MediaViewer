@@ -16,6 +16,7 @@ Rectangle {
 
 	// externally set
 	property var player
+	property var output
 
 	// control the look & feel. Can be overriden
 	property int iconSize: 32
@@ -97,6 +98,17 @@ Rectangle {
 			Layout.fillWidth: true
 			height: root.iconSize
 
+			// media size
+			Image {
+				sourceSize { width: root.iconSize; height: root.iconSize }
+				source: root.output.fullscreen ? "qrc:/Icons/OriginalSize" : "qrc:/Icons/Fullscreen"
+				MouseArea {
+					anchors.fill: parent
+					acceptedButtons: Qt.LeftButton
+					onClicked: root.output.fullscreen = !root.output.fullscreen
+				}
+			}
+
 			RowLayout {
 				anchors.centerIn: parent
 				spacing: 10
@@ -130,11 +142,11 @@ Rectangle {
 				Image {
 					sourceSize { width: root.iconSize; height: root.iconSize }
 					source: "qrc:/Icons/Loop"
-					opacity: player.loops === 1 ? 0.2 : 1
+					opacity: player.loops === 0 ? 0.2 : 1
 					MouseArea {
 						anchors.fill: parent
 						acceptedButtons: Qt.LeftButton
-						onClicked: player.loops = player.loops === 1 ? MediaPlayer.Infinite : 1
+						onClicked: player.loops = player.loops === 0 ? MediaPlayer.Infinite : 0
 					}
 				}
 

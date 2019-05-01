@@ -13,6 +13,8 @@
 		Source - https://material.io/tools/icons
 	-->
 	<qresource prefix="/Icons">
+		<file alias="Fullscreen">Icons/round-fullscreen-24px.svg</file>
+		<file alias="OriginalSize">Icons/round-fullscreen_exit-24px.svg</file>
 		<file alias="Play">Icons/round-play_circle_outline-24px.svg</file>
 		<file alias="Pause">Icons/round-pause_circle_outline-24px.svg</file>
 		<file alias="Stop">Icons/round-stop-24px.svg</file>

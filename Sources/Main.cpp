@@ -68,6 +68,10 @@ void Setup(QApplication & app, QuickView & view)
 	settings->Init("Slideshow.Loop",						true);
 	settings->Init("Slideshow.Selection",					true);
 	settings->Init("Slideshow.Delay",						2000);
+	settings->Init("Movie.Fullscreen",						true);
+	settings->Init("Movie.Loop",							0);
+	settings->Init("Movie.Muted",							true);
+	settings->Init("Movie.Volume",							0.5);
 	settings->Init("MediaPreviewProvider.UseCache",			true);
 	settings->Init("MediaPreviewProvider.CachePath",		MediaViewer::MediaPreviewProvider::DefaultCachePath());
 
