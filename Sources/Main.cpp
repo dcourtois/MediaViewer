@@ -52,6 +52,9 @@ void Setup(QApplication & app, QuickView & view)
 	// set default size
 	view.resize(1000, 750);
 
+	// configure it
+	view.SetRestoreFullScreen(false);
+
 	// register QML types
 	MediaViewer::RegisterQMLTypes();
 
@@ -150,7 +153,14 @@ void Setup(QApplication & app, QuickView & view)
 		else if (info.isDir())
 		{
 			engine.rootContext()->setContextProperty("initFolder", info.absoluteFilePath());
+			engine.rootContext()->setContextProperty("initMedia", "");
 		}
+		else
+		{
+			engine.rootContext()->setContextProperty("initMedia", "");
+			engine.rootContext()->setContextProperty("initFolder", "");
+		}
+
 	}
 	else
 	{
@@ -160,6 +170,7 @@ void Setup(QApplication & app, QuickView & view)
 
 	// set the source
 	view.setSource(QUrl("qrc:/Main.qml"));
+	view.show();
 }
 
 //!

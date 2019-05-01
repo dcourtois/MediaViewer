@@ -13,9 +13,6 @@ Item {
 	// initialize
 	Component.onCompleted: {
 
-		// do not restore fullscreen state
-		rootView.restoreFullscreen = false;
-
 		// select the initial folder
 		if (initFolder !== "") {
 			folderBrowser.currentFolderPath = initFolder;
@@ -26,6 +23,8 @@ Item {
 			selection.selectByPath(initMedia);
 			if (selection.currentMedia) {
 				rootView.fullscreen = true;
+			} else {
+				console.log(`initial media ${initMedia} not found`);
 			}
 		}
 
