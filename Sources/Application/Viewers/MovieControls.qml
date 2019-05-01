@@ -179,7 +179,7 @@ Rectangle {
 					visible: enabled
 					interactive: enabled
 					position: player.volume
-					onPositionChanged: { player.volume = position; }
+					onPositionSet: player.volume = position
 				}
 
 			}
