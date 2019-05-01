@@ -72,6 +72,7 @@ Controls.TreeView {
 	onCollapsed: {
 		const folder = model.data(index, 258);
 		if (folder) {
+			folderSelectionModel.setCurrentIndex(index, ItemSelectionModel.Current);
 			folder.collapse();
 		}
 	}

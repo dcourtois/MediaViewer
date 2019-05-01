@@ -195,7 +195,11 @@ namespace MediaViewer
 	{
 		if (parent.isValid())
 		{
-			return this->createIndex(row, column, static_cast< Folder * >(parent.internalPointer())->GetChildren().at(row));
+			auto * node = static_cast< Folder * >(parent.internalPointer());
+			Q_ASSERT(node != nullptr);
+			return row < node->GetChildren().size() ?
+				this->createIndex(row, column, node->GetChildren().at(row)) :
+				QModelIndex();
 		}
 
 		if (row < m_Roots.size())
