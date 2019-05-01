@@ -75,8 +75,8 @@ Item {
 	// detect size changes
 	Connections {
 		target: root
-		onWidthChanged: { output.resize(); controls.setPosition(player.position); }
-		onHeightChanged: { output.resize(); controls.setPosition(player.position); }
+		onWidthChanged: output.resize()
+		onHeightChanged: output.resize()
 	}
 
 	// movie controls

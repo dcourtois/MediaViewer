@@ -19,6 +19,9 @@ Item {
 	property real position: 0
 	property var direction: Qt.Horizontal
 
+	// this signal is emitted when the position is modified by the user
+	signal positionSet(real position)
+
 	// clamped position
 	property real clampedPosition: Math.min(1, Math.max(position))
 
@@ -56,11 +59,14 @@ Item {
 		enabled: parent.interactive
 		acceptedButtons: Qt.LeftButton
 		function setPosition(mouse) {
+			let pos = null;
 			if (parent.direction === Qt.Horizontal) {
-				parent.position = Math.min(1, Math.max(0, mouse.x / parent.width));
+				pos = Math.min(1, Math.max(0, mouse.x / parent.width));
 			} else {
-				parent.position = Math.min(1, Math.max(0, mouse.y / parent.height));
+				pos = Math.min(1, Math.max(0, mouse.y / parent.height));
 			}
+			parent.positionChanged(pos);
+			parent.positionSet(pos);
 		}
 		onPressed: setPosition(mouse)
 		onPositionChanged: setPosition(mouse)

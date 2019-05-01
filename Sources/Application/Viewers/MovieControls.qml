@@ -61,11 +61,11 @@ Rectangle {
 
 	// set the movie at the given position
 	function setPosition(position) {
-		player.seek(position);
 		if (player.playbackState !== MediaPlayer.PlayingState) {
 			player.play();
 			player.pause();
 		}
+		player.seek(position);
 	}
 
 	// return time as a readable string. t is in milliseconds
@@ -109,8 +109,8 @@ Rectangle {
 						anchors.fill: parent
 						acceptedButtons: Qt.LeftButton
 						onClicked: {
-							player.stop();
 							root.setPosition(0);
+							player.stop();
 						}
 					}
 				}
@@ -189,8 +189,8 @@ Rectangle {
 				Layout.fillWidth: true
 				Layout.preferredHeight: root.iconSize
 				interactive: true
-				position: player.position / player.duration
-				onPositionChanged: Math.round(position * player.duration)
+				position: player.playbackState === MediaPlayer.StoppedState ? 0 : player.position / player.duration
+				onPositionSet: root.setPosition(Math.round(position * player.duration))
 			}
 
 			// total time
