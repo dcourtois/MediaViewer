@@ -1,6 +1,7 @@
 #
 # Ignore IDE configuration stuff
 #
+.vscode
 .vs
 *.pro.user
 *.txt.user
