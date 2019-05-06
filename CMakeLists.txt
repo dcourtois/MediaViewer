@@ -101,6 +101,14 @@ target_pch (MediaViewer
 )
 
 #
+# c++17
+#
+target_compile_features (MediaViewer
+	PRIVATE
+		cxx_std_17
+)
+
+#
 # includes
 #
 target_include_directories (MediaViewer
