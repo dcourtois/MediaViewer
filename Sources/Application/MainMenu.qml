@@ -51,7 +51,7 @@ ToolBar {
 			}
 
 		}
-		
+
 		//
 		// Edit Menu
 		//

@@ -11,6 +11,7 @@ namespace MediaViewer
 	//!
 	const static QHash< QString, Media::Type > SupportedMediaExtensions = {
 		// static images
+		{ "bmp",	Media::Type::Image },
 		{ "jpg",	Media::Type::Image },
 		{ "jpeg",	Media::Type::Image },
 		{ "tif",	Media::Type::Image },
