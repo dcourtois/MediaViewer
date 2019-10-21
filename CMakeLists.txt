@@ -1,7 +1,7 @@
 #
 # Min version of CMake
 #
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.16)
 
 #
 # Project
@@ -9,34 +9,47 @@ cmake_minimum_required(VERSION 3.8)
 project(MediaViewer)
 
 #
-# Include our utility scripts
-#
-include (CMakeUtils.cmake)
-
-#
-# Define options for this project
-#
-cu_option (QT_DIR "C:/Development/Libs/Qt/5.12.3/msvc2017_64/lib/cmake")
-
-#
 # Configure Qt
 #
-set (CMAKE_PREFIX_PATH ${QT_DIR})
-find_package (Qt5 5.12
-	COMPONENTS
-		Multimedia
-		Qml
-		Quick
-		QuickControls2
-	REQUIRED
+set (QT_ROOT
+	${QT_ROOT}
+	"C:/Development/Libs/Qt/5.13.1"
+	"D:/Development/Libs/Qt/5.13.1"
+	"~/Development/Libs/Qt/5.13.1"
 )
+set (QT_SUFFIX
+	${QT_SUFFIX}
+	"msvc2017_64/lib/cmake"
+	"gcc_64/lib/cmake"
+	"clang_64/lib/cmake"
+)
+set (QT_COMPONENTS
+	Multimedia
+	Qml
+	Quick
+	QuickControls2
+)
+set (QT_VERSION
+	5.12
+)
+
+#
+# Include our utility scripts
+#
+include (CMakeUtils/Utils.cmake)
+include (CMakeUtils/Qt.cmake)
+
+#
+# totally remove warnings. This lets us set the warning level we want per target
+# without command lines complaining when we override the warning levels.
+#
+string (REGEX REPLACE "(/W[^ ]+)|(-W[123])" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 #
 # Auto moc and rcc
 #
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_AUTORCC ON)
-set (CMAKE_AUTOMOC_MOC_OPTIONS "-bMediaViewerPCH.h")
 
 #
 # Add QtUtils
@@ -87,18 +100,17 @@ add_executable (MediaViewer WIN32
 	Sources/MediaViewerPCH.h
 	Sources/RegisterQMLTypes.cpp
 	Sources/RegisterQMLTypes.h
-
-	# RC file on Windows
-	$<$<PLATFORM_ID:Windows>:Resources/MediaViewer.rc>
 )
 
 #
-# Using PCH to speed-up compilation
+# Application icon
 #
-target_pch (MediaViewer
-	MediaViewerPCH.h
-	Sources/MediaViewerPCH.cpp
-)
+target_set_app_icon (MediaViewer "Resources/Icons/MediaViewer.ico")
+
+#
+# Set the precompiled headers
+#
+target_precompile_headers (MediaViewer PRIVATE "Sources/MediaViewerPCH.h")
 
 #
 # c++17
@@ -163,7 +175,7 @@ target_compile_options (MediaViewer
 	PRIVATE
 		# Warning levels
 		$<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-		$<$<CXX_COMPILER_ID:Clang>:-Wall -Werror>
+		$<$<CXX_COMPILER_ID:Clang>:-Werror>
 		$<$<CXX_COMPILER_ID:GNU>:-Wall -Werror>
 )
 

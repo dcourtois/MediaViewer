@@ -93,7 +93,8 @@ void Setup(QApplication & app, QuickView & view)
 		{ "settings",		QVariant::fromValue(settings) },
 		{ "cursor",			QVariant::fromValue(cursor) },
 		{ "fileSystem",		QVariant::fromValue(fileSystem) },
-		{ "mediaProvider",	QVariant::fromValue(mediaProvider) }
+		{ "mediaProvider",	QVariant::fromValue(mediaProvider) },
+		{ "rootView",		QVariant::fromValue(&view) }
 	});
 
 	// expose the list of drives to QML
@@ -170,7 +171,8 @@ void Setup(QApplication & app, QuickView & view)
 
 	// set the source
 	view.setSource(QUrl("qrc:/Main.qml"));
-	view.show();
+	view.raise();
+	view.requestActivate();
 }
 
 //!

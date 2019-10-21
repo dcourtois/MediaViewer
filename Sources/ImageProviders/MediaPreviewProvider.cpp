@@ -174,7 +174,7 @@ namespace MediaViewer
 			.arg(hashName[0]).arg(hashName[1]).arg(hashName[2]).arg(hashName[3])
 			.arg(hashName[4]).arg(hashName[5]).arg(hashName[6]).arg(hashName[7]);
 	}
-	
+
 	//!
 	//! Try to get a preview for a static image
 	//!
@@ -470,7 +470,7 @@ namespace MediaViewer
 
 			// check the size of the source frame and destination capture
 			const int srcBytes = frame.mappedBytes();
-			const int dstBytes = capturedFrame.byteCount();
+			const qsizetype dstBytes = capturedFrame.sizeInBytes();
 
 			// check cancellation
 			if (m_Cancel == true)
@@ -493,7 +493,7 @@ namespace MediaViewer
 				uchar * src = frame.bits();
 				uchar * dst = capturedFrame.bits();
 				const int srcBytesPerLine = frame.bytesPerLine();
-				const int dstBytesPerLine = dstBytes / capturedFrame.height();
+				const int dstBytesPerLine = static_cast< int >(dstBytes / capturedFrame.height());
 				for (int i = 0, iend = frame.height(); i < iend; ++i)
 				{
 
