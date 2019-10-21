@@ -21,6 +21,11 @@ static Cursor *			cursor			= nullptr;
 static FileSystem *		fileSystem		= nullptr;
 
 //!
+//! Disable custom log context
+//!
+bool g_DisableLogContext = false;
+
+//!
 //! Message handler. Since Qt 5.12.xx there is a fucking flood of warnings whenever you use a
 //! TreeView from QtQuick.Controls 1. And since there's not replacement in Controls 2, I'm
 //! stuck with this. So at least I can filter those.
@@ -34,11 +39,13 @@ void MessageHandler(QtMsgType, const QMessageLogContext & context, const QString
 	if (QString(context.file).contains("jsruntime") == false)
 	{
 		// customize our message, while we're at it...
-		const QString output = QString("MediaViewer: %1:%2 - %3\n").arg(context.file).arg(context.line).arg(message);
+		const QString output = g_DisableLogContext ?
+			QString("%1%2").arg(message).arg(message.back() == '\n' ? "" : "\n") :
+			QString("MediaViewer: %1:%2 - %3%4").arg(context.file).arg(context.line).arg(message).arg(message.back() == '\n' ? "" : "\n");
 #	if defined(OutputDebugString)
 		OutputDebugStringA(qPrintable(output));
 #	else
-		printf("MediaViewer: %s\n", qPrintable(output));
+		printf("%s", qPrintable(output));
 #	endif
 	}
 #endif
@@ -180,34 +187,39 @@ void Setup(QApplication & app, QuickView & view)
 //!
 int main(int argc, char *argv[])
 {
-	// create the application
-	QApplication *app = MT_NEW QApplication(argc, argv);
-	app->setOrganizationName(ORGANIZATION_NAME);
-	app->setOrganizationDomain(ORGANIZATION_DOMAIN);
-	app->setApplicationName(APPLICATION_NAME);
-	app->setApplicationVersion(APPLICATION_VERSION);
+	int code = -1;
+	{
+		// create the application
+		QApplication app(argc, argv);
+		app.setOrganizationName(ORGANIZATION_NAME);
+		app.setOrganizationDomain(ORGANIZATION_DOMAIN);
+		app.setApplicationName(APPLICATION_NAME);
+		app.setApplicationVersion(APPLICATION_VERSION);
 
-	// install our message handler
-	qInstallMessageHandler(MessageHandler);
+		// install our message handler
+		qInstallMessageHandler(MessageHandler);
 
-	// set style
-	QQuickStyle::setStyle("Material");
+		// set style
+		QQuickStyle::setStyle("Material");
 
-	// create and setup our view
-	QuickView * view = MT_NEW QuickView();
-	Setup(*app, *view);
+		// create and setup our view
+		QuickView * view = MT_NEW QuickView();
+		Setup(app, *view);
 
-	// run the application
-	int code = app->exec();
+		// run the application
+		int code = app.exec();
 
-	// cleanup (order is important)
-	MT_DELETE cursor;
-	MT_DELETE fileSystem;
-	MT_DELETE view;
-	MT_DELETE app;
+		// cleanup (order is important)
+		MT_DELETE cursor;
+		MT_DELETE fileSystem;
+		MT_DELETE view;
+	}
+
+	// end of cleanup
 	MT_DELETE settings;
 
 	// log memory leaks
+	g_DisableLogContext = true;
 	MT_SHUTDOWN(qDebug);
 
 	return code;
