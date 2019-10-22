@@ -182,4 +182,8 @@ target_compile_options (MediaViewer
 #
 # Install mediaviewer
 #
-qt_install (MediaViewer "${CMAKE_CURRENT_SOURCE_DIR}/Sources")
+install_qt_target (MediaViewer "${CMAKE_CURRENT_SOURCE_DIR}/Sources"
+	RUNTIME DESTINATION .
+	LIBRARY DESTINATION .
+	ARCHIVE DESTINATION .
+)
