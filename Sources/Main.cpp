@@ -56,12 +56,6 @@ void MessageHandler(QtMsgType, const QMessageLogContext & context, const QString
 //!
 void Setup(QApplication & app, QuickView & view)
 {
-	// set default size
-	view.resize(1000, 750);
-
-	// configure it
-	view.SetRestoreFullScreen(false);
-
 	// register QML types
 	MediaViewer::RegisterQMLTypes();
 
@@ -176,10 +170,18 @@ void Setup(QApplication & app, QuickView & view)
 		engine.rootContext()->setContextProperty("initFolder", "");
 	}
 
+	// configure the view
+	view.SetPersistence(
+		QuickView::PersistenceFlags::Maximized |
+		QuickView::PersistenceFlags::Position |
+		QuickView::PersistenceFlags::Size
+	);
+
 	// set the source
 	view.setSource(QUrl("qrc:/Main.qml"));
-	view.raise();
-	view.requestActivate();
+
+	// and restore
+	view.Restore(1000, 750, QWindow::Visibility::Windowed);
 }
 
 //!
@@ -207,7 +209,7 @@ int main(int argc, char *argv[])
 		Setup(app, *view);
 
 		// run the application
-		int code = app.exec();
+		code = app.exec();
 
 		// cleanup (order is important)
 		MT_DELETE cursor;
