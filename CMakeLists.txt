@@ -13,7 +13,7 @@ project(MediaViewer)
 #
 set (QT_ROOT ${QT_ROOT} "C:/Development/Libs/Qt" "D:/Development/Libs/Qt" "~/Development/Libs/Qt")
 set (QT_VERSIONS "5.13.2" "5.13.1")
-set (QT_SUFFIX ${QT_SUFFIX} "msvc2017_64/lib/cmake" "gcc_64/lib/cmake" "clang_64/lib/cmake")
+set (QT_SUFFIX ${QT_SUFFIX} "install/lib/cmake" "msvc2017_64/lib/cmake" "gcc_64/lib/cmake" "clang_64/lib/cmake")
 set (QT_COMPONENTS Multimedia Qml Quick QuickControls2)
 set (QT_MIN_VERSION 5.12)
 
