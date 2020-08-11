@@ -120,7 +120,7 @@ Rectangle {
 	// on selection change, update the viewer if needed
 	Connections {
 		target: selection
-		onCurrentMediaChanged: {
+		function onCurrentMediaChanged() {
 			const type = selection.currentMedia ? selection.currentMedia.type : Media.NotSupported;
 			if (viewer.item === null || viewer.item.mediaType !== type) {
 				switch (type) {

@@ -1,19 +1,19 @@
 #
 # Min version of CMake
 #
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required (VERSION 3.16)
 
 #
 # Project
 #
-project(MediaViewer)
+project (MediaViewer)
 
 #
 # Configure Qt
 #
-set (QT_ROOT ${QT_ROOT} "C:/Development/Libs/Qt" "D:/Development/Libs/Qt" "~/Development/Libs/Qt")
-set (QT_VERSIONS "5.13.2" "5.13.1")
-set (QT_SUFFIX ${QT_SUFFIX} "install/lib/cmake" "msvc2017_64/lib/cmake" "gcc_64/lib/cmake" "clang_64/lib/cmake")
+set (QT_ROOT ${QT_ROOT} "C:/Development/Libs/Qt" "C:/Development/Libs/Qt/official" "D:/Development/Libs/Qt" "~/Development/Libs/Qt")
+set (QT_VERSIONS "5.15.0")
+set (QT_SUFFIX ${QT_SUFFIX} "install/lib/cmake" "msvc2019_64/lib/cmake" "msvc2017_64/lib/cmake" "gcc_64/lib/cmake" "clang_64/lib/cmake")
 set (QT_COMPONENTS Multimedia Qml Quick QuickControls2)
 set (QT_MIN_VERSION 5.12)
 
@@ -137,6 +137,10 @@ target_compile_definitions (MediaViewer
 		$<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
 		$<$<CONFIG:Release>:QT_NO_INFO_OUTPUT>
 		$<$<CONFIG:Release>:QT_NO_WARNING_OUTPUT>
+
+		# Build type
+		$<$<CONFIG:Release>:RELEASE>
+		$<$<NOT:$<CONFIG:Release>>:DEBUG>
 
 		# Platforms
 		$<$<PLATFORM_ID:Windows>:WINDOWS>

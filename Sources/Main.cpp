@@ -182,6 +182,8 @@ void Setup(QApplication & app, QuickView & view)
 
 	// and restore
 	view.Restore(1000, 750, QWindow::Visibility::Windowed);
+	view.raise();
+	view.requestActivate();
 }
 
 //!

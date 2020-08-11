@@ -11,7 +11,12 @@ AnimatedImage {
 	fillMode: (sourceSize.width > width || sourceSize.height > height) ? Image.PreserveAspectFit : Image.Pad
 
 	// cursor hidden in fullscreen
-	Connections { target: rootView; onFullscreenChanged: cursor.hidden = rootView.fullscreen }
+	Connections {
+		target: rootView
+		function onFullscreenChanged() {
+			cursor.hidden = rootView.fullscreen;
+		}
+	}
 
 	// configure the image for best quality
 	asynchronous: true

@@ -17,8 +17,18 @@ Item {
 	focus: true
 
 	// show the controls when needed
-	Connections { target: rootView; onFullscreenChanged: controls.show() }
-	Connections { target: selection; onCurrentChanged: controls.show() }
+	Connections {
+		target: rootView
+		function onFullscreenChanged() {
+			controls.show();
+		}
+	}
+	Connections {
+		target: selection
+		function onCurrentChanged() {
+			controls.show();
+		}
+	}
 
 	// the media player
 	VideoOutput {
@@ -58,8 +68,8 @@ Item {
 		// when the root is resized, we need to make sure the media is correctly resized
 		Connections {
 			target: root
-			onWidthChanged: output.resize()
-			onHeightChanged: output.resize()
+			function onWidthChanged() { output.resize(); }
+			function onHeightChanged() { output.resize(); }
 		}
 
 	}

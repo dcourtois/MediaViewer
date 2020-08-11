@@ -36,7 +36,7 @@ Item {
 
 		// on fullscreen changes, reparent the media viewer and update
 		// the focus to have shortcuts working.
-		onFullscreenChanged: {
+		function onFullscreenChanged() {
 			if (rootView.fullscreen === true) {
 				mediaViewer.parent = mainWindow;
 				mediaViewer.forceActiveFocus();
@@ -70,7 +70,7 @@ Item {
 	// connect the media selection and the folder browser
 	Connections {
 		target: folderBrowser
-		onCurrentFolderPathChanged: selection.clear()
+		function onCurrentFolderPathChanged() { selection.clear(); }
 	}
 
 	// the preferences dialog

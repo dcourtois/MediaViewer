@@ -32,7 +32,7 @@ Rectangle {
 	// watch for setting changes
 	Connections {
 		target: settings
-		onSettingChanged: {
+		function onSettingChanged() {
 			switch (key) {
 				case "Media.SortBy":
 					selection.model.sortBy = value;
@@ -87,7 +87,7 @@ Rectangle {
 					// check selection change to update the background
 					Connections {
 						target: selection
-						onSelectionChanged: {
+						function onSelectionChanged() {
 							const selected = selection.isSelected(index);
 							thumbnailBackground.color = selected ? _highlight : _background;
 							label.item.color = selected ? _background : "black";
@@ -180,7 +180,9 @@ Rectangle {
 			Connections {
 				target: selection
 				enabled: rootView.fullscreen
-				onCurrentChanged: grid.currentIndex = selection.current.row
+				function onCurrentChanged() {
+					grid.currentIndex = selection.current.row;
+				}
 			}
 
 			// Mouse handling
