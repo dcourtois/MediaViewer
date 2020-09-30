@@ -1,5 +1,6 @@
-#include "MediaViewerPCH.h"
-#include "Job.h"
+#include "./Job.h"
+
+#include <QThreadPool>
 
 
 namespace MediaViewer

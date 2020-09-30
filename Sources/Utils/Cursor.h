@@ -1,5 +1,6 @@
-#ifndef __CURSOR_H__
-#define __CURSOR_H__
+#pragma once
+
+#include <QObject>
 
 
 //!
@@ -30,6 +31,3 @@ private:
 	bool m_Hidden;
 
 };
-
-
-#endif // __CURSOR_H__

@@ -1,6 +1,7 @@
-#include "MediaViewerPCH.h"
 #include "FolderIconProvider.h"
+
 #include "ImageResponse.h"
+#include "CppUtils/MemoryTracker.h"
 
 
 namespace MediaViewer

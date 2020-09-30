@@ -5,5 +5,5 @@
 	path = Libs/QtUtils
 	url = https://github.com/dcourtois/QtUtils.git
 [submodule "CMakeUtils"]
-	path = CMakeUtils
+	path = CMake/CMakeUtils
 	url = https://github.com/dcourtois/CMakeUtils.git

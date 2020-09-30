@@ -1,5 +1,6 @@
-#ifndef __THREAD_H__
-#define __THREAD_H__
+#pragma once
+
+#include <QRunnable>
 
 
 namespace MediaViewer
@@ -30,6 +31,3 @@ namespace MediaViewer
 	};
 
 } // namespace MediaViewer
-
-
-#endif // __THREAD_H__

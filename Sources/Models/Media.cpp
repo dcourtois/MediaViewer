@@ -1,6 +1,8 @@
-#include "MediaViewerPCH.h"
 #include "MediaModel.h"
+
 #include "Media.h"
+
+#include <QFileInfo>
 
 
 namespace MediaViewer

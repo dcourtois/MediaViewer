@@ -1,9 +1,16 @@
-#include "MediaViewerPCH.h"
 #include "FileSystem.h"
 
+#include "CppUtils/MemoryTracker.h"
+#include "QtUtils/Settings.h"
+
 #if defined(WINDOWS)
+#	include <windows.h>
 #	include <shellapi.h>
 #endif
+
+#include <QDebug>
+#include <QFileInfo>
+
 
 
 //!

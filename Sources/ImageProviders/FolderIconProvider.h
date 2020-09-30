@@ -1,5 +1,8 @@
-#ifndef IMAGE_PROVIDERS_FOLDER_ICON_PROVIDER_H
-#define IMAGE_PROVIDERS_FOLDER_ICON_PROVIDER_H
+#pragma once
+
+#include <QFileIconProvider>
+#include <QMutex>
+#include <QQuickAsyncImageProvider>
 
 
 namespace MediaViewer
@@ -30,6 +33,3 @@ namespace MediaViewer
 	};
 
 }
-
-
-#endif

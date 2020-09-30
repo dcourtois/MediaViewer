@@ -1,5 +1,11 @@
-#ifndef IMAGE_PROVIDERS_MEDIA_PREVIEW_PROVIDER_H
-#define IMAGE_PROVIDERS_MEDIA_PREVIEW_PROVIDER_H
+#pragma once
+
+#include <QAbstractVideoSurface>
+#include <QEventLoop>
+#include <QObject>
+#include <QQuickAsyncImageProvider>
+#include <QThreadPool>
+#include <QTime>
 
 
 namespace MediaViewer
@@ -111,6 +117,3 @@ namespace MediaViewer
 
 
 }
-
-
-#endif

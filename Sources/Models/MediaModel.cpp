@@ -1,6 +1,11 @@
-#include "MediaViewerPCH.h"
 #include "MediaModel.h"
+
 #include "Media.h"
+#include "CppUtils/MemoryTracker.h"
+#include "CppUtils/STLUtils.h"
+
+#include <QDir>
+#include <QQmlEngine>
 
 
 namespace MediaViewer

@@ -1,5 +1,7 @@
-#ifndef MODELS_MEDIA_H
-#define MODELS_MEDIA_H
+#pragma once
+
+#include <QDateTime>
+#include <QObject>
 
 
 namespace MediaViewer
@@ -89,6 +91,3 @@ namespace MediaViewer
 
 
 #include "Media.inl"
-
-
-#endif

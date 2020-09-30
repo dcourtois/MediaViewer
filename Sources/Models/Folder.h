@@ -1,5 +1,7 @@
-#ifndef MODELS_FOLDER_H
-#define MODELS_FOLDER_H
+#pragma once
+
+#include <QFileSystemWatcher>
+#include <QObject>
 
 
 namespace MediaViewer
@@ -76,6 +78,3 @@ namespace MediaViewer
 
 
 #include "Folder.inl"
-
-
-#endif

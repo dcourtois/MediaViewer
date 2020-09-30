@@ -1,8 +1,11 @@
-#include "MediaViewerPCH.h"
 #include "FolderModel.h"
+
+#include "CppUtils/MemoryTracker.h"
 #include "Folder.h"
 #include "Media.h"
 #include "Utils/Job.h"
+
+#include <QDir>
 
 
 namespace MediaViewer

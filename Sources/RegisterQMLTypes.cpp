@@ -1,9 +1,11 @@
-#include "MediaViewerPCH.h"
 #include "RegisterQMLTypes.h"
+
 #include "Models/FolderModel.h"
 #include "Models/Folder.h"
 #include "Models/MediaModel.h"
 #include "Models/Media.h"
+
+#include <QQmlEngine>
 
 
 namespace MediaViewer
@@ -29,4 +31,4 @@ namespace MediaViewer
 		qmlRegisterType< MediaModel >("MediaViewer", major, minor, "MediaModel");
 	}
 
-} // namespace MediaViewer
+}

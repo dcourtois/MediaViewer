@@ -1,5 +1,8 @@
-#ifndef IMAGE_PROVIDERS_IMAGE_RESPONSE_H
-#define IMAGE_PROVIDERS_IMAGE_RESPONSE_H
+#pragma once
+
+#include <QQuickImageResponse>
+#include <QRunnable>
+#include <QThreadPool>
 
 
 namespace MediaViewer
@@ -43,6 +46,3 @@ namespace MediaViewer
 	};
 
 }
-
-
-#endif

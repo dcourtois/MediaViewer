@@ -1,5 +1,7 @@
-#include "MediaViewerPCH.h"
-#include "Cursor.h"
+#include "./Cursor.h"
+
+#include <QGuiApplication>
+#include <QCursor>
 
 
 //!

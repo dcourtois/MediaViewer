@@ -1,5 +1,4 @@
-#ifndef MODELS_FOLDER_MODEL_INL
-#define MODELS_FOLDER_MODEL_INL
+#pragma once
 
 
 namespace MediaViewer
@@ -39,6 +38,3 @@ namespace MediaViewer
 	}
 
 }
-
-
-#endif

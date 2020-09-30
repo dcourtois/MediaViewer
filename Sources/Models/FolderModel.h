@@ -1,5 +1,7 @@
-#ifndef MODELS_FOLDER_MODEL_H
-#define MODELS_FOLDER_MODEL_H
+#pragma once
+
+#include <QAbstractItemModel>
+#include <QQmlListProperty>
 
 
 namespace MediaViewer
@@ -59,6 +61,3 @@ namespace MediaViewer
 
 
 #include "FolderModel.inl"
-
-
-#endif

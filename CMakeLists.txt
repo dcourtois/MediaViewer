@@ -6,34 +6,27 @@ cmake_minimum_required (VERSION 3.16)
 #
 # Project
 #
-project (MediaViewer)
+project (MediaViewer
+	VERSION 0.1.0
+	LANGUAGES CXX
+	DESCRIPTION "Multiplatform image viewer."
+)
 
 #
-# Configure Qt
+# Expose a few options to configure various things
 #
-set (QT_ROOT ${QT_ROOT} "C:/Development/Libs/Qt" "C:/Development/Libs/Qt/official" "D:/Development/Libs/Qt" "~/Development/Libs/Qt")
-set (QT_VERSIONS "5.15.0")
-set (QT_SUFFIX ${QT_SUFFIX} "install/lib/cmake" "msvc2019_64/lib/cmake" "msvc2017_64/lib/cmake" "gcc_64/lib/cmake" "clang_64/lib/cmake")
-set (QT_COMPONENTS Multimedia Qml Quick QuickControls2)
-set (QT_MIN_VERSION 5.12)
+option (WARNINGS_AS_ERRORS "If ON, warnings will be treated as errors during compilation. \
+This is the default, but you can set that to OFF if you're using a compiler which I haven't \
+tested and on which the project generates warnings." ON)
+option (USE_PRECOMPILED_HEADERS "ON by default. When using CMake version 3.16 or greater, \
+uses precompiled header to speed up compilation time." ON)
 
 #
-# Include our utility scripts
+# Setup CMake, Qt, load our utilities, etc.
 #
-include (CMakeUtils/Utils.cmake)
-include (CMakeUtils/Qt.cmake)
-
-#
-# totally remove warnings. This lets us set the warning level we want per target
-# without command lines complaining when we override the warning levels.
-#
-string (REGEX REPLACE "(/W[^ ]+)|(-W[123])" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-
-#
-# Auto moc and rcc
-#
-set (CMAKE_AUTOMOC ON)
-set (CMAKE_AUTORCC ON)
+include (CMake/Setup.cmake)
+include (CMake/CMakeUtils/Qt.cmake)
+include (CMake/CMakeUtils/Utils.cmake)
 
 #
 # Add QtUtils
@@ -80,8 +73,6 @@ add_executable (MediaViewer WIN32
 
 	# main stuff
 	Sources/Main.cpp
-	Sources/MediaViewerPCH.cpp
-	Sources/MediaViewerPCH.h
 	Sources/RegisterQMLTypes.cpp
 	Sources/RegisterQMLTypes.h
 )
@@ -89,12 +80,84 @@ add_executable (MediaViewer WIN32
 #
 # Application icon
 #
-target_set_app_icon (MediaViewer "Resources/Icons/MediaViewer.ico")
+target_set_app_icon (MediaViewer
+	"Resources/Icons/MediaViewer.ico"
+)
 
 #
 # Set the precompiled headers
+# Note that target_precompile_headers use the same compilation options as the target they are
+# added to. So, if any of the header you include in your pch generates any warning and you have
+# the poor taste or compiling warning as error, you have no way of making your pch build -_-
+# The only trick I found was to generate headers that are added before and after all the pch's
+# headers. In the first I disable all warnings using pragmas, in the second I re-enable them.
 #
-target_precompile_headers (MediaViewer PRIVATE "Sources/MediaViewerPCH.h")
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.16" AND USE_PRECOMPILED_HEADERS)
+	if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/pch_begin.h")
+		file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/pch_begin.h "
+			#if defined(WINDOWS)
+			#	pragma warning ( push , 0 )
+			#endif
+		")
+	endif ()
+	if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/pch_end.h")
+		file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/pch_end.h "
+			#if defined(WINDOWS)
+			#	pragma warning ( pop )
+			#endif
+		")
+	endif ()
+	target_precompile_headers (MediaViewer
+		PRIVATE
+			# header guard
+			"${CMAKE_CURRENT_BINARY_DIR}/pch_begin.h"
+			# Qt
+			<QAbstractVideoSurface>
+			<QApplication>
+			<QCommandLineParser>
+			<QDebug>
+			<QDir>
+			<QFile>
+			<QFileIconProvider>
+			<QFileInfo>
+			<QFileSystemWatcher>
+			<QIcon>
+			<QImage>
+			<QImageReader>
+			<QList>
+			<QMediaPlayer>
+			<QObject>
+			<QPainter>
+			<QPixmap>
+			<QQmlApplicationEngine>
+			<QQmlContext>
+			<QQmlExtensionPlugin>
+			<QQuickImageProvider>
+			<QQuickStyle>
+			<QRunnable>
+			<QSize>
+			<QString>
+			<QtDebug>
+			<QtQml>
+			<QVector>
+			<QWidget>
+			# STL
+			<algorithm>
+			<atomic>
+			<cctype>
+			<functional>
+			<thread>
+			# Platform stuff
+			$<$<PLATFORM_ID:Windows>:<Windows.h>>
+			# header guard
+			"${CMAKE_CURRENT_BINARY_DIR}/pch_end.h"
+			# Our own utililities
+			"Libs/CppUtils/MemoryTracker.h"
+			"Libs/CppUtils/STLUtils.h"
+			"Libs/QtUtils/Settings.h"
+			"Libs/QtUtils/Utils.h"
+	)
+endif ()
 
 #
 # c++17
@@ -130,6 +193,11 @@ target_link_libraries(MediaViewer
 #
 target_compile_definitions (MediaViewer
 	PRIVATE
+		# Application identification
+		ORGANIZATION_NAME="Citron"
+		APPLICATION_NAME="${CMAKE_PROJECT_NAME}$<$<CONFIG:Debug>:Debug>"
+		APPLICATION_VERSION="${CMAKE_PROJECT_VERSION}"
+
 		# Debug stuff
 		$<$<NOT:$<CONFIG:Release>>:MEMORY_CHECK=1>
 		$<$<NOT:$<CONFIG:Release>>:QT_QML_DEBUG>
@@ -154,6 +222,11 @@ target_compile_definitions (MediaViewer
 
 		# Disable some annoying warnings
 		$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
+
+		# To avoid including too many things from Windows headers
+		$<$<PLATFORM_ID:Windows>:VC_EXTRALEAN>
+		$<$<PLATFORM_ID:Windows>:WIN32_LEAN_AND_MEAN>
+		$<$<PLATFORM_ID:Windows>:NOMINMAX>
 )
 
 #
@@ -162,9 +235,9 @@ target_compile_definitions (MediaViewer
 target_compile_options (MediaViewer
 	PRIVATE
 		# Warning levels
-		$<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-		$<$<CXX_COMPILER_ID:Clang>:-Werror>
-		$<$<CXX_COMPILER_ID:GNU>:-Wall -Werror>
+		$<$<CXX_COMPILER_ID:MSVC>:/W4 $<$<BOOL:${WARNINGS_AS_ERRORS}>:/WX>>
+		$<$<CXX_COMPILER_ID:Clang>:-Wall $<$<BOOL:${WARNINGS_AS_ERRORS}>:-Werror>>
+		$<$<CXX_COMPILER_ID:GNU>:-Wall $<$<BOOL:${WARNINGS_AS_ERRORS}>:-Werror>>
 )
 
 #

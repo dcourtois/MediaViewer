@@ -1,5 +1,6 @@
-#ifndef UTILS_FILE_SYSTEM_H
-#define UTILS_FILE_SYSTEM_H
+#pragma once
+
+#include <QObject>
 
 
 //!
@@ -48,6 +49,3 @@ private:
 	QString m_TrashFolder;
 
 };
-
-
-#endif // UTILS_FILE_SYSTEM_H

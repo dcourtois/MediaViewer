@@ -1,9 +1,18 @@
-#include "MediaViewerPCH.h"
 #include "MediaPreviewProvider.h"
-#include "ImageResponse.h"
+
 #include "CppUtils/Hash.h"
+#include "CppUtils/MemoryTracker.h"
+#include "ImageResponse.h"
+#include "QtUtils/Settings.h"
 #include "Utils/Job.h"
 
+#include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QImageReader>
+#include <QMediaPlayer>
+#include <QRegularExpression>
+#include <QStandardPaths>
 
 namespace MediaViewer
 {

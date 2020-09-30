@@ -1,18 +1,20 @@
-#include "MediaViewerPCH.h"
-#include "RegisterQMLTypes.h"
 #include "ImageProviders/FolderIconProvider.h"
 #include "ImageProviders/MediaPreviewProvider.h"
+#include "QtUtils/QuickView.h"
+#include "QtUtils/Settings.h"
+#include "RegisterQMLTypes.h"
 #include "Utils/Cursor.h"
 #include "Utils/FileSystem.h"
-#include "QtUtils/QuickView.h"
 
+#include <QApplication>
+#include <QQmlContext>
+#include <QQuickStyle>
+#include <QDir>
+#include <QStandardPaths>
 
-// application information
-#define ORGANIZATION_NAME	"Citron"
-#define ORGANIZATION_DOMAIN	"pcitron.fr"
-#define APPLICATION_NAME	"MediaViewer"
-#define APPLICATION_VERSION	"0.1"
-
+// header-only libs implementations
+#define MEMORY_TRACKER_IMPLEMENTATION
+#include "CppUtils/MemoryTracker.h"
 
 // those are exposed to QML through QQmlContext::setContextProperty, which
 // does not take ownership, so we'll need to delete them we leaving the app.
@@ -196,7 +198,6 @@ int main(int argc, char *argv[])
 		// create the application
 		QApplication app(argc, argv);
 		app.setOrganizationName(ORGANIZATION_NAME);
-		app.setOrganizationDomain(ORGANIZATION_DOMAIN);
 		app.setApplicationName(APPLICATION_NAME);
 		app.setApplicationVersion(APPLICATION_VERSION);
 

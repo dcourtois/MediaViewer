@@ -1,5 +1,7 @@
-#ifndef MODELS_MEDIA_MODEL_H
-#define MODELS_MEDIA_MODEL_H
+#pragma once
+
+#include <QAbstractItemModel>
+#include <QFileSystemWatcher>
 
 
 namespace MediaViewer
@@ -116,6 +118,3 @@ namespace MediaViewer
 
 
 #include "MediaModel.inl"
-
-
-#endif
