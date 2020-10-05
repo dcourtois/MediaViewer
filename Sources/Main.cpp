@@ -23,33 +23,18 @@ static Cursor *			cursor			= nullptr;
 static FileSystem *		fileSystem		= nullptr;
 
 //!
-//! Disable custom log context
+//! Message handler used to redirect QML log, warnings, etc. to the debug output.
 //!
-bool g_DisableLogContext = false;
-
-//!
-//! Message handler. Since Qt 5.12.xx there is a fucking flood of warnings whenever you use a
-//! TreeView from QtQuick.Controls 1. And since there's not replacement in Controls 2, I'm
-//! stuck with this. So at least I can filter those.
-//!
-void MessageHandler(QtMsgType, const QMessageLogContext & context, const QString & message)
+void MessageHandler(QtMsgType, const QMessageLogContext &, const QString & message)
 {
 #if defined(QT_NO_DEBUG)
-	Q_UNUSED(context);
 	Q_UNUSED(message);
 #else
-	if (QString(context.file).contains("jsruntime") == false)
-	{
-		// customize our message, while we're at it...
-		const QString output = g_DisableLogContext ?
-			QString("%1%2").arg(message).arg(message.back() == '\n' ? "" : "\n") :
-			QString("MediaViewer: %1:%2 - %3%4").arg(context.file).arg(context.line).arg(message).arg(message.back() == '\n' ? "" : "\n");
 #	if defined(OutputDebugString)
-		OutputDebugStringA(qPrintable(output));
+	OutputDebugStringA(qPrintable(message.back() == '\n' ? message : message + '\n'));
 #	else
-		printf("%s", qPrintable(output));
+	printf("%s\n", qPrintable(message));
 #	endif
-	}
 #endif
 }
 
@@ -224,7 +209,6 @@ int main(int argc, char *argv[])
 	MT_DELETE settings;
 
 	// log memory leaks
-	g_DisableLogContext = true;
 	MT_SHUTDOWN(qDebug);
 
 	return code;
