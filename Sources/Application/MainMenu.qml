@@ -90,7 +90,7 @@ ToolBar {
 
 				Components.MenuItemEx {
 					text: "Paste"
-					enabled: fileSystem.canPaste && fileMenu._sourceFolder !== folderBrowser.currentFolderPath
+					enabled: fileSystem && fileSystem.canPaste && fileMenu._sourceFolder !== folderBrowser.currentFolderPath
 					sequence: StandardKey.Paste
 					onTriggered: fileSystem.paste(folderBrowser.currentFolderPath)
 				}

@@ -13,12 +13,10 @@ class FileSystem
 	Q_OBJECT
 
 	Q_PROPERTY(bool canPaste READ CanPaste NOTIFY canPasteChanged)
-	Q_PROPERTY(bool canTrash READ CanTrash NOTIFY canTrashChanged)
 
 signals:
 
 	void	canPasteChanged(bool value);
-	void	canTrashChanged(bool value);
 
 public:
 
@@ -35,7 +33,6 @@ private:
 
 	// private API
 	bool	CanPaste(void) const;
-	bool	CanTrash(void) const;
 	void	InitTrashFolder(void);
 	void	MoveToTrash(const QString & path);
 
@@ -44,8 +41,5 @@ private:
 
 	//! The list of cut files
 	QStringList m_CutFiles;
-
-	//! The trash folder
-	QString m_TrashFolder;
 
 };

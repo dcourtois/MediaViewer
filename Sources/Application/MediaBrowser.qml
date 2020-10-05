@@ -32,12 +32,12 @@ Rectangle {
 	// watch for setting changes
 	Connections {
 		target: settings
-		function onSettingChanged() {
+		function onSettingChanged(key, oldValue, value) {
 			switch (key) {
 				case "Media.SortBy":
 					selection.model.sortBy = value;
 					break;
-					
+
 				case "Media.SortOrder":
 					selection.model.sortOrder = value;
 					break;

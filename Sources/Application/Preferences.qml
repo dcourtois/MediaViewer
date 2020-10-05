@@ -80,14 +80,12 @@ Dialog {
 
 					// Delete permanently
 					Label {
-						enabled: fileSystem.canTrash
 						text: "Delete Permanently"
 						Layout.alignment: Qt.AlignRight
 					}
 					CheckBox {
 						id: deletePermanently
-						enabled: fileSystem.canTrash
-						checked: fileSystem.canTrash ? settings.get("FileSystem.DeletePermanently") : true
+						checked: settings.get("FileSystem.DeletePermanently")
 						onCheckedChanged: settings.set("FileSystem.DeletePermanently", checked)
 						ToolTip.delay: _tooltipDelay
 						ToolTip.visible: hovered

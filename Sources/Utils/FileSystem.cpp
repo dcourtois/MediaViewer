@@ -18,7 +18,6 @@
 //!
 FileSystem::FileSystem(void)
 {
-	this->InitTrashFolder();
 }
 
 //!
@@ -78,7 +77,7 @@ void FileSystem::paste(QString destination)
 void FileSystem::remove(QStringList paths)
 {
 	// check if we need to permanently delete
-	bool permanent = Settings::Get< bool >("FileSystem.DeletePermanently") || this->CanTrash() == false;
+	bool permanent = Settings::Get< bool >("FileSystem.DeletePermanently");
 	for (const QString & path : paths)
 	{
 		if (permanent == true)
@@ -105,119 +104,9 @@ bool FileSystem::CanPaste(void) const
 }
 
 //!
-//! Check if the system can move things to trash
-//!
-bool FileSystem::CanTrash(void) const
-{
-#if defined(LINUX)
-
-	// only supported if we found the trash location (see InitTrashFolder)
-	return m_TrashFolder.isEmpty() == false;
-
-#elif defined(WINDOWS)
-
-	// always supported
-	return true;
-
-#else
-	static_assert(false, "implement FileSystem::CanTrash for your platform");
-#endif
-}
-
-//!
-//! Initialize the trash folder
-//!
-void FileSystem::InitTrashFolder(void)
-{
-#if defined(LINUX)
-
-	// note: following https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
-	QVector< QString > trashes = {
-		QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.local/share/Trash",
-		QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.trash"
-	};
-	for (const QString & trash : trashes)
-	{
-		if (QDir(trash).exists() == true ||
-			QDir(trash + "/info").exists() == true ||
-			QDir(trash + "/files").exists() == true)
-		{
-			m_TrashFolder = trash;
-			emit canTrashChanged(true);
-			break;
-		}
-	}
-
-#elif defined(WINDOWS)
-
-	// nothing to do
-
-#else
-	static_assert(false, "implement FileSystem::InitTrash for your platform");
-#endif
-}
-
-//!
 //! Send a file to trash
 //!
 void FileSystem::MoveToTrash(const QString & path)
 {
-#if defined(LINUX)
-
-	// note: following https://specifications.freedesktop.org/trash-spec/trashspec-latest.html
-	// check that we can trash
-	if (m_TrashFolder.isEmpty() == true)
-	{
-		return;
-	}
-
-	// get a unique trash name
-	QString trashName = path.section('/', -1, -1);
-	int trashIndex = 0;
-	QString trashSuffix = ".trash000000";
-	while (QFile::exists(m_TrashFolder + "/files/" + trashName + trashSuffix) == true)
-	{
-		++trashIndex;
-		trashSuffix = QString(".trash%1").arg(trashIndex, 6, 10, QLatin1Char('0'));
-	}
-	trashName = trashName + trashSuffix;
-
-	// create the content of the file info
-	QString trashInfo = "[Trash Info]\n";
-	trashInfo += "Path=" + path + "\n";
-	trashInfo += "DeletionDate=" + QDateTime::currentDateTime().toString("YYYY-MM-DDThh:mm:ss") + "\n";
-
-	// move file
-	QFile file(path);
-	file.copy(m_TrashFolder + "/files/" + trashName);
-	file.remove();
-
-	// create info
-	QFile info(m_TrashFolder + "/info/" + trashName + ".trashinfo");
-	info.open(QIODevice::WriteOnly);
-	info.write(trashInfo.toUtf8());
-
-#elif defined(WINDOWS)
-
-	// convert the path
-	char * pStr = MT_NEW char [path.size() + 2];
-	memcpy(pStr, qPrintable(QString(path).replace('/', '\\')), path.size());
-	memset(pStr + path.size(), 0, 2);
-
-	// init the options
-	SHFILEOPSTRUCT fileOpt;
-	memset(&fileOpt, 0, sizeof(SHFILEOPSTRUCT));
-	fileOpt.wFunc	= FO_DELETE;
-	fileOpt.fFlags	= FOF_SILENT | FOF_NOERRORUI | FOF_NOCONFIRMATION | FOF_ALLOWUNDO;
-	fileOpt.pFrom	= pStr;
-
-	// recycle
-	SHFileOperation(&fileOpt);
-
-	// cleanup
-	MT_DELETE [] pStr;
-
-#else
-	static_assert(false, "implement FileSystem::MoveToTrash for your platform");
-#endif
+	QFile(path).moveToTrash();
 }
