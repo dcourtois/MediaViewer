@@ -12,9 +12,9 @@ Image {
 
 	// cursor hidden in fullscreen
 	Connections {
-		target: rootView
-		function onFullscreenChanged() {
-			cursor.hidden = rootView.fullscreen;
+		target: mainWindow
+		function onFullscreenViewChanged() {
+			cursor.hidden = mainWindow.fullscreenView;
 		}
 	}
 

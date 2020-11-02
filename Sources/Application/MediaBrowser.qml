@@ -1,8 +1,8 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import QtQuick.Controls 1.4 as Controls
-import QtQuick.Controls 2.2
-import QtQuick.Controls.Material 2.2
-import QtQuick.Layouts 1.2
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 import QtMultimedia 5.8
 import MediaViewer 0.1
 
@@ -14,12 +14,16 @@ Rectangle {
 	id: root
 
 	// externally set
-	property var selection
+	required property var mainWindow
+	required property var selection
+
+	// background
+	color: mainWindow.Material.background
 
 	// privates
 	property bool _controlDown: false
 	property bool _shiftDown: false
-	property color _highlight: Material.color(Material.LightBlue, Material.Shade300)
+	property color _highlight: mainWindow.highlight
 	property color _background: root.color
 	property int _thumbnailSize: settings.get("Media.ThumbnailSize")
 	property bool _showLabel: settings.get("Media.ShowLabel")
@@ -165,7 +169,7 @@ Rectangle {
 			// notify the selection manager that the index changed. In fullscreen, do nothing since it's
 			// the media viewer which controls things
 			onCurrentIndexChanged: {
-				if (rootView.fullscreen === false) {
+				if (mainWindow.fullscreenView === false) {
 					if (_controlDown === true) {
 						selection.toggleSelection(grid.currentIndex);
 					} else if (_shiftDown === true) {
@@ -179,7 +183,7 @@ Rectangle {
 			// update the view's current item when the selection manager's current index changed
 			Connections {
 				target: selection
-				enabled: rootView.fullscreen
+				enabled: mainWindow.fullscreenView
 				function onCurrentChanged() {
 					grid.currentIndex = selection.current.row;
 				}
@@ -213,14 +217,14 @@ Rectangle {
 
 					// middle click, toggle fullscreen
 					if (selection.currentMedia && mouse.button === Qt.MiddleButton) {
-						rootView.fullscreen = true;
+						mainWindow.fullscreenView = true;
 					}
 				}
 
 				// toggle fullscreen
 				onDoubleClicked: {
 					if (selection.currentMedia) {
-						rootView.fullscreen = true;
+						mainWindow.fullscreenView = true;
 					}
 				}
 			}
@@ -255,7 +259,7 @@ Rectangle {
 					break;
 				case Qt.Key_Enter:
 				case Qt.Key_Return:
-					rootView.fullscreen = true;
+					mainWindow.fullscreenView = true;
 					break;
 			}
 		}

@@ -1,18 +1,25 @@
-import QtQuick 2.12
-import QtQuick.Controls 1.4
-import QtQuick.Layouts 1.12
+import QtQuick 2.15
+import QtQuick.Controls 1.4 as Controls
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 import MediaViewer 0.1
 
 
 //
 // The main window
 //
-Item {
+FramelessWindow {
 	id: mainWindow
+
+	// get a few colors
+	readonly property color highlight: Material.accent
+
+	// true when the application is viewing a single media
+	property bool fullscreenView: false
 
 	// initialize
 	Component.onCompleted: {
-
 		// select the initial folder
 		if (initFolder !== "") {
 			folderBrowser.currentFolderPath = initFolder;
@@ -22,29 +29,44 @@ Item {
 		if (initMedia !== "") {
 			selection.selectByPath(initMedia);
 			if (selection.currentMedia) {
-				rootView.fullscreen = true;
+				fullscreenView = true;
 			} else {
 				console.log(`initial media ${initMedia} not found`);
 			}
 		}
-
 	}
 
-	// reparent the mediaviewer on fullscreen state change
-	Connections {
-		target: rootView
+	// backups
+	property var backup: QtObject {
+		property int headerHeight
+		property bool maximized
+	}
 
-		// on fullscreen changes, reparent the media viewer and update
-		// the focus to have shortcuts working.
-		function onFullscreenChanged() {
-			if (rootView.fullscreen === true) {
-				mediaViewer.parent = mainWindow;
-				mediaViewer.forceActiveFocus();
-			} else {
-				cursor.hidden = false;
-				mediaViewer.parent = mediaViewerContainer;
-				mediaBrowser.forceFocus();
-			}
+	// on fullscreen view change, update the layout
+	onFullscreenViewChanged: {
+		if (fullscreenView === true) {
+			// first, go to maximized
+			backup.maximized = rootView.maximized;
+			rootView.maximized = true;
+
+			// disable the header
+			backup.headerHeight = headerHeight;
+			headerHeight = 0;
+
+			// reparent the media viewer and give it focus
+			mediaViewer.parent = mainContainer;
+			mediaViewer.forceActiveFocus();
+		} else {
+			// restore the states
+			rootView.maximized = backup.maximized;
+			headerHeight = backup.headerHeight;
+
+			// show the cursor
+			cursor.hidden = false;
+
+			// reparent the media viewer and give focus to the media browser
+			mediaViewer.parent = mediaViewerContainer;
+			mediaBrowser.forceFocus();
 		}
 	}
 
@@ -76,53 +98,67 @@ Item {
 	// the preferences dialog
 	Preferences {
 		id: preferences
+		mainWindow: mainWindow
 		mediaBrowser: mediaBrowser
 		x: (mainWindow.width - width) / 2
 		y: (mainWindow.height - height) / 2
+		Material.theme: mainWindow.Material.theme
+		Material.accent: mainWindow.Material.accent
 	}
 
-	//
-	ColumnLayout {
+	// the main menu
+	menu: MainMenu {
+		id: menu
+		selection: selection
+		preferences: preferences
+	}
+
+	// application title
+	title: Label {
+		id: title
+		text: selection.currentMedia !== undefined ? `MediaViewer - ${selection.currentMedia.name}` : "MediaViewer"
 		anchors.fill: parent
-		spacing: 0
+		horizontalAlignment: Text.AlignHCenter
+		verticalAlignment: Text.AlignVCenter
+	}
 
-		// Menu
-		MainMenu {
-			Layout.fillWidth: true
-			selection: selection
-			preferences: preferences
-		}
+	// main split view (between the media browsers on the right and the folder + preview on the left)
+	// note that the root Item is used to reparent the media viewer because we can't parent to a placeholder directly.
+	content: Item {
+		id: mainContainer
+		anchors.fill: parent
 
-		// The split between the media preview and folder browser on the left,
-		// and the media browser on the right
-		SplitView {
-			Layout.fillWidth: true
-			Layout.fillHeight: true
+		Controls.SplitView {
+			id: horizontalSplit
+			anchors.fill: parent
 			orientation: Qt.Horizontal
 
 			// split between the folders and the media preview
-			SplitView {
+			Controls.SplitView {
+				id: verticalSplit
 				orientation: Qt.Vertical
 
 				// folder view
 				FolderBrowser {
 					id: folderBrowser
 					Layout.fillHeight: true
+					mainWindow: mainWindow
 					model: folderModel
 				}
 
 				// media preview
 				Item {
 					id: mediaViewerContainer
-					width: settings.get("MediaView.Preview.Width", 300)
-					height: settings.get("MediaView.Preview.Height", 300)
+					width: settings.get("MediaView.Preview.Width", 400)
+					height: settings.get("MediaView.Preview.Height", 500)
 
 					onWidthChanged: settings.set("MediaView.Preview.Width", width)
 					onHeightChanged: settings.set("MediaView.Preview.Height", height)
 
 					MediaViewer {
 						id: mediaViewer
-						color: Qt.rgba(0, 0, 0, 1);
+						color: Qt.rgba(0, 0, 0, 1)
+						mainWindow: mainWindow
 						selection: selection
 					}
 				}
@@ -132,9 +168,9 @@ Item {
 			MediaBrowser {
 				id: mediaBrowser
 				Layout.fillWidth: true
+				mainWindow: mainWindow
 				selection: selection
 			}
 		}
 	}
-
 }

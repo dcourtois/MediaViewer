@@ -1,6 +1,7 @@
-import QtQuick 2.7
-import QtQuick.Controls 2.2
-import QtQuick.Layouts 1.3
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 import Qt.labs.platform 1.0 as PlatformDialog
 import MediaViewer 0.1
 
@@ -14,7 +15,8 @@ Dialog {
 	height: 500
 
 	// externally set
-	property var mediaBrowser
+	required property var mainWindow
+	required property var mediaBrowser
 
 	// private properties
 	property int _tooltipDelay: 750
@@ -36,6 +38,11 @@ Dialog {
 			TabButton {
 				width: column.width / bar.contentChildren.length
 				text: "Interface"
+			}
+
+			TabButton {
+				width: column.width / bar.contentChildren.length
+				text: "Theme"
 			}
 
 			TabButton {
@@ -67,7 +74,6 @@ Dialog {
 						Layout.alignment: Qt.AlignRight
 					}
 					CheckBox {
-						id: restoreLastVisitedFolder
 						checked: settings.get("General.RestoreLastVisitedFolder", true)
 						onCheckedChanged: settings.set("General.RestoreLastVisitedFolder", checked)
 						ToolTip.delay: _tooltipDelay
@@ -84,7 +90,6 @@ Dialog {
 						Layout.alignment: Qt.AlignRight
 					}
 					CheckBox {
-						id: deletePermanently
 						checked: settings.get("FileSystem.DeletePermanently")
 						onCheckedChanged: settings.set("FileSystem.DeletePermanently", checked)
 						ToolTip.delay: _tooltipDelay
@@ -116,7 +121,6 @@ Dialog {
 						Layout.alignment: Qt.AlignRight
 					}
 					ComboBox {
-						id: sortBy
 						Layout.minimumWidth: 150
 						model: [
 							"Name",
@@ -141,7 +145,6 @@ Dialog {
 						Layout.alignment: Qt.AlignRight
 					}
 					ComboBox {
-						id: sortOrder
 						Layout.minimumWidth: 150
 						model: [
 							"Ascending",
@@ -179,7 +182,6 @@ Dialog {
 						Layout.alignment: Qt.AlignRight
 					}
 					CheckBox {
-						id: showLabel
 						checked: settings.get("Media.ShowLabel", true)
 						onCheckedChanged: settings.set("Media.ShowLabel", checked)
 						ToolTip.delay: _tooltipDelay
@@ -187,6 +189,95 @@ Dialog {
 						ToolTip.text: {
 							return	"If checked, will display the name of the medias under\n" +
 									"the thumbnails in the media browser view.";
+						}
+					}
+
+				}
+			}
+
+			// theme options
+			Item {
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+
+				GridLayout {
+					anchors.centerIn: parent
+					columns: 2
+					columnSpacing: 10
+					rowSpacing: 10
+
+					Label {
+						text: "Theme"
+						Layout.alignment: Qt.AlignRight
+					}
+					ComboBox {
+						Layout.minimumWidth: 200
+						model: [
+							"Light",
+							"Dark"
+						]
+						currentIndex: settings.get("Theme.Theme", 0)
+						onCurrentIndexChanged: {
+							settings.set("Theme.Theme", currentIndex);
+							switch (currentIndex) {
+								case 0:		mainWindow.Material.theme = Material.Light;		break;
+								case 1:		mainWindow.Material.theme = Material.Dark;		break;
+							}
+						}
+					}
+
+					Label {
+						text: "Accent Color"
+						Layout.alignment: Qt.AlignRight
+					}
+					ComboBox {
+						id: accent
+						Layout.minimumWidth: 200
+						model: [
+							"Red",
+							"Pink",
+							"Purple",
+							"DeepPurple",
+							"Indigo",
+							"Blue",
+							"LightBlue",
+							"Cyan",
+							"Teal",
+							"Green",
+							"LightGreen",
+							"Lime",
+							"Yellow",
+							"Amber",
+							"Orange",
+							"DeepOrange",
+							"Brown",
+							"Grey",
+							"BlueGrey"
+						]
+						currentIndex: settings.get("Theme.Accent", 14)
+						onCurrentIndexChanged: {
+							settings.set("Theme.Accent", currentIndex);
+							switch (currentIndex) {
+								case 0:		mainWindow.Material.accent = Material.Red;			break;
+								case 1:		mainWindow.Material.accent = Material.Pink;			break;
+								case 2:		mainWindow.Material.accent = Material.Purple;		break;
+								case 3:		mainWindow.Material.accent = Material.DeepPurple;	break;
+								case 4:		mainWindow.Material.accent = Material.Indigo;		break;
+								case 5:		mainWindow.Material.accent = Material.Blue;			break;
+								case 6:		mainWindow.Material.accent = Material.LightBlue;	break;
+								case 7:		mainWindow.Material.accent = Material.Cyan;			break;
+								case 8:		mainWindow.Material.accent = Material.Teal;			break;
+								case 9:		mainWindow.Material.accent = Material.Green;		break;
+								case 10:	mainWindow.Material.accent = Material.LightGreen;	break;
+								case 11:	mainWindow.Material.accent = Material.Lime;			break;
+								case 12:	mainWindow.Material.accent = Material.Yellow;		break;
+								case 13:	mainWindow.Material.accent = Material.Amber;		break;
+								case 14:	mainWindow.Material.accent = Material.Orange;		break;
+								case 15:	mainWindow.Material.accent = Material.DeepOrange;	break;
+								case 16:	mainWindow.Material.accent = Material.Brown;		break;
+								case 17:	mainWindow.Material.accent = Material.Grey;			break;
+								case 18:	mainWindow.Material.accent = Material.BlueGrey;		break;
+							}
 						}
 					}
 

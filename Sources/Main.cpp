@@ -27,7 +27,7 @@ static FileSystem *		fileSystem		= nullptr;
 //!
 void MessageHandler(QtMsgType, const QMessageLogContext &, const QString & message)
 {
-#if defined(QT_NO_DEBUG)
+#if defined(RELEASE)
 	Q_UNUSED(message);
 #else
 #	if defined(OutputDebugString)
@@ -39,52 +39,10 @@ void MessageHandler(QtMsgType, const QMessageLogContext &, const QString & messa
 }
 
 //!
-//! Set the application engine with our main QML file
+//! Helper used to get the root directories
 //!
-void Setup(QApplication & app, QuickView & view)
+QVariantList GetRootDrives(void)
 {
-	// register QML types
-	MediaViewer::RegisterQMLTypes();
-
-	// the settings. These need to be created first since some other parts of the
-	// code will check them to initialize correctly
-	settings = MT_NEW Settings;
-	settings->Init("FileSystem.DeletePermanently",			false);
-	settings->Init("General.RestoreLastVisitedFolder",		true);
-	settings->Init("General.LastVisitedFolder",				QString(""));
-	settings->Init("Media.SortBy",							0);
-	settings->Init("Media.SortOrder",						0);
-	settings->Init("Media.ThumbnailSize",					170);
-	settings->Init("Media.ShowLabel",						true);
-	settings->Init("Slideshow.Loop",						true);
-	settings->Init("Slideshow.Selection",					true);
-	settings->Init("Slideshow.Delay",						2000);
-	settings->Init("Movie.Fullscreen",						true);
-	settings->Init("Movie.Loop",							0);
-	settings->Init("Movie.Muted",							true);
-	settings->Init("Movie.Volume",							0.5);
-	settings->Init("MediaPreviewProvider.UseCache",			true);
-	settings->Init("MediaPreviewProvider.CachePath",		MediaViewer::MediaPreviewProvider::DefaultCachePath());
-
-	// create data that's shared with QML
-	auto * mediaProvider	= MT_NEW MediaViewer::MediaPreviewProvider;
-	cursor					= MT_NEW Cursor;
-	fileSystem				= MT_NEW FileSystem;
-
-	// set the image provider for the folders
-	QQmlEngine & engine = *view.engine();
-	engine.addImageProvider("FolderIcon", MT_NEW MediaViewer::FolderIconProvider);
-	engine.addImageProvider("MediaPreview", mediaProvider);
-
-	// set a few global QML helpers
-	engine.rootContext()->setContextProperties({
-		{ "settings",		QVariant::fromValue(settings) },
-		{ "cursor",			QVariant::fromValue(cursor) },
-		{ "fileSystem",		QVariant::fromValue(fileSystem) },
-		{ "mediaProvider",	QVariant::fromValue(mediaProvider) },
-		{ "rootView",		QVariant::fromValue(&view) }
-	});
-
 	// expose the list of drives to QML
 	QVariantList drives;
 #if defined(WINDOWS)
@@ -126,7 +84,60 @@ void Setup(QApplication & app, QuickView & view)
 #else
 	static_assert(false, "initialize drives for your platform");
 #endif
-	engine.rootContext()->setContextProperty("drives", drives);
+
+	return drives;
+}
+
+//!
+//! Set the application engine with our main QML file
+//!
+void Setup(QApplication & app, QuickView & view)
+{
+	view.setDefaultAlphaBuffer(true);
+	view.setColor(Qt::transparent);
+
+	// register QML types
+	MediaViewer::RegisterQMLTypes();
+
+	// the settings. These need to be created first since some other parts of the
+	// code will check them to initialize correctly
+	settings = MT_NEW Settings;
+	settings->Init("FileSystem.DeletePermanently",			false);
+	settings->Init("General.RestoreLastVisitedFolder",		true);
+	settings->Init("General.LastVisitedFolder",				QString(""));
+	settings->Init("Media.SortBy",							0);
+	settings->Init("Media.SortOrder",						0);
+	settings->Init("Media.ThumbnailSize",					200);
+	settings->Init("Media.ShowLabel",						true);
+	settings->Init("Slideshow.Loop",						true);
+	settings->Init("Slideshow.Selection",					true);
+	settings->Init("Slideshow.Delay",						2000);
+	settings->Init("Movie.Fullscreen",						true);
+	settings->Init("Movie.Loop",							0);
+	settings->Init("Movie.Muted",							true);
+	settings->Init("Movie.Volume",							0.5);
+	settings->Init("MediaPreviewProvider.UseCache",			true);
+	settings->Init("MediaPreviewProvider.CachePath",		MediaViewer::MediaPreviewProvider::DefaultCachePath());
+
+	// create data that's shared with QML
+	auto * mediaProvider	= MT_NEW MediaViewer::MediaPreviewProvider;
+	cursor					= MT_NEW Cursor;
+	fileSystem				= MT_NEW FileSystem;
+
+	// set the image provider for the folders
+	QQmlEngine & engine = *view.engine();
+	engine.addImageProvider("FolderIcon", MT_NEW MediaViewer::FolderIconProvider);
+	engine.addImageProvider("MediaPreview", mediaProvider);
+
+	// set a few global QML helpers
+	engine.rootContext()->setContextProperties({
+		{ "settings",		QVariant::fromValue(settings) },
+		{ "cursor",			QVariant::fromValue(cursor) },
+		{ "fileSystem",		QVariant::fromValue(fileSystem) },
+		{ "mediaProvider",	QVariant::fromValue(mediaProvider) },
+		{ "rootView",		QVariant::fromValue(&view) },
+		{ "drives",			GetRootDrives() },
+	});
 
 	// open the initial folder / media
 	QStringList args = app.arguments();
@@ -157,18 +168,11 @@ void Setup(QApplication & app, QuickView & view)
 		engine.rootContext()->setContextProperty("initFolder", "");
 	}
 
-	// configure the view
-	view.SetPersistence(
-		QuickView::PersistenceFlags::Maximized |
-		QuickView::PersistenceFlags::Position |
-		QuickView::PersistenceFlags::Size
-	);
-
 	// set the source
 	view.setSource(QUrl("qrc:/Main.qml"));
 
 	// and restore
-	view.Restore(1000, 750, QWindow::Visibility::Windowed);
+	view.Restore(1600, 900, QWindow::Visibility::Windowed);
 	view.raise();
 	view.requestActivate();
 }

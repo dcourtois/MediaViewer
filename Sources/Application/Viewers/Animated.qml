@@ -12,9 +12,9 @@ AnimatedImage {
 
 	// cursor hidden in fullscreen
 	Connections {
-		target: rootView
-		function onFullscreenChanged() {
-			cursor.hidden = rootView.fullscreen;
+		target: mainWindow
+		function onFullscreenViewChanged(fullscreenView) {
+			cursor.hidden = fullscreenView;
 		}
 	}
 

@@ -17,23 +17,24 @@ Rectangle {
 	anchors.fill: parent
 
 	// externally set
-	property var selection
+	required property var mainWindow
+	required property var selection
 
 	// default mouse handling
 	MouseArea {
 		anchors.fill: parent
-		enabled: rootView.fullscreen
+		enabled: mainWindow.fullscreenView
 		acceptedButtons: Qt.LeftButton | Qt.MiddleButton
 
 		// middle button click, toggle fullscreen
 		onClicked: {
 			if (mouse.button === Qt.MiddleButton) {
-				rootView.fullscreen = !rootView.fullscreen;
+				mainWindow.fullscreenView = !mainWindow.fullscreenView;
 			}
 		}
 
 		// double click: exit fullscreen
-		onDoubleClicked: rootView.fullscreen = false
+		onDoubleClicked: mainWindow.fullscreenView = false
 
 		// mouse wheel, image navigation
 		onWheel: {
@@ -48,7 +49,7 @@ Rectangle {
 	// default key handling
 	Keys.onPressed: {
 		// this should not happen
-		if (rootView.fullscreen === false) {
+		if (mainWindow.fullscreenView === false) {
 			return;
 		}
 
@@ -72,14 +73,14 @@ Rectangle {
 			case Qt.Key_Enter:
 				event.accepted = true;
 				if (selection.currentMedia) {
-					rootView.fullscreen = !rootView.fullscreen;
+					mainWindow.fullscreenView = !mainWindow.fullscreenView;
 				}
 				break;
 
 			// escape goes back to preview
 			case Qt.Key_Escape:
 				event.accepted = true;
-				rootView.fullscreen = false;
+				mainWindow.fullscreenView = false;
 				break;
 
 			// default, froward to the viewer
@@ -94,6 +95,7 @@ Rectangle {
 	Component {
 		id: animated
 		Viewers.Animated {
+			property var mainWindow: root.mainWindow
 			readonly property var mediaType: Media.Animated
 			source: "file:///" + selection.currentMedia.path
 		}
@@ -103,6 +105,7 @@ Rectangle {
 	Component {
 		id: image
 		Viewers.Image {
+			property var mainWindow: root.mainWindow
 			readonly property var mediaType: Media.Image
 			source: "file:///" + selection.currentMedia.path
 		}
@@ -112,6 +115,7 @@ Rectangle {
 	Component {
 		id: movie
 		Viewers.Movie {
+			property var mainWindow: root.mainWindow
 			readonly property var mediaType: Media.Movie
 			source: "file:///" + selection.currentMedia.path
 		}

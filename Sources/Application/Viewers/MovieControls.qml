@@ -55,7 +55,7 @@ Rectangle {
 
 	// handle the cursor
 	onEnabledChanged: {
-		if (rootView.fullscreen === true) {
+		if (mainWindow.fullscreenView === true) {
 			cursor.hidden = enabled === false;
 		}
 	}
@@ -161,7 +161,7 @@ Rectangle {
 					id: volumeIcon
 					sourceSize { width: root.iconSize; height: root.iconSize }
 					opacity: player.muted ? 0.2 : 1
-					source: player.muted ? "qrc:/Icons/Mute" :  "qrc:/Icons/Sound"
+					source: player.muted ? "qrc:/Icons/Mute" : "qrc:/Icons/Sound"
 					MouseArea {
 						anchors.fill: parent
 						acceptedButtons: Qt.LeftButton

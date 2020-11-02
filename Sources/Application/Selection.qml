@@ -7,7 +7,7 @@ import MediaViewer 0.1
 //
 Item {
 	// externally set
-	property var model
+	required property var model
 
 	// selection
 	property var current: { valid: false }

@@ -12,6 +12,9 @@ import QtQml.Models 2.2
 Controls.TreeView {
 	id: root
 
+	// externally set
+	required property var mainWindow
+
 	// The currently selected path
 	property string currentFolderPath: ""
 
@@ -48,11 +51,13 @@ Controls.TreeView {
 	//
 
 	// Colors
-	property color selectedColor: Material.color(Material.LightBlue, Material.Shade300)
-	property color evenColor: Qt.rgba(1, 1, 1, 1)
-	property color oddColor: Qt.rgba(0.96, 0.96, 0.96, 1)
+	property color foreground: mainWindow.Material.foreground
+	property color selectedColor: mainWindow.Material.accent
+	property color evenColor: mainWindow.Material.background
+	property color oddColor: mainWindow.Material.theme === Material.Dark ? Qt.lighter(evenColor) : Qt.darker(evenColor, 0.1)
 
-	// Don't need the headers
+	// don't need the header, and don't display the background (it's not themed to Material)
+	backgroundVisible: false
 	headerVisible: false
 
 	// The selection model
@@ -112,6 +117,7 @@ Controls.TreeView {
 				anchors.right: delegateMediaCount.visible ? delegateMediaCount.left : parent.right
 				anchors.rightMargin: 5
 				elide: Text.ElideRight
+				color: styleData.selected ? root.evenColor : root.foreground
 				text: folder ? folder.name : ""
 			}
 
