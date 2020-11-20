@@ -10,7 +10,7 @@
 #
 # -DQT_ROOT=<path> : make this point to the lib/cmake folder of your Qt installation.
 #
-set (QT_VERSIONS ${QT_VERSIONS} "install" "official/5.15.1")
+set (QT_VERSIONS ${QT_VERSIONS} "install" "official/5.15.2" "official/5.15.1")
 set (QT_ROOT ${QT_ROOT} "C:/Development/Libs/Qt" "D:/Development/Libs/Qt" "~/Development/Libs/Qt" )
 set (QT_SUFFIX ${QT_SUFFIX} "lib/cmake" "msvc2019_64/lib/cmake")
 set (QT_COMPONENTS Multimedia Network Qml Quick QuickControls2 Svg Xml)
